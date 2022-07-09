@@ -21,14 +21,16 @@ public class Logger
                 Console.ForegroundColor = ConsoleColor.Yellow;
                 break;
             case LogSeverity.Info:
-                Console.ForegroundColor = ConsoleColor.White;
+                Console.ForegroundColor = ConsoleColor.Cyan;
                 break;
             case LogSeverity.Verbose:
+                Console.ForegroundColor = ConsoleColor.Green;
+                break;
             case LogSeverity.Debug:
                 Console.ForegroundColor = ConsoleColor.DarkGray;
                 break;
         }
-        Console.WriteLine($"{DateTime.Now,-19} [{message.Severity,8}] {message.Source}: {message.Message} {message.Exception}");
+        Console.WriteLine($"{DateTime.Now.ToString("MM/dd/yyyy hh:mm:ss.fff tt")} [{message.Severity}] {message.Source}: {message.Message} {message.Exception}");
         Console.ResetColor();
         
         // If you get an error saying 'CompletedTask' doesn't exist,
