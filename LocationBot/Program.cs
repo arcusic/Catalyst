@@ -9,7 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 var config = new ConfigurationBuilder()
-    .AddJsonFile($"appsettings.json")
+    .AddJsonFile("/Users/arcusic/Documents/GitHub/LocationBot/LocationBot/appsettings.json")
     .AddEnvironmentVariables()
     .Build();
 var client = new DiscordShardedClient();
