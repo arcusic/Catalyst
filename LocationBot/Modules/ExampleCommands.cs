@@ -15,6 +15,9 @@ public class ExampleCommands : ModuleBase<ShardedCommandContext>
         var whiteCheckMark = new Emoji("\u2705");
         await Logger.Log(LogSeverity.Verbose, "CommandReceived", $"{Context.User.Username} has invoked !hello from the {Context.Channel.Name} channel.");
         
+        await Context.Message.AddReactionAsync(whiteCheckMark);
+        await Logger.Log(LogSeverity.Verbose, "MessageAcknowledged", $"Reacted with :white_check_mark: to {Context.User.Username}'s message.");
+        
         await Context.Message.ReplyAsync($"Hello {Context.User.Username}. Nice to meet you!");
         await Logger.Log(LogSeverity.Verbose, "ResponseSent", $"'Hello { Context.User.Username}. Nice to meet you!' in the {Context.Channel.Name} channel.");
     }
