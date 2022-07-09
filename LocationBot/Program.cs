@@ -17,7 +17,10 @@ var config = new ConfigurationBuilder()
 
 // Initialize Azure KeyVault
 var secretClient = new SecretClient(new Uri($"https://{config.GetRequiredSection("KeyVault")["KeyVaultName"]}.vault.azure.net"), new ClientSecretCredential(config.GetRequiredSection("KeyVault")["AzureADTennantId"], config.GetRequiredSection("KeyVault")["AzureADClientId"], config.GetRequiredSection("KeyVault")["AzureADClientSecret"]));
+await Logger.Log(LogSeverity.Debug, "SecretClientConfigured", $"Configured Azure Key Vault client to connect to {secretClient.VaultUri}.");
+
 var token = secretClient.GetSecret(config.GetRequiredSection("KeyVault")["SecretName"]);
+await Logger.Log(LogSeverity.Debug, "AuthTokenObtained", $"Successfully obtained token from Azure Key Vault. Secret ID: {token.Value.Id}");
 
 var client = new DiscordShardedClient();
 
@@ -57,7 +60,10 @@ async Task MainAsync()
     }
 
     await client.LoginAsync(TokenType.Bot, token.Value.Value);
+    await Logger.Log(LogSeverity.Debug, $"Client{client.LoginState}", $"Discord Presence: {client.Status}.");
+    
     await client.StartAsync();
+    await Logger.Log(LogSeverity.Debug, $"ClientReady", $"Client is connected to Discord.");
 
     // Wait infinitely so your bot actually stays connected.
     await Task.Delay(Timeout.Infinite);
