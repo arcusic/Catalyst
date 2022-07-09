@@ -1,4 +1,5 @@
-﻿// See https://aka.ms/new-console-template for more information
+﻿using Azure.Identity;
+using Azure.Security.KeyVault.Secrets;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
@@ -8,12 +9,17 @@ using LocationBot.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
+// Initialize Local Configuration File
 var config = new ConfigurationBuilder()
-    .AddJsonFile("/Users/arcusic/Documents/GitHub/LocationBot/LocationBot/appsettings.json")
+    .AddJsonFile("appsettings.json")
     .AddEnvironmentVariables()
     .Build();
-var client = new DiscordShardedClient();
 
+// Initialize Azure KeyVault
+var secretClient = new SecretClient(new Uri($"https://{config.GetRequiredSection("KeyVault")["KeyVaultName"]}.vault.azure.net"), new ClientSecretCredential(config.GetRequiredSection("KeyVault")["AzureADTennantId"], config.GetRequiredSection("KeyVault")["AzureADClientId"], config.GetRequiredSection("KeyVault")["AzureADClientSecret"]));
+var token = secretClient.GetSecret(config.GetRequiredSection("KeyVault")["SecretName"]);
+
+var client = new DiscordShardedClient();
 
 var commands = new CommandService(new CommandServiceConfig
 {
@@ -43,15 +49,14 @@ async Task MainAsync()
         await Logger.Log(LogSeverity.Info, "ShardReady", $"Shard Number {shard.ShardId} is connected and ready!");
     };
 
-    // Login and connect.
-    var token = config.GetRequiredSection("Settings")["DiscordBotToken"];
-    if (string.IsNullOrWhiteSpace(token))
+    // Login and connect.    
+    if (string.IsNullOrWhiteSpace(token.Value.Value))
     {
         await Logger.Log(LogSeverity.Error, $"{nameof(Program)} | {nameof(MainAsync)}", "Token is null or empty.");
         return;
     }
 
-    await client.LoginAsync(TokenType.Bot, token);
+    await client.LoginAsync(TokenType.Bot, token.Value.Value);
     await client.StartAsync();
 
     // Wait infinitely so your bot actually stays connected.
