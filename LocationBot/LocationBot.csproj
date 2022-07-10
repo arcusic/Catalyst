@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <None Remove="Discord.Net" />
+    <None Remove="Lextm.SharpSnmpLib" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Azure.Identity" Version="1.6.0" />
@@ -19,6 +20,7 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="6.0.1" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
+    <PackageReference Include="Lextm.SharpSnmpLib" Version="12.4.0" />
   </ItemGroup>
   <ItemGroup>
     <None Update="appsettings.json">
