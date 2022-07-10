@@ -9,6 +9,7 @@ using Discord.Commands;
 using Lextm.SharpSnmpLib;
 using Lextm.SharpSnmpLib.Messaging;
 using LocationBot.Common;
+using SpeedTest.Net;
 using RunMode = Discord.Commands.RunMode;
 
 namespace LocationBot.Modules;
@@ -152,12 +153,21 @@ public class Utilities : ModuleBase<ShardedCommandContext>
         //    ((AutoResetEvent)e.UserState).Set();
         //}
 
-        await Context.Message.ReplyAsync($"__**Network Enclosure Health Report:**__" +
-            $"__*Environemnt Information:*__" +
+        var speed = await FastClient.GetDownloadSpeed(SpeedTest.Net.Enums.SpeedTestUnit.MegaBitsPerSecond);
+        await Logger.Log(LogSeverity.Debug, "SpeedTestServer", $"SpeedTest has completed. Download Speed ({speed.Source}): {speed.Speed} {speed.Unit}");
+
+        await Context.Message.ReplyAsync($"__**Network Enclosure Health Report:**__\n" +
+            $"__*Environemntal Information:*__" +
             $"\n`Current Temperature:` {Convert.ToDecimal(tempResult[0].Data.ToString()) / 10} F\n" +
             $"`Current Humidity:` {humResult[0].Data}%\n" +
             $"`UPS Battery Capacity:` {capResult[0].Data}%\n" +
-            $"`UPS Runtime:` {timeResult[0].Data} minutes");
+            $"`UPS Runtime:` {timeResult[0].Data} minutes\n\n" +
+            $"__*Topology Information:*__\n" +
+            $"***Not Implemented***\n\n" +
+            $"__*Hardware Information:*__\n" +
+            $"***Not Implemented***\n\n" +
+            $"__*Connection Information:*__\n" +
+            $"`ISP Connection Speed:` {speed.Speed:0.00} {speed.Unit}\n");
         await Logger.Log(LogSeverity.Verbose, $"[{Context.Guild.Name}] ResponseSent", $"Health Report sent to the {Context.Channel.Name} channel.");
     }
 }
