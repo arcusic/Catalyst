@@ -13,7 +13,7 @@ public class ExampleCommands : ModuleBase<ShardedCommandContext>
     public async Task Hello()
     {
         var whiteCheckMark = new Emoji("\u2705");
-        await Logger.Log(LogSeverity.Verbose, $"[{Context.Guild.Name}]  CommandReceived", $"{Context.User.Username}#{Context.User.DiscriminatorValue} has invoked {Context.Message.Content} from the {Context.Channel.Name} channel.");
+        await Logger.Log(LogSeverity.Verbose, $"[{Context.Guild.Name}] CommandReceived", $"{Context.User.Username}#{Context.User.DiscriminatorValue} has invoked {Context.Message.Content} from the {Context.Channel.Name} channel.");
 
         await Context.Message.AddReactionAsync(whiteCheckMark);
         await Logger.Log(LogSeverity.Verbose, $"[{Context.Guild.Name}] MessageAcknowledged", $"Reacted with :white_check_mark: to {Context.User.Username}#{Context.User.DiscriminatorValue}'s message.");
