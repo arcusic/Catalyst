@@ -90,7 +90,6 @@ public class Utilities : ModuleBase<ShardedCommandContext>
         var secretClient = new SecretClient(new Uri($"https://{keyVault}.vault.azure.net"), new ClientSecretCredential(azureADTennantId, azureADClientId, azureADClientSecret));
         await Logger.Log(LogSeverity.Debug, "SNMPSecretClientConfigured", $"Configured Azure Key Vault client to connect to {secretClient.VaultUri}.");
 
-
         var upsIPAddress = secretClient.GetSecret(upsIPSecret);
         await Logger.Log(LogSeverity.Debug, "SNMPAddressObtained", $"Successfully obtained SNMP Address from Azure Key Vault.");
 
@@ -154,6 +153,7 @@ public class Utilities : ModuleBase<ShardedCommandContext>
         //}
 
         await Context.Message.ReplyAsync($"__**Network Enclosure Health Report:**__" +
+            $"__*Environemnt Information:*__" +
             $"\n`Current Temperature:` {Convert.ToDecimal(tempResult[0].Data.ToString()) / 10} F\n" +
             $"`Current Humidity:` {humResult[0].Data}%\n" +
             $"`UPS Battery Capacity:` {capResult[0].Data}%\n" +
