@@ -141,7 +141,29 @@ public class Utilities : ModuleBase<ShardedCommandContext>
         var snmpPort = secretClient.GetSecret(upsSnmpPort);
         await Logger.Log(LogSeverity.Debug, "SNMPPortObtained", $"Successfully obtained SNMP Port from Azure Key Vault.");
 
-        //TODO - Pull Secrets from KeyVault
+        var gw = secretClient.GetSecret(topGW);
+        await Logger.Log(LogSeverity.Debug, "TopologyGWIPObtained", $"Successfully obtained Gateway IP from Azure Key Vault.");
+
+        var aggA1 = secretClient.GetSecret(topAGG1);
+        await Logger.Log(LogSeverity.Debug, "TopologyAGGA1IPObtained", $"Successfully obtained AGGA1 IP from Azure Key Vault.");
+
+        var aggA2 = secretClient.GetSecret(topAGG2);
+        await Logger.Log(LogSeverity.Debug, "TopologyAGGA2IPObtained", $"Successfully obtained AGGA2 IP from Azure Key Vault.");
+
+        var coreSW1 = secretClient.GetSecret(topCore1);
+        await Logger.Log(LogSeverity.Debug, "TopologyCoreSW1IPObtained", $"Successfully obtained CoreSW1 IP from Azure Key Vault.");
+
+        var coreSW2 = secretClient.GetSecret(topCore2);
+        await Logger.Log(LogSeverity.Debug, "TopologyCoreSW2IPObtained", $"Successfully obtained CoreSW2 IP from Azure Key Vault.");
+
+        var accSW1 = secretClient.GetSecret(topACC1);
+        await Logger.Log(LogSeverity.Debug, "TopologyACCSW1IPObtained", $"Successfully obtained ACCSW1 IP from Azure Key Vault.");
+
+        var ap1 = secretClient.GetSecret(topAP1);
+        await Logger.Log(LogSeverity.Debug, "TopologyAP1IPObtained", $"Successfully obtained AP1 IP from Azure Key Vault.");
+
+        var ap2 = secretClient.GetSecret(topAP2);
+        await Logger.Log(LogSeverity.Debug, "TopologyAP2IPObtained", $"Successfully obtained AP2 IP from Azure Key Vault.");
 
         var tempResult = Messenger.Get(VersionCode.V2,
             new IPEndPoint(IPAddress.Parse(upsIPAddress.Value.Value), Convert.ToInt32(snmpPort.Value.Value)),
