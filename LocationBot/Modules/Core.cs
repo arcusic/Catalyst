@@ -17,7 +17,7 @@ public class Core : ModuleBase<ShardedCommandContext>
         await Logger.Log(LogSeverity.Verbose, $"[{Context.Guild.Name}] CommandReceived", $"{Context.User.Username}#{Context.User.DiscriminatorValue} has invoked {Context.Message.Content} from the {Context.Channel.Name} channel.");
 
         await Context.Message.AddReactionAsync(whiteCheckMark);
-        await Logger.Log(LogSeverity.Verbose, $"[{Context.Guild.Name}] MessageAcknowledged", $"Reacted with :white_check_mark: to {Context.User.Username}#{Context.User.DiscriminatorValue}'s message.");
+        await Logger.Log(LogSeverity.Verbose, $"[{Context.Guild.Name}] CommandAcknowledged", $"Reacted with :white_check_mark: to {Context.User.Username}#{Context.User.DiscriminatorValue}'s message.");
 
         string osEmote = Environment.Is64BitOperatingSystem ? ":white_check_mark:" : ":x:";
         string procEmote = Environment.Is64BitProcess ? ":white_check_mark:" : ":x:";
@@ -54,7 +54,7 @@ public class Core : ModuleBase<ShardedCommandContext>
         await Logger.Log(LogSeverity.Verbose, $"[{Context.Guild.Name}] CommandReceived", $"{Context.User.Username}#{Context.User.DiscriminatorValue} has invoked {Context.Message.Content} from the {Context.Channel.Name} channel.");
 
         await Context.Message.AddReactionAsync(redX);
-        await Logger.Log(LogSeverity.Verbose, $"[{Context.Guild.Name}] MessageAcknowledged", $"Reacted with :x: to {Context.User.Username}#{Context.User.DiscriminatorValue}'s message.");
+        await Logger.Log(LogSeverity.Verbose, $"[{Context.Guild.Name}] CommandAcknowledged", $"Reacted with :x: to {Context.User.Username}#{Context.User.DiscriminatorValue}'s message.");
     }
 
     [Command("help", RunMode = RunMode.Async)]
@@ -66,6 +66,6 @@ public class Core : ModuleBase<ShardedCommandContext>
         await Logger.Log(LogSeverity.Verbose, $"[{Context.Guild.Name}] CommandReceived", $"{Context.User.Username}#{Context.User.DiscriminatorValue} has invoked {Context.Message.Content} from the {Context.Channel.Name} channel.");
 
         await Context.Message.AddReactionAsync(redX);
-        await Logger.Log(LogSeverity.Verbose, $"[{Context.Guild.Name}] MessageAcknowledged", $"Reacted with :x: to {Context.User.Username}#{Context.User.DiscriminatorValue}'s message.");
+        await Logger.Log(LogSeverity.Verbose, $"[{Context.Guild.Name}] CommandAcknowledged", $"Reacted with :x: to {Context.User.Username}#{Context.User.DiscriminatorValue}'s message.");
     }
 }
