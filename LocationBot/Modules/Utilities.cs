@@ -34,6 +34,7 @@ public class Utilities : ModuleBase<ShardedCommandContext>
         var appSettings = JsonDocument.Parse(jsonString)!;
         var keyVaultSettings = appSettings.RootElement.GetProperty("KeyVault").EnumerateObject();
         var snmpSettings = appSettings.RootElement.GetProperty("SNMP").EnumerateObject();
+        var topologySettings = appSettings.RootElement.GetProperty("Topology").EnumerateObject();
         await Logger.Log(LogSeverity.Debug, $"JSONImported", "JSON file has been successfully imported... Processing.");
 
         string keyVault = keyVaultSettings
@@ -78,6 +79,54 @@ public class Utilities : ModuleBase<ShardedCommandContext>
             .FirstOrDefault()
             .ToString();
 
+        string topGW = topologySettings
+            .Where(device => device.Name == "GW")
+            .Select(device => device.Value)
+            .FirstOrDefault()
+            .ToString();
+
+        string topAGG1 = topologySettings
+            .Where(device => device.Name == "AggA1")
+            .Select(device => device.Value)
+            .FirstOrDefault()
+            .ToString();
+        
+        string topAGG2 = topologySettings
+            .Where(device => device.Name == "AggA2")
+            .Select(device => device.Value)
+            .FirstOrDefault()
+            .ToString();
+        
+        string topCore1 = topologySettings
+            .Where(device => device.Name == "CoreSW1")
+            .Select(device => device.Value)
+            .FirstOrDefault()
+            .ToString();
+
+        string topCore2 = topologySettings
+            .Where(device => device.Name == "CoreSW2")
+            .Select(device => device.Value)
+            .FirstOrDefault()
+            .ToString();
+
+        string topACC1 = topologySettings
+            .Where(device => device.Name == "AccSW1")
+            .Select(device => device.Value)
+            .FirstOrDefault()
+            .ToString();
+
+        string topAP1 = topologySettings
+            .Where(device => device.Name == "AP01")
+            .Select(device => device.Value)
+            .FirstOrDefault()
+            .ToString();
+
+        string topAP2 = topologySettings
+            .Where(device => device.Name == "AP02")
+            .Select(device => device.Value)
+            .FirstOrDefault()
+            .ToString();
+
         await Logger.Log(LogSeverity.Debug, $"JSONParsed", "JSON file has been successfully parsed.");
 
         var secretClient = new SecretClient(new Uri($"https://{keyVault}.vault.azure.net"), new ClientSecretCredential(azureADTennantId, azureADClientId, azureADClientSecret));
@@ -91,6 +140,8 @@ public class Utilities : ModuleBase<ShardedCommandContext>
 
         var snmpPort = secretClient.GetSecret(upsSnmpPort);
         await Logger.Log(LogSeverity.Debug, "SNMPPortObtained", $"Successfully obtained SNMP Port from Azure Key Vault.");
+
+        //TODO - Pull Secrets from KeyVault
 
         var tempResult = Messenger.Get(VersionCode.V2,
             new IPEndPoint(IPAddress.Parse(upsIPAddress.Value.Value), Convert.ToInt32(snmpPort.Value.Value)),
