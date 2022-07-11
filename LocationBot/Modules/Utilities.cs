@@ -120,12 +120,12 @@ public class Utilities : ModuleBase<ShardedCommandContext>
             60000);
         await Logger.Log(LogSeverity.Debug, "UPSTimeObtained", $"Successfully obtained Runtime from UPS. {timeResult[0].Data.ToString()}");
 
-        //Ping pingSender = new();
-        //PingOptions options = new();
+        Ping pingSender = new();
+        PingOptions options = new();
 
-        //string data = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
-        //byte[] buffer = Encoding.ASCII.GetBytes(data);
-        //int timeout = 120;
+        string data = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+        byte[] buffer = Encoding.ASCII.GetBytes(data);
+        int timeout = 120;
 
         //PingReply reply = pingSender.Send("x.x.x.x", timeout, buffer, options);
 
