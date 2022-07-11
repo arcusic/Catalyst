@@ -128,29 +128,23 @@ public class Utilities : ModuleBase<ShardedCommandContext>
             60000);
         await Logger.Log(LogSeverity.Debug, "UPSTimeObtained", $"Successfully obtained Runtime from UPS. {timeResult[0].Data.ToString()}");
 
-        //Ping pingSender = new Ping();
-        //PingOptions options = new PingOptions();
+        //Ping pingSender = new();
+        //PingOptions options = new();
 
         //string data = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
         //byte[] buffer = Encoding.ASCII.GetBytes(data);
         //int timeout = 120;
+
         //PingReply reply = pingSender.Send("x.x.x.x", timeout, buffer, options);
+
         //if (reply.Status == IPStatus.Success)
         //{
         //    Console.WriteLine("Address: {0}", reply.Address.ToString());
         //    Console.WriteLine("RoundTrip time: {0}", reply.RoundtripTime);
-        //    Console.WriteLine("Time to live: {0}", reply.Options.Ttl);
-        //    Console.WriteLine("Don't fragment: {0}", reply.Options.DontFragment);
-        //    Console.WriteLine("Buffer size: {0}", reply.Buffer.Length);
         //}
-
-        //if (e.Error != null)
+        //else
         //{
-        //    Console.WriteLine("Ping failed:");
-        //    Console.WriteLine(e.Error.ToString());
 
-        //    // Let the main thread resume.
-        //    ((AutoResetEvent)e.UserState).Set();
         //}
 
         var speed = await FastClient.GetDownloadSpeed(SpeedTest.Net.Enums.SpeedTestUnit.MegaBitsPerSecond);
