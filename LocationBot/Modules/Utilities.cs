@@ -14,14 +14,6 @@ using RunMode = Discord.Commands.RunMode;
 
 namespace LocationBot.Modules;
 
-public class AppSettings
-{
-    public string? KeyVaultName { get; set; }
-    public string? AzureADClientId { get; set; }
-    public string? AzureADTennantId { get; set; }
-    public string? AzureADClientSecret { get; set; }
-}
-
 public class Utilities : ModuleBase<ShardedCommandContext>
 {
     public CommandService CommandService { get; set; }
