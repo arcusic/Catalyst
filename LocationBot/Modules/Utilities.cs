@@ -8,11 +8,11 @@ using Discord;
 using Discord.Commands;
 using Lextm.SharpSnmpLib;
 using Lextm.SharpSnmpLib.Messaging;
-using LocationBot.Common;
+using Catalyst.Common;
 using SpeedTest.Net;
 using RunMode = Discord.Commands.RunMode;
 
-namespace LocationBot.Modules;
+namespace Catalyst.Modules;
 
 public class Utilities : ModuleBase<ShardedCommandContext>
 {
