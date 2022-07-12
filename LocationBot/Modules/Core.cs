@@ -95,7 +95,7 @@ await Context.Channel.TriggerTypingAsync();
 
 message = @"**User Actions:**
 `Mute:`  Muting a user prevents them from sending messages or connecting to voice. A DM will be sent to the user(s) warned informing them of the action.
-:alert:  Time is optional.  **Not including a time will result in a Perma Mute!!!**  :alert:
+:warning:  Time is optional.  **Not including a time will result in a Perma Mute!!!**  :warning:
 ```
 Command Syntax:
 +mute @User | UserID ?r You have been muted.  <Reason>  Please review the rules in ┃welcome.  Repeat offenses will result in a longer duration or additional action. {?t #(m/h/d)}
@@ -137,7 +137,7 @@ await Context.Channel.TriggerTypingAsync();
 
 message = @"**Giveaway Commands**
 `gcreate:`  Creates a giveaway in the giveaway channel.
-:alert:  This command has no command syntax.  It will walk you through the process of setting up a giveaway.  :alert:
+:warning:  This command has no command syntax.  It will walk you through the process of setting up a giveaway.  :warning:
 ```
 Command Syntax:
 /gcreate
