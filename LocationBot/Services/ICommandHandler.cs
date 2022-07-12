@@ -1,4 +1,4 @@
-namespace LocationBot.Services;
+namespace Catalyst.Services;
 
 public interface ICommandHandler
 {
