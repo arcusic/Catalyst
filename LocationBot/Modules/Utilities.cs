@@ -127,6 +127,12 @@ public class Utilities : ModuleBase<ShardedCommandContext>
             .FirstOrDefault()
             .ToString();
 
+        string topLTE = topologySettings
+            .Where(device => device.Name == "LTE")
+            .Select(device => device.Value)
+            .FirstOrDefault()
+            .ToString();
+
         await Logger.Log(LogSeverity.Debug, $"JSONParsed", "JSON file has been successfully parsed.");
 
         var secretClient = new SecretClient(new Uri($"https://{keyVault}.vault.azure.net"), new ClientSecretCredential(azureADTennantId, azureADClientId, azureADClientSecret));
@@ -165,7 +171,8 @@ public class Utilities : ModuleBase<ShardedCommandContext>
         var ap2IP = secretClient.GetSecret(topAP2);
         await Logger.Log(LogSeverity.Debug, "AP2IPObtained", $"Successfully obtained AP-2 IP Address from Azure Key Vault.");
 
-        
+        var lteIP = secretClient.GetSecret(topLTE);
+        await Logger.Log(LogSeverity.Debug, "LTEIPObtained", $"Successfully obtained LTE IP Address from Azure Key Vault.");
 
         var tempResult = Messenger.Get(VersionCode.V2,
             new IPEndPoint(IPAddress.Parse(upsIPAddress.Value.Value), Convert.ToInt32(snmpPort.Value.Value)),
@@ -195,6 +202,20 @@ public class Utilities : ModuleBase<ShardedCommandContext>
             60000);
         await Logger.Log(LogSeverity.Debug, "UPSTimeObtained", $"Successfully obtained Runtime from UPS. {timeResult[0].Data.ToString()}");
 
+        //create network device array
+        string[,] networkDevices = new string[,]
+        {
+            { "UDE-SE", gatewayIP.Value.Value, "", "" },
+            { "USW-AGG-A1", aggA1IP.Value.Value, "", "" },
+            { "USW-AGG-A2", aggA2IP.Value.Value, "", "" },
+            { "USW-CORE-SW1", coreSW1IP.Value.Value, "", "" },
+            { "USW-CORE-SW2", coreSW2IP.Value.Value, "", "" },
+            { "USW-ACC-SW1", accSW1IP.Value.Value, "", "" },
+            { "U6-LR-01", ap1IP.Value.Value, "", "" },
+            { "U6-LR-02", ap2IP.Value.Value, "", "" },
+            { "U-LTE", lteIP.Value.Value, "", "" }
+        };
+
         Ping pingSender = new();
         PingOptions options = new();
 
@@ -202,17 +223,24 @@ public class Utilities : ModuleBase<ShardedCommandContext>
         byte[] buffer = Encoding.ASCII.GetBytes(data);
         int timeout = 120;
 
-        //PingReply reply = pingSender.Send("x.x.x.x", timeout, buffer, options);
-
-        //if (reply.Status == IPStatus.Success)
-        //{
-        //    Console.WriteLine("Address: {0}", reply.Address.ToString());
-        //    Console.WriteLine("RoundTrip time: {0}", reply.RoundtripTime);
-        //}
-        //else
-        //{
-
-        //}
+        int x = 0;
+        while (x < networkDevices.GetLength(0))
+        {
+            PingReply reply = pingSender.Send(networkDevices[x, 1], timeout, buffer, options);
+            if (reply.Status == IPStatus.Success)
+            {
+                await Logger.Log(LogSeverity.Debug, $"PING{networkDevices[x, 0]}", $"Successfully pinged {networkDevices[x, 0]}. {reply.RoundtripTime}ms");
+                networkDevices[x, 2] = ":white_check_mark:";
+                networkDevices[x, 3] = $"{reply.RoundtripTime}ms";
+            }
+            else
+            {
+                await Logger.Log(LogSeverity.Debug, $"PING{networkDevices[x, 0]}", $"Failed to ping {networkDevices[x, 0]}. {reply.Status}");
+                networkDevices[x, 2] = ":x:";
+                networkDevices[x, 3] = "**OFFLINE**";
+            }
+            x++;
+        }
 
         var speed = await FastClient.GetDownloadSpeed(SpeedTest.Net.Enums.SpeedTestUnit.MegaBitsPerSecond);
         await Logger.Log(LogSeverity.Debug, "SpeedTestServer", $"SpeedTest has completed. Download Speed ({speed.Source}): {speed.Speed} {speed.Unit}");
@@ -224,7 +252,15 @@ public class Utilities : ModuleBase<ShardedCommandContext>
             $"`UPS Battery Capacity:` {capResult[0].Data}%\n" +
             $"`UPS Runtime:` {timeResult[0].Data} minutes\n\n" +
             $"__*Topology Information:*__\n" +
-            $"***Not Implemented***\n\n" +
+            $"`{networkDevices[0,0]}:`  {networkDevices[0,2]}  {networkDevices[0,3]}\n" +
+            $"`{networkDevices[1,0]}:`  {networkDevices[1,2]}  {networkDevices[1,3]}\n" +
+            $"`{networkDevices[2,0]}:`  {networkDevices[2,2]}  {networkDevices[2,3]}\n" +
+            $"`{networkDevices[3,0]}:`  {networkDevices[3,2]}  {networkDevices[3,3]}\n" +
+            $"`{networkDevices[4,0]}:`  {networkDevices[4,2]}  {networkDevices[4,3]}\n" +
+            $"`{networkDevices[5,0]}:`  {networkDevices[5,2]}  {networkDevices[5,3]}\n" +
+            $"`{networkDevices[6,0]}:`  {networkDevices[6,2]}  {networkDevices[6,3]}\n" +
+            $"`{networkDevices[7,0]}:`  {networkDevices[7,2]}  {networkDevices[7,3]}\n" +
+            $"`{networkDevices[8,0]}:`  {networkDevices[8,2]}  {networkDevices[8,3]}\n\n" +
             $"__*Hardware Information:*__\n" +
             $"***Not Implemented***\n\n" +
             $"__*Connection Information:*__\n" +
