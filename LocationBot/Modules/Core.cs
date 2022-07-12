@@ -19,6 +19,8 @@ public class Core : ModuleBase<ShardedCommandContext>
         await Context.Message.AddReactionAsync(whiteCheckMark);
         await Logger.Log(LogSeverity.Verbose, $"[{Context.Guild.Name}] CommandAcknowledged", $"Reacted with :white_check_mark: to {Context.User.Username}#{Context.User.DiscriminatorValue}'s message.");
 
+        await Context.Channel.TriggerTypingAsync();
+
         string osEmote = Environment.Is64BitOperatingSystem ? ":white_check_mark:" : ":x:";
         string procEmote = Environment.Is64BitProcess ? ":white_check_mark:" : ":x:";
 
@@ -78,18 +80,22 @@ public class Core : ModuleBase<ShardedCommandContext>
         await Context.Message.AddReactionAsync(whiteCheckMark);
         await Logger.Log(LogSeverity.Verbose, $"[{Context.Guild.Name}] CommandAcknowledged", $"Reacted with :white_check_mark: to {Context.User.Username}#{Context.User.DiscriminatorValue}'s message.");
 
+        await Context.Channel.TriggerTypingAsync();
+
         string message = @"@STAFF 
 **COMMAND QUICK REFERENCE GUIDE**
 The server currently uses multiple different bots for different actions which can lead to confusion when action needs to be taken.
 This Quick Reference Guide will describe the critical commands that will be needed during an incident.
 > `PLEASE NOTE:` for commands that have multiple options (ex. @User#0001 or UserID) `or` will be designated by `|`.
 > 
-> `OPTIONAL COMMANDS:` will be denoted in braces { ex. }... optional commands are NOT required, but not including them may have additional consequences.  See docs for each command below for details.
+> `OPTIONAL COMMANDS:` will be denoted in braces { ex. }... optional commands are NOT required, but not including them may have additional consequences.  See docs for each command below for details.";
 
+await Context.Channel.SendMessageAsync(message);
+await Context.Channel.TriggerTypingAsync();
 
-**User Actions:**
+message = @"**User Actions:**
 `Mute:`  Muting a user prevents them from sending messages or connecting to voice. A DM will be sent to the user(s) warned informing them of the action.
-:zalert:  Time is optional.  **Not including a time will result in a Perma Mute!!!**  :zalert:
+:alert:  Time is optional.  **Not including a time will result in a Perma Mute!!!**  :alert:
 ```
 Command Syntax:
 +mute @User | UserID ?r You have been muted.  <Reason>  Please review the rules in ┃welcome.  Repeat offenses will result in a longer duration or additional action. {?t #(m/h/d)}
@@ -107,29 +113,36 @@ Command Syntax:
 +warn Ascended#1023 ?r Didn't even realize who Catalyst#7894 was on Instagram.
 ```
 `Kick:`  User will be immediately kicked from the server.  A DM will be sent to the user(s) being kicked informing them of the action.
-:zalert:  A kicked user will be able to immediately rejoin the server.  :zalert:
+:warning:  A kicked user will be able to immediately rejoin the server.  :warning:
 ```
 Command Syntax:
 +kick @User | UserID ?r <reason>
 +kick @1xs#0001 ?r There is no way this command would ever work.
 +kick @Catalyst#7894, #Ascended#1023 ?r They lost GHXST's fit battle.
-```
-`Ban:`  User will be immediately banned from the server.  A DM will be sent to the user(s) being banned informing them of the action.
+```";
+
+await Context.Channel.SendMessageAsync(message);
+await Context.Channel.TriggerTypingAsync();
+
+message = @"`Ban:`  User will be immediately banned from the server.  A DM will be sent to the user(s) being banned informing them of the action.
 ```
 Command Syntax:
 +ban @User | UserID ?r <Reason>
 +ban 1xs#0001 ?r How dare you actually take a vacation. <3
 +ban 1xs#0001, Catalyst#7894 ?r Who needs IT Professionals anyway.
-```
+```";
 
-**Giveaway Commands**
+await Context.Channel.SendMessageAsync(message);
+await Context.Channel.TriggerTypingAsync();
+
+message = @"**Giveaway Commands**
 `gcreate:`  Creates a giveaway in the giveaway channel.
-:zalert:  This command has no command syntax.  It will walk you through the process of setting up a giveaway.  :zalert:
+:alert:  This command has no command syntax.  It will walk you through the process of setting up a giveaway.  :alert:
 ```
 Command Syntax:
 /gcreate
 ```";
 
-    await Context.Message.ReplyAsync(message);
+        await Context.Channel.SendMessageAsync(message);
     }
 }
