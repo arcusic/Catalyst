@@ -80,8 +80,8 @@ public class Utilities : ModuleBase<ShardedCommandContext>
             .ToString();
 
         string topGW = topologySettings
-            .Where(device => device.Name == "GW")
-            .Select(device => device.Value)
+            .Where(kxunna => kxunna.Name == "GW")
+            .Select(kxunna => kxunna.Value)
             .FirstOrDefault()
             .ToString();
 
@@ -141,7 +141,31 @@ public class Utilities : ModuleBase<ShardedCommandContext>
         var snmpPort = secretClient.GetSecret(upsSnmpPort);
         await Logger.Log(LogSeverity.Debug, "SNMPPortObtained", $"Successfully obtained SNMP Port from Azure Key Vault.");
 
-        //TODO - Pull Secrets from KeyVault
+        var gatewayIP = secretClient.GetSecret(topGW);
+        await Logger.Log(LogSeverity.Debug, "GatewayIPObtained", $"Successfully obtained Gateway IP Address from Azure Key Vault.");
+
+        var aggA1IP = secretClient.GetSecret(topAGG1);
+        await Logger.Log(LogSeverity.Debug, "AGGA1IPObtained", $"Successfully obtained AGG-A1 IP Address from Azure Key Vault.");
+
+        var aggA2IP = secretClient.GetSecret(topAGG2);
+        await Logger.Log(LogSeverity.Debug, "AGGA2IPObtained", $"Successfully obtained AGG-A2 IP Address from Azure Key Vault.");
+
+        var coreSW1IP = secretClient.GetSecret(topCore1);
+        await Logger.Log(LogSeverity.Debug, "CORESW1IPObtained", $"Successfully obtained CORE-SW1 IP Address from Azure Key Vault.");
+
+        var coreSW2IP = secretClient.GetSecret(topCore2);
+        await Logger.Log(LogSeverity.Debug, "CORESW2IPObtained", $"Successfully obtained CORE-SW2 IP Address from Azure Key Vault.");
+
+        var accSW1IP = secretClient.GetSecret(topACC1);
+        await Logger.Log(LogSeverity.Debug, "ACCSW1IPObtained", $"Successfully obtained ACC-SW1 IP Address from Azure Key Vault.");
+
+        var ap1IP = secretClient.GetSecret(topAP1);
+        await Logger.Log(LogSeverity.Debug, "AP1IPObtained", $"Successfully obtained AP-1 IP Address from Azure Key Vault.");
+
+        var ap2IP = secretClient.GetSecret(topAP2);
+        await Logger.Log(LogSeverity.Debug, "AP2IPObtained", $"Successfully obtained AP-2 IP Address from Azure Key Vault.");
+
+        
 
         var tempResult = Messenger.Get(VersionCode.V2,
             new IPEndPoint(IPAddress.Parse(upsIPAddress.Value.Value), Convert.ToInt32(snmpPort.Value.Value)),
