@@ -206,6 +206,13 @@ public class Utilities : ModuleBase<ShardedCommandContext>
             60000);
         await Logger.Log(LogSeverity.Debug, "UPSTimeObtained", $"Successfully obtained Runtime from UPS. {timeResult[0].Data.ToString()}");
 
+        var inputResult = Messenger.Get(VersionCode.V2,
+            new IPEndPoint(IPAddress.Parse(upsIPAddress.Value.Value), Convert.ToInt32(snmpPort.Value.Value)),
+            new OctetString(snmpCommunity.Value.Value),
+            new List<Variable> { new Variable(new ObjectIdentifier(".1.3.6.1.4.1.850.1.1.3.1.3.2.2.1.2.1.1")) },
+            60000);
+        await Logger.Log(LogSeverity.Debug, "UPSInputObtained", $"Successfully obtained Input Voltage Frequency from UPS. {timeResult[0].Data.ToString()}");
+
         //create network device array
         string[,] networkDevices = new string[,]
         {
@@ -251,12 +258,13 @@ public class Utilities : ModuleBase<ShardedCommandContext>
 
         decimal tempF = Convert.ToDecimal(tempResult[0].Data.ToString()) / 10;
         decimal tempC = (tempF - 32) * 5 / 9;
+        decimal inputFrequency = Convert.ToDecimal(inputResult[0].Data.ToString()) / 10;
 
         await response.ModifyAsync(msg => msg.Content = $"__**Network Enclosure Health Report:**__\n" +
             $"__*Environemntal Information:*__" +
             $"\n`Current Temperature:` {tempF} F  ({tempC:0.0} C)\n" +
             $"`Current Humidity:` {humResult[0].Data}%\n" +
-            $"`UPS Input Voltage:` ***Not Implemented***\n" +
+            $"`UPS Input Voltage Frequency:` {inputFrequency} Hz\n" +
             $"`UPS Battery Capacity:` {capResult[0].Data}%\n" +
             $"`UPS Runtime:` {timeResult[0].Data} minutes\n\n" +
             $"__*Topology Information:*__\n" +
