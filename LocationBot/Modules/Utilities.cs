@@ -291,9 +291,40 @@ public class Utilities : ModuleBase<ShardedCommandContext>
 
             var response = await Context.Channel.SendMessageAsync("***Emergency Power Off***\n" +
             "__**WARNING:**__ This command will `Power Off` the entire network stack!\n\n" +
-            $"`Confirm Execution by reacting with` {whiteCheckMark}\n " +
-            $"`Abort Execution by reacting with` {redX}");
+            $"`Abort Execution by reacting with` {redX}\n " +
+            $"`Confirm Execution by reacting with` {whiteCheckMark}\n");
 
+            await response.AddReactionAsync(redX);
+            await response.AddReactionAsync(whiteCheckMark);
+
+            bool reacted = false;
+
+            while ((!reacted))
+            {
+                var message = await Context.Channel.GetMessageAsync(response.Id);
+                var confirm = await message.GetReactionUsersAsync(whiteCheckMark, 100).FlattenAsync();
+                var abort = await message.GetReactionUsersAsync(redX, 100).FlattenAsync();
+
+                foreach (var user in confirm)
+                {
+                    if (user.Username == "Catalyst" && user.Discriminator == "7894")
+                    {
+                        // TODO- KILL IT.  KILL IT ALL.
+                        reacted = true;
+                    }
+                }
+
+                foreach (var user in abort)
+                {
+                    if (user.Username == "Catalyst" && user.Discriminator == "7894")
+                    {
+                        await response.ModifyAsync(msg => msg.Content = "***Emergency Power Off***\n" +
+                            "__**WARNING:**__ This command will `Power Off` the entire network stack!\n\n" +
+                            $"**Execution has been aborted.**");
+                        reacted = true;
+                    }
+                }
+            }
 
             // await Context.Message.ReplyAsync($"{Context.User.Username}#{Context.User.DiscriminatorValue} has initiated an Emergency Power Off procedure.");
             // await Logger.Log(LogSeverity.Debug, $"[{Context.Guild.Name}] ResponseSent", $"Emergency Power Off sent to the {Context.Channel.Name} channel.");
