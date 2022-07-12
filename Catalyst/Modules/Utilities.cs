@@ -260,13 +260,71 @@ public class Utilities : ModuleBase<ShardedCommandContext>
         decimal tempC = (tempF - 32) * 5 / 9;
         decimal inputFrequency = Convert.ToDecimal(inputResult[0].Data.ToString()) / 10;
 
+        string tempStatus = "";
+        string humidStatus = "";
+        string capStatus = "";
+        string runStatus = "";
+        string inputStatus = inputFrequency != 0 ? ":white_check_mark:" : ":x:";
+
+        if (tempF > 100)
+        {
+            tempStatus = ":x:";
+        }
+        else if (tempF > 90)
+        {
+            tempStatus = ":warning:";
+        }
+        else
+        {
+            tempStatus = ":white_check_mark:";
+        }
+
+        if (Convert.ToInt32(humResult[0].Data.ToString()) > 95)
+        {
+            humidStatus = ":x:";
+        }
+        else if (Convert.ToInt32(humResult[0].Data.ToString()) > 80 || Convert.ToInt32(humResult[0].Data.ToString()) < 15)
+        {
+            humidStatus = ":warning:";
+        }
+        else
+        {
+            humidStatus = ":white_check_mark:";
+        }
+
+        if (Convert.ToInt32(capResult[0].Data.ToString()) < 20)
+        {
+            capStatus = ":x:";
+        }
+        else if (Convert.ToInt32(capResult[0].Data.ToString()) < 50)
+        {
+            capStatus = ":warning:";
+        }
+        else
+        {
+            capStatus = ":white_check_mark:";
+        }
+
+        if (Convert.ToInt32(timeResult[0].Data.ToString()) < 10)
+        {
+            runStatus = ":x:";
+        }
+        else if (Convert.ToInt32(timeResult[0].Data.ToString()) < 20)
+        {
+            runStatus = ":warning:";
+        }
+        else
+        {
+            runStatus = ":white_check_mark:";
+        }
+
         await response.ModifyAsync(msg => msg.Content = $"__**Network Enclosure Health Report:**__\n" +
             $"__*Environemntal Information:*__" +
-            $"\n`Current Temperature:` {tempF} F  ({tempC:0.0} C)\n" +
-            $"`Current Humidity:` {humResult[0].Data}%\n" +
-            $"`UPS Input Voltage Frequency:` {inputFrequency} Hz\n" +
-            $"`UPS Battery Capacity:` {capResult[0].Data}%\n" +
-            $"`UPS Runtime:` {timeResult[0].Data} minutes\n\n" +
+            $"\n`Current Temperature:`  {tempStatus}  {tempF} F  ({tempC:0.0} C)\n" +
+            $"`Current Humidity:`  {humidStatus}  {humResult[0].Data}%\n" +
+            $"`UPS Input Voltage Frequency:`  {inputStatus}  {inputFrequency} Hz\n" +
+            $"`UPS Battery Capacity:`  {capStatus}  {capResult[0].Data}%\n" +
+            $"`UPS Runtime:`  {runStatus}  {timeResult[0].Data} minutes\n\n" +
             $"__*Topology Information:*__\n" +
             $"`{networkDevices[0,0]}:`  {networkDevices[0,2]}  {networkDevices[0,3]}\n" +
             $"`{networkDevices[1,0]}:`  {networkDevices[1,2]}  {networkDevices[1,3]}\n" +
