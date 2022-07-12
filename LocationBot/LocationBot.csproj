@@ -17,6 +17,7 @@
     <None Remove="Microsoft.EntityFrameworkCore.SqlServer" />
     <None Remove="Microsoft.EntityFrameworkCore.Analyzers" />
     <None Remove="Microsoft.EntityFrameworkCore.Tools" />
+    <None Remove="Discord.Net.Analyzers" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Azure.Identity" Version="1.6.0" />
@@ -38,6 +39,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="Discord.Net.Analyzers" Version="3.7.0" />
   </ItemGroup>
   <ItemGroup>
     <None Update="appsettings.json">
