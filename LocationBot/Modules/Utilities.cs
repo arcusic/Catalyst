@@ -27,8 +27,12 @@ public class Utilities : ModuleBase<ShardedCommandContext>
         await Context.Message.AddReactionAsync(whiteCheckMark);
         await Logger.Log(LogSeverity.Verbose, $"[{Context.Guild.Name}] CommandAcknowledged", $"Reacted with :white_check_mark: to {Context.User.Username}#{Context.User.DiscriminatorValue}'s message.");
 
-        await Context.Message.ReplyAsync($"Executing infrastructure health check... please wait.");
+        await Context.Channel.TriggerTypingAsync();
+
+        var response = await Context.Message.ReplyAsync($"Executing infrastructure health check... please wait.");
         await Logger.Log(LogSeverity.Verbose, $"[{Context.Guild.Name}] ResponseSent", $"'Executing infrastructure health check... please wait.' in the {Context.Channel.Name} channel.");
+
+        await Context.Channel.TriggerTypingAsync();
 
         var jsonString = await File.ReadAllTextAsync("appsettings.json");
         var appSettings = JsonDocument.Parse(jsonString)!;
@@ -248,7 +252,7 @@ public class Utilities : ModuleBase<ShardedCommandContext>
         decimal tempF = Convert.ToDecimal(tempResult[0].Data.ToString()) / 10;
         decimal tempC = (tempF - 32) * 5 / 9;
 
-        await Context.Message.ReplyAsync($"__**Network Enclosure Health Report:**__\n" +
+        await response.ModifyAsync(msg => msg.Content = $"__**Network Enclosure Health Report:**__\n" +
             $"__*Environemntal Information:*__" +
             $"\n`Current Temperature:` {tempF} F  ({tempC:0.0} C)\n" +
             $"`Current Humidity:` {humResult[0].Data}%\n" +
@@ -290,7 +294,7 @@ public class Utilities : ModuleBase<ShardedCommandContext>
             $"`Confirm Execution by reacting with` {whiteCheckMark}\n " +
             $"`Abort Execution by reacting with` {redX}");
 
-            
+
             // await Context.Message.ReplyAsync($"{Context.User.Username}#{Context.User.DiscriminatorValue} has initiated an Emergency Power Off procedure.");
             // await Logger.Log(LogSeverity.Debug, $"[{Context.Guild.Name}] ResponseSent", $"Emergency Power Off sent to the {Context.Channel.Name} channel.");
         }
