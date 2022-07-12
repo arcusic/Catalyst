@@ -3,9 +3,9 @@ using Azure.Security.KeyVault.Secrets;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
-using LocationBot.Common;
-using LocationBot.Init;
-using LocationBot.Services;
+using Catalyst.Common;
+using Catalyst.Init;
+using Catalyst.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 

@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 25.0.1700.5
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LocationBot", "LocationBot\LocationBot.csproj", "{668EA493-9B47-4CFF-8340-D75F5ADD511C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Catalyst", "LocationBot\Catalyst.csproj", "{668EA493-9B47-4CFF-8340-D75F5ADD511C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
