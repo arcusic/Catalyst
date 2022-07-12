@@ -1,6 +1,6 @@
 using Discord;
 
-namespace LocationBot.Common;
+namespace Catalyst.Common;
 
 public class Logger
 {

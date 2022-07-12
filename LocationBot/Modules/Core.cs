@@ -1,9 +1,9 @@
 ﻿using Discord;
 using Discord.Commands;
-using LocationBot.Common;
+using Catalyst.Common;
 using RunMode = Discord.Commands.RunMode;
 
-namespace LocationBot.Modules;
+namespace Catalyst.Modules;
 
 public class Core : ModuleBase<ShardedCommandContext>
 {

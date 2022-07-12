@@ -2,10 +2,10 @@ using System.Reflection;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
-using LocationBot.Common;
-using LocationBot.Init;
+using Catalyst.Common;
+using Catalyst.Init;
 
-namespace LocationBot.Services;
+namespace Catalyst.Services;
 
 public class CommandHandler : ICommandHandler
 {

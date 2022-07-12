@@ -1,6 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 
-namespace LocationBot.Init;
+namespace Catalyst.Init;
 
 public static class Bootstrapper
 {
