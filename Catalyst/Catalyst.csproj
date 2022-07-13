@@ -18,6 +18,7 @@
     <None Remove="Microsoft.EntityFrameworkCore.Analyzers" />
     <None Remove="Microsoft.EntityFrameworkCore.Tools" />
     <None Remove="Discord.Net.Analyzers" />
+    <None Remove="SSH.NET" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Azure.Identity" Version="1.6.0" />
@@ -40,6 +41,7 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Discord.Net.Analyzers" Version="3.7.0" />
+    <PackageReference Include="SSH.NET" Version="2020.0.2" />
   </ItemGroup>
   <ItemGroup>
     <None Update="appsettings.json">
