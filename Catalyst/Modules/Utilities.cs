@@ -569,6 +569,13 @@ public class Utilities : ModuleBase<ShardedCommandContext>
         {
             await Context.Message.AddReactionAsync(denied);
             await Logger.Log(LogSeverity.Verbose, $"[{Context.Guild.Name}] CommandRejected", $"Reacted with :: to {Context.User.Username}#{Context.User.DiscriminatorValue}'s message.");
+
+            await Context.Channel.TriggerTypingAsync();
+
+            await Context.Message.ReplyAsync(":no_entry:  ***UNAUTHORIZED***  :no_entry:\n" +
+                "You have attempted to execute a privledged command without propper permissions.\n\n" +
+                "__**WARNING:**__  This incident has been logged!\n" +
+                "*Further attempts to execute a privledged command without authorization may lead to additional action.*");
         }
 
         await Logger.Log(LogSeverity.Verbose, $"[{Context.Guild.Name}] CommandExecuted", $"Emergency Power Off command executed by {Context.User.Username}.");
