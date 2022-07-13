@@ -39,6 +39,7 @@ public class Utilities : ModuleBase<ShardedCommandContext>
         var keyVaultSettings = appSettings.RootElement.GetProperty("KeyVault").EnumerateObject();
         var snmpSettings = appSettings.RootElement.GetProperty("SNMP").EnumerateObject();
         var topologySettings = appSettings.RootElement.GetProperty("Topology").EnumerateObject();
+        var hardwareSettings = appSettings.RootElement.GetProperty("Hardware").EnumerateObject();
         await Logger.Log(LogSeverity.Debug, $"JSONImported", "JSON file has been successfully imported... Processing.");
 
         string keyVault = keyVaultSettings
@@ -90,50 +91,62 @@ public class Utilities : ModuleBase<ShardedCommandContext>
             .ToString();
 
         string topAGG1 = topologySettings
-            .Where(device => device.Name == "AggA1")
-            .Select(device => device.Value)
+            .Where(nova => nova.Name == "AggA1")
+            .Select(nova => nova.Value)
             .FirstOrDefault()
             .ToString();
         
         string topAGG2 = topologySettings
-            .Where(device => device.Name == "AggA2")
-            .Select(device => device.Value)
+            .Where(frozendion => frozendion.Name == "AggA2")
+            .Select(frozendion => frozendion.Value)
             .FirstOrDefault()
             .ToString();
         
         string topCore1 = topologySettings
-            .Where(device => device.Name == "CoreSW1")
-            .Select(device => device.Value)
+            .Where(lenx => lenx.Name == "CoreSW1")
+            .Select(lenx => lenx.Value)
             .FirstOrDefault()
             .ToString();
 
         string topCore2 = topologySettings
-            .Where(device => device.Name == "CoreSW2")
-            .Select(device => device.Value)
+            .Where(xndrops => xndrops.Name == "CoreSW2")
+            .Select(xndrops => xndrops.Value)
             .FirstOrDefault()
             .ToString();
 
         string topACC1 = topologySettings
-            .Where(device => device.Name == "AccSW1")
-            .Select(device => device.Value)
+            .Where(altercore => altercore.Name == "AccSW1")
+            .Select(altercore => altercore.Value)
             .FirstOrDefault()
             .ToString();
 
         string topAP1 = topologySettings
-            .Where(device => device.Name == "AP01")
-            .Select(device => device.Value)
+            .Where(holygrail => holygrail.Name == "AP01")
+            .Select(holygrail => holygrail.Value)
             .FirstOrDefault()
             .ToString();
 
         string topAP2 = topologySettings
-            .Where(device => device.Name == "AP02")
-            .Select(device => device.Value)
+            .Where(dxxm => dxxm.Name == "AP02")
+            .Select(dxxm => dxxm.Value)
             .FirstOrDefault()
             .ToString();
 
         string topLTE = topologySettings
-            .Where(device => device.Name == "LTE")
-            .Select(device => device.Value)
+            .Where(mxdvs => mxdvs.Name == "LTE")
+            .Select(mxdvs => mxdvs.Value)
+            .FirstOrDefault()
+            .ToString();
+
+        string hwDNS01 = hardwareSettings
+            .Where(kijmix => kijmix.Name == "DNS01")
+            .Select(kijmix => kijmix.Value)
+            .FirstOrDefault()
+            .ToString();
+
+        string hwDNS02 = hardwareSettings
+            .Where(howly => howly.Name == "DNS02")
+            .Select(howly => howly.Value)
             .FirstOrDefault()
             .ToString();
 
@@ -176,6 +189,12 @@ public class Utilities : ModuleBase<ShardedCommandContext>
         await Logger.Log(LogSeverity.Debug, "AP2IPObtained", $"Successfully obtained AP-2 IP Address from Azure Key Vault.");
 
         var lteIP = secretClient.GetSecret(topLTE);
+        await Logger.Log(LogSeverity.Debug, "LTEIPObtained", $"Successfully obtained LTE IP Address from Azure Key Vault.");
+
+        var dns01IP = secretClient.GetSecret(hwDNS01);
+        await Logger.Log(LogSeverity.Debug, "LTEIPObtained", $"Successfully obtained LTE IP Address from Azure Key Vault.");
+
+        var dns02IP = secretClient.GetSecret(hwDNS01);
         await Logger.Log(LogSeverity.Debug, "LTEIPObtained", $"Successfully obtained LTE IP Address from Azure Key Vault.");
 
         var tempResult = Messenger.Get(VersionCode.V2,
@@ -224,7 +243,9 @@ public class Utilities : ModuleBase<ShardedCommandContext>
             { "USW-ACC-SW1", accSW1IP.Value.Value, "", "" },
             { "U6-LR-01", ap1IP.Value.Value, "", "" },
             { "U6-LR-02", ap2IP.Value.Value, "", "" },
-            { "U-LTE", lteIP.Value.Value, "", "" }
+            { "U-LTE", lteIP.Value.Value, "", "" },
+            { "FINALIZER", dns01IP.Value.Value, "", "" },
+            { "DEVASTATOR", dns02IP.Value.Value, "", "" },
         };
 
         Ping pingSender = new();
@@ -336,7 +357,8 @@ public class Utilities : ModuleBase<ShardedCommandContext>
             $"`{networkDevices[7,0]}:`  {networkDevices[7,2]}  {networkDevices[7,3]}\n" +
             $"`{networkDevices[8,0]}:`  {networkDevices[8,2]}  {networkDevices[8,3]}\n\n" +
             $"__*Hardware Information:*__\n" +
-            $"***Not Implemented***\n\n" +
+            $"`{networkDevices[9, 0]}:`  {networkDevices[9, 2]}  {networkDevices[9, 3]}\n" +
+            $"`{networkDevices[10, 0]}:`  {networkDevices[10, 2]}  {networkDevices[10, 3]}\n\n" +
             $"__*Connection Information:*__\n" +
             $"`ISP Connection Speed:` {speed.Speed:0.00} {speed.Unit}\n");
         await Logger.Log(LogSeverity.Verbose, $"[{Context.Guild.Name}] ResponseSent", $"Health Report sent to the {Context.Channel.Name} channel.");
