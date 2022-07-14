@@ -9,9 +9,9 @@ using Discord.Commands;
 using Lextm.SharpSnmpLib;
 using Lextm.SharpSnmpLib.Messaging;
 using Catalyst.Common;
-using SpeedTest.Net;
-using RunMode = Discord.Commands.RunMode;
 using Renci.SshNet;
+using RunMode = Discord.Commands.RunMode;
+using System.Management.Automation;
 
 namespace Catalyst.Modules;
 
@@ -275,8 +275,23 @@ public class Utilities : ModuleBase<ShardedCommandContext>
             x++;
         }
 
-        var speed = await FastClient.GetDownloadSpeed(SpeedTest.Net.Enums.SpeedTestUnit.MegaBitsPerSecond);
-        await Logger.Log(LogSeverity.Debug, "SpeedTestServer", $"SpeedTest has completed. Download Speed ({speed.Source}): {speed.Speed} {speed.Unit}");
+        PowerShell psInstance = PowerShell.Create();
+
+        if (OperatingSystem.IsWindows())
+        {
+            string stDirectory = Directory.GetCurrentDirectory();
+            stDirectory += "\\Redistributables\\SpeedTest\\speedtest.exe";
+            psInstance.AddCommand(stDirectory);
+        }
+        else
+        {
+            psInstance.AddCommand("speedtest");
+        }
+
+        await Logger.Log(LogSeverity.Debug, "SpeedTestStarting", $"Launching speedtest.exe... Please Wait.");
+        var psOutput = psInstance.Invoke();
+        await Logger.Log(LogSeverity.Debug, "SpeedTestResults", $"{psOutput[7]}");
+        await Logger.Log(LogSeverity.Debug, "SpeedTestResults", $"{psOutput[9]}");
 
         decimal tempF = Convert.ToDecimal(tempResult[0].Data.ToString()) / 10;
         decimal tempC = (tempF - 32) * 5 / 9;
@@ -361,7 +376,7 @@ public class Utilities : ModuleBase<ShardedCommandContext>
             $"`{networkDevices[9, 0]}:`  {networkDevices[9, 2]}  {networkDevices[9, 3]}\n" +
             $"`{networkDevices[10, 0]}:`  {networkDevices[10, 2]}  {networkDevices[10, 3]}\n\n" +
             $"__*Connection Information:*__\n" +
-            $"`ISP Connection Speed:` {speed.Speed:0.00} {speed.Unit}\n");
+            $"`ISP Connection Speed:` {psOutput[11]}.png\n");
         await Logger.Log(LogSeverity.Verbose, $"[{Context.Guild.Name}] ResponseSent", $"Health Report sent to the {Context.Channel.Name} channel.");
     }
     [Command("epo", RunMode = RunMode.Async)]

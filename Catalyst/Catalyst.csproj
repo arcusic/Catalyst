@@ -30,7 +30,10 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
     <PackageReference Include="Lextm.SharpSnmpLib" Version="12.4.0" />
-    <PackageReference Include="SpeedTest.NetCore" Version="2.1.0" />
+    <PackageReference Include="Microsoft.PowerShell.Commands.Diagnostics" Version="7.2.5" />
+    <PackageReference Include="Microsoft.PowerShell.Commands.Management" Version="7.2.5" />
+    <PackageReference Include="Microsoft.PowerShell.Commands.Utility" Version="7.2.5" />
+    <PackageReference Include="Microsoft.PowerShell.ConsoleHost" Version="7.2.5" />
     <PackageReference Include="MediatR" Version="10.0.1" />
     <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="10.0.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.7" />
@@ -40,12 +43,19 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Discord.Net.Analyzers" Version="3.7.0" />
+    <PackageReference Include="Microsoft.PowerShell.Security" Version="7.2.5" />
+    <PackageReference Include="Microsoft.WSMan.Management" Version="7.2.5" />
     <PackageReference Include="SSH.NET" Version="2020.0.2" />
   </ItemGroup>
   <ItemGroup>
     <None Update="appsettings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Redistributables\SpeedTest\speedtest.exe">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Redistributables\SpeedTest\speedtest.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 </Project>
