@@ -28,13 +28,13 @@ public class Utilities : ModuleBase<ShardedCommandContext>
         await Context.Message.AddReactionAsync(whiteCheckMark);
         await Logger.Log(LogSeverity.Verbose, $"[{Context.Guild.Name}] CommandAcknowledged", $"Reacted with :white_check_mark: to {Context.User.Username}#{Context.User.DiscriminatorValue}'s message.");
 
-        await Context.Channel.TriggerTypingAsync();
+        var typingState = Context.Channel.EnterTypingState();
 
-        var response = await Context.Message.ReplyAsync($"Executing infrastructure health check... please wait.");
+        var response = await Context.Message.ReplyAsync($"Executing infrastructure health check... please wait.\n\n`CURRENT STATUS:`  Preparing for execution...");
         await Logger.Log(LogSeverity.Verbose, $"[{Context.Guild.Name}] ResponseSent", $"'Executing infrastructure health check... please wait.' in the {Context.Channel.Name} channel.");
-
         await Context.Channel.TriggerTypingAsync();
 
+        await response.ModifyAsync(msg => msg.Content = $"Executing infrastructure health check... please wait.\n\n`CURRENT STATUS:`  Parsing required information...");
         var jsonString = await File.ReadAllTextAsync("appsettings.json");
         var appSettings = JsonDocument.Parse(jsonString)!;
         var keyVaultSettings = appSettings.RootElement.GetProperty("KeyVault").EnumerateObject();
@@ -153,6 +153,7 @@ public class Utilities : ModuleBase<ShardedCommandContext>
 
         await Logger.Log(LogSeverity.Debug, $"JSONParsed", "JSON file has been successfully parsed.");
 
+        await response.ModifyAsync(msg => msg.Content = $"Executing infrastructure health check... please wait.\n\n`CURRENT STATUS:`  Retreiving Secrets from Azure KeyVault...");
         var secretClient = new SecretClient(new Uri($"https://{keyVault}.vault.azure.net"), new ClientSecretCredential(azureADTennantId, azureADClientId, azureADClientSecret));
         await Logger.Log(LogSeverity.Debug, "SNMPSecretClientConfigured", $"Configured Azure Key Vault client to connect to {secretClient.VaultUri}.");
 
@@ -198,6 +199,7 @@ public class Utilities : ModuleBase<ShardedCommandContext>
         var dns02IP = secretClient.GetSecret(hwDNS02);
         await Logger.Log(LogSeverity.Debug, "DNS02IPObtained", $"Successfully obtained DNS02 IP Address from Azure Key Vault.");
 
+        await response.ModifyAsync(msg => msg.Content = $"Executing infrastructure health check... please wait.\n\n`CURRENT STATUS:`  Gathering Environmental Information...");
         var tempResult = Messenger.Get(VersionCode.V2,
             new IPEndPoint(IPAddress.Parse(upsIPAddress.Value.Value), Convert.ToInt32(snmpPort.Value.Value)),
             new OctetString(snmpCommunity.Value.Value),
@@ -232,6 +234,8 @@ public class Utilities : ModuleBase<ShardedCommandContext>
             new List<Variable> { new Variable(new ObjectIdentifier(".1.3.6.1.4.1.850.1.1.3.1.3.2.2.1.2.1.1")) },
             60000);
         await Logger.Log(LogSeverity.Debug, "UPSInputObtained", $"Successfully obtained Input Voltage Frequency from UPS. {timeResult[0].Data.ToString()}");
+
+        await response.ModifyAsync(msg => msg.Content = $"Executing infrastructure health check... please wait.\n\n`CURRENT STATUS:`  Gathering Topology Information...");
 
         //create network device array
         string[,] networkDevices = new string[,]
@@ -275,6 +279,7 @@ public class Utilities : ModuleBase<ShardedCommandContext>
             x++;
         }
 
+        await response.ModifyAsync(msg => msg.Content = $"Executing infrastructure health check... please wait.\n\n`CURRENT STATUS:`  Spawning a PowerShell Instance...");
         PowerShell psInstance = PowerShell.Create();
 
         if (OperatingSystem.IsWindows())
@@ -288,11 +293,14 @@ public class Utilities : ModuleBase<ShardedCommandContext>
             psInstance.AddCommand("speedtest");
         }
 
+        await response.ModifyAsync(msg => msg.Content = $"Executing infrastructure health check... please wait.\n\n`CURRENT STATUS:`  Executing Speed Test...");
         await Logger.Log(LogSeverity.Debug, "SpeedTestStarting", $"Launching speedtest.exe... Please Wait.");
         var psOutput = psInstance.Invoke();
+        psInstance.Dispose();
         await Logger.Log(LogSeverity.Debug, "SpeedTestResults", $"{psOutput[7]}");
         await Logger.Log(LogSeverity.Debug, "SpeedTestResults", $"{psOutput[9]}");
 
+        await response.ModifyAsync(msg => msg.Content = $"Executing infrastructure health check... please wait.\n\n`CURRENT STATUS:`  Converting retreived data to human-readable format...");
         decimal tempF = Convert.ToDecimal(tempResult[0].Data.ToString()) / 10;
         decimal tempC = (tempF - 32) * 5 / 9;
         decimal inputFrequency = Convert.ToDecimal(inputResult[0].Data.ToString()) / 10;
@@ -315,6 +323,7 @@ public class Utilities : ModuleBase<ShardedCommandContext>
         {
             tempStatus = ":white_check_mark:";
         }
+        await response.ModifyAsync(msg => msg.Content = $"Executing infrastructure health check... please wait.\n\n`CURRENT STATUS:`  Analyzing Environmental Health... (25%)");
 
         if (Convert.ToInt32(humResult[0].Data.ToString()) > 95)
         {
@@ -328,6 +337,7 @@ public class Utilities : ModuleBase<ShardedCommandContext>
         {
             humidStatus = ":white_check_mark:";
         }
+        await response.ModifyAsync(msg => msg.Content = $"Executing infrastructure health check... please wait.\n\n`CURRENT STATUS:`  Analyzing Environmental Health... (50%)");
 
         if (Convert.ToInt32(capResult[0].Data.ToString()) < 20)
         {
@@ -341,6 +351,7 @@ public class Utilities : ModuleBase<ShardedCommandContext>
         {
             capStatus = ":white_check_mark:";
         }
+        await response.ModifyAsync(msg => msg.Content = $"Executing infrastructure health check... please wait.\n\n`CURRENT STATUS:`  Analyzing Environmental Health... (75%)");
 
         if (Convert.ToInt32(timeResult[0].Data.ToString()) < 10)
         {
@@ -354,7 +365,11 @@ public class Utilities : ModuleBase<ShardedCommandContext>
         {
             runStatus = ":white_check_mark:";
         }
+        typingState.Dispose();
+        await response.ModifyAsync(msg => msg.Content = $"Executing infrastructure health check... please wait.\n\n`CURRENT STATUS:`  Analyzing Environmental Health... (99%)");
 
+        await response.ModifyAsync(msg => msg.Content = $"Executing infrastructure health check... please wait.\n\n`CURRENT STATUS:`  Analyzing Environmental Health... (100%)");
+        
         await response.ModifyAsync(msg => msg.Content = $"__**Network Enclosure Health Report:**__\n" +
             $"__*Environemntal Information:*__" +
             $"\n`Current Temperature:`  {tempStatus}  {tempF} F  ({tempC:0.0} C)\n" +
@@ -376,7 +391,7 @@ public class Utilities : ModuleBase<ShardedCommandContext>
             $"`{networkDevices[9, 0]}:`  {networkDevices[9, 2]}  {networkDevices[9, 3]}\n" +
             $"`{networkDevices[10, 0]}:`  {networkDevices[10, 2]}  {networkDevices[10, 3]}\n\n" +
             $"__*Connection Information:*__\n" +
-            $"`ISP Connection Speed:` {psOutput[11]}.png\n");
+            $"`Speed Test Results:` {psOutput[11].ToString().Replace("Result URL: ", "")}.png\n");
         await Logger.Log(LogSeverity.Verbose, $"[{Context.Guild.Name}] ResponseSent", $"Health Report sent to the {Context.Channel.Name} channel.");
     }
     [Command("epo", RunMode = RunMode.Async)]
