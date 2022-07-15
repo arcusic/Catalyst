@@ -407,6 +407,7 @@ public class Utilities : ModuleBase<ShardedCommandContext>
         {
             await Context.Channel.TriggerTypingAsync();
             await Context.Message.AddReactionAsync(whiteCheckMark);
+            await Logger.Log(LogSeverity.Verbose, $"[{Context.Guild.Name}] CommandAcknowledged", $"Reacted with :white_check_mark: to {Context.User.Username}#{Context.User.DiscriminatorValue}'s message.");
 
             var response = await Context.Channel.SendMessageAsync("***Emergency Power Off***\n" +
             "__**WARNING:**__ This command will `Shut Down` the Servers within the Enclosure!\n\n" +
@@ -415,11 +416,13 @@ public class Utilities : ModuleBase<ShardedCommandContext>
 
             await response.AddReactionAsync(redX);
             await response.AddReactionAsync(whiteCheckMark);
+            await Logger.Log(LogSeverity.Verbose, $"[{Context.Guild.Name}] ConfirmationRequired", $"Confirmation Message posted... awaiting user input.");
 
             bool reacted = false;
 
             while ((!reacted))
             {
+                
                 var message = await Context.Channel.GetMessageAsync(response.Id);
                 var confirm = await message.GetReactionUsersAsync(whiteCheckMark, 100).FlattenAsync();
                 var abort = await message.GetReactionUsersAsync(redX, 100).FlattenAsync();
@@ -428,6 +431,7 @@ public class Utilities : ModuleBase<ShardedCommandContext>
                 {
                     if (user.Username == "Catalyst" && user.Discriminator == "7894")
                     {
+                        await Logger.Log(LogSeverity.Verbose, $"[{Context.Guild.Name}] ConfirmationReceived", $"{Context.User.Username}#{Context.User.DiscriminatorValue} has reacted with :white_check_mark: to the confirmation message.");
                         await response.ModifyAsync(msg => msg.Content = "***Emergency Power Off***\n" +
                             "__**WARNING:**__ This command will `Shut Down` the Servers within the Enclosure!\n\n" +
                             $"**Execution has started.**\n" +
@@ -525,6 +529,7 @@ public class Utilities : ModuleBase<ShardedCommandContext>
                                 $"`STATUS:`  Connecting to FINALIZER...  Server 1/2.");
 
                             sshClient.Connect();
+                            await Logger.Log(LogSeverity.Debug, "SSHClient", $"Successfully connected to FINALIZER.");
 
                             await response.ModifyAsync(msg => msg.Content = "***Emergency Power Off***\n" +
                                 "__**WARNING:**__ This command will `Shut Down` the Servers within the Enclosure!\n\n" +
@@ -532,6 +537,7 @@ public class Utilities : ModuleBase<ShardedCommandContext>
                                 $"`STATUS:`  Connected to FINALIZER.  Executing System Shutdown...  Server 1/2");
 
                             var output = sshClient.RunCommand("shutdown /s /f /t 10");
+                            await Logger.Log(LogSeverity.Debug, "SSHClient", $"Executing shutdown /s /f /t 10 on FINALIZER.");
 
                             await response.ModifyAsync(msg => msg.Content = "***Emergency Power Off***\n" +
                                 "__**WARNING:**__ This command will `Shut Down` the Servers within the Enclosure!\n\n" +
@@ -553,6 +559,7 @@ public class Utilities : ModuleBase<ShardedCommandContext>
                                 $"`STATUS:`  Connecting to DEVASTATOR...  Server 2/2.");
 
                             sshClient.Connect();
+                            await Logger.Log(LogSeverity.Debug, "SSHClient", $"Successfully connected to DEVASTATOR.");
 
                             await response.ModifyAsync(msg => msg.Content = "***Emergency Power Off***\n" +
                                 "__**WARNING:**__ This command will `Shut Down` the Servers within the Enclosure!\n\n" +
@@ -560,6 +567,7 @@ public class Utilities : ModuleBase<ShardedCommandContext>
                                 $"`STATUS:`  Connected to DEVASTATOR.  Executing System Shutdown...  Server 2/2");
 
                             var output = sshClient.RunCommand("shutdown /s /f /t 10");
+                            await Logger.Log(LogSeverity.Debug, "SSHClient", $"Executing shutdown /s /f /t 10 on DEVASTATOR.");
 
                             await response.ModifyAsync(msg => msg.Content = "***Emergency Power Off***\n" +
                                 "__**WARNING:**__ This command will `Shut Down` the Servers within the Enclosure!\n\n" +
@@ -574,15 +582,18 @@ public class Utilities : ModuleBase<ShardedCommandContext>
                                 "__**WARNING:**__ This command will `Shut Down` the Servers within the Enclosure!\n\n" +
                                 $"**Execution has completed.**\n" +
                                 $":skull_crossbones:  Goodbye cruel world.  I will remain offline until activated again.  :skull_crossbones: ");
+                        await Logger.Log(LogSeverity.Debug, "EPOComplete", $"EPO has completed.");
 
                         reacted = true;
                     }
+                    await Logger.Log(LogSeverity.Verbose, $"[{Context.Guild.Name}] ConfirmationRequired", $"No reaction found... awaiting user input.");
                 }
 
                 foreach (var user in abort)
                 {
                     if (user.Username == "Catalyst" && user.Discriminator == "7894")
                     {
+                        await Logger.Log(LogSeverity.Verbose, $"[{Context.Guild.Name}] AbortReceived", $"{Context.User.Username}#{Context.User.DiscriminatorValue} has reacted with :x: to the confirmation message.");
                         await response.ModifyAsync(msg => msg.Content = "***Emergency Power Off***\n" +
                             "__**WARNING:**__ This command will `Shut Down` the Servers within the Enclosure!\n\n" +
                             $"**Execution has been aborted.**");
@@ -592,13 +603,11 @@ public class Utilities : ModuleBase<ShardedCommandContext>
                 }
             }
 
-            // await Context.Message.ReplyAsync($"{Context.User.Username}#{Context.User.DiscriminatorValue} has initiated an Emergency Power Off procedure.");
-            // await Logger.Log(LogSeverity.Debug, $"[{Context.Guild.Name}] ResponseSent", $"Emergency Power Off sent to the {Context.Channel.Name} channel.");
         }
         else
         {
             await Context.Message.AddReactionAsync(denied);
-            await Logger.Log(LogSeverity.Verbose, $"[{Context.Guild.Name}] CommandRejected", $"Reacted with :: to {Context.User.Username}#{Context.User.DiscriminatorValue}'s message.");
+            await Logger.Log(LogSeverity.Verbose, $"[{Context.Guild.Name}] CommandRejected", $"Reacted with :no_entry_sign: to {Context.User.Username}#{Context.User.DiscriminatorValue}'s message.");
 
             await Context.Channel.TriggerTypingAsync();
 
@@ -607,7 +616,5 @@ public class Utilities : ModuleBase<ShardedCommandContext>
                 "__**WARNING:**__  This incident has been logged!\n" +
                 "*Further attempts to execute a privledged command without authorization may lead to additional action.*");
         }
-
-        await Logger.Log(LogSeverity.Verbose, $"[{Context.Guild.Name}] CommandExecuted", $"Emergency Power Off command executed by {Context.User.Username}.");
     }
 }
