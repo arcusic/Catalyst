@@ -233,7 +233,7 @@ public class Utilities : ModuleBase<ShardedCommandContext>
             new OctetString(snmpCommunity.Value.Value),
             new List<Variable> { new Variable(new ObjectIdentifier(".1.3.6.1.4.1.850.1.1.3.1.3.2.2.1.2.1.1")) },
             60000);
-        await Logger.Log(LogSeverity.Debug, "UPSInputObtained", $"Successfully obtained Input Voltage Frequency from UPS. {timeResult[0].Data.ToString()}");
+        await Logger.Log(LogSeverity.Debug, "UPSInputObtained", $"Successfully obtained Input Voltage Frequency from UPS. {inputResult[0].Data.ToString()}");
 
         await response.ModifyAsync(msg => msg.Content = $"Executing infrastructure health check... please wait.\n\n`CURRENT STATUS:`  Gathering Topology Information...");
 
