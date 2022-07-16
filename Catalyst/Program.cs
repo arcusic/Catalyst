@@ -52,6 +52,7 @@ async Task MainAsync()
 {
     await Bootstrapper.ServiceProvider.GetRequiredService<ICommandHandler>().InitializeAsync();
 
+    //Start Conversion Module
     var temperatureConversion = new SlashCommandBuilder()
         .WithName("temperature")
         .WithDescription("Temperature Conversion")
@@ -102,9 +103,36 @@ async Task MainAsync()
             .AddChoice("Inches", "in")
             .WithType(ApplicationCommandOptionType.String))
         .Build();
+    //End Conversion Module
+
+    //Start About Module
+    var about = new SlashCommandBuilder()
+        .WithName("about")
+        .WithDescription("About The Catalyst")
+        .Build();
+
+    var changeLog = new SlashCommandBuilder()
+        .WithName("release_notes")
+        .WithDescription("Display Release Notes")
+        .Build();
+
+    var help = new SlashCommandBuilder()
+        .WithName("help")
+        .WithDescription("Help for all Context Commands")
+        .Build();
+    //End About Module
 
     client.ShardReady += async shard =>
     {
+        await shard.CreateGlobalApplicationCommandAsync(about);
+        await Logger.Log(LogSeverity.Info, "CMDBuilt", $"Slash Command {about.Name} is built and ready!");
+
+        await shard.CreateGlobalApplicationCommandAsync(changeLog);
+        await Logger.Log(LogSeverity.Info, "CMDBuilt", $"Slash Command {changeLog.Name} is built and ready!");
+
+        await shard.CreateGlobalApplicationCommandAsync(help);
+        await Logger.Log(LogSeverity.Info, "CMDBuilt", $"Slash Command {help.Name} is built and ready!");
+
         await shard.CreateGlobalApplicationCommandAsync(temperatureConversion);
         await Logger.Log(LogSeverity.Info, "CMDBuilt", $"Slash Command {temperatureConversion.Name} is built and ready!");
 

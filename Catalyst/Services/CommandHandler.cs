@@ -66,6 +66,91 @@ public class CommandHandler : ICommandHandler
 
     public async Task SlashCommandHandler(SocketSlashCommand command)
     {
+        if (command.Data.Name == "about")
+        {
+            var whiteCheckMark = new Emoji("\u2705");
+
+            await Logger.Log(LogSeverity.Verbose, $"[{command.GuildId}] CommandReceived", $"{command.User.Username}#{command.User.DiscriminatorValue} has invoked {command.Data.Name} from the {command.Channel.Name} channel.");
+            
+            string osEmote = Environment.Is64BitOperatingSystem ? ":white_check_mark:" : ":x:";
+            string procEmote = Environment.Is64BitProcess ? ":white_check_mark:" : ":x:";
+            string operatingSystem = Environment.OSVersion.ToString().Contains("Microsoft Windows") ? "Microsoft Windows" : Environment.OSVersion.ToString();
+#if DEBUG
+            string description = $":warning: `THIS IS A PRE-RELEASE VERSION.` :warning:\n\n" +
+                $"`Catalyst Version:`  Alpha v0.1 (Build 2207)\n\n" +
+                $"__*System Information*__\n" +
+                $"`Active Node:`  {Environment.MachineName}\n" +
+                $"`Operating System Platform:`  {operatingSystem}\n" +
+                $"`Operating System Version:`  {Environment.OSVersion.Version}\n" +
+                $"`64 Bit Operating System:`  {osEmote}\n" +
+                $"`64 Bit Process:`  {procEmote}\n" +
+                $"`.NET Version:`  {Environment.Version}\n\n" +
+                $"__*Created By:*__\n" +
+                $"> Catalyst#7894\n" +
+                $"> Tactical050#9264\n" +
+                $"> 1xs#0001\n" +
+                $"> lovelxrd#7895\n\n" +
+                $"__*Loaded Modules:*__\n" +
+                $"> Core Command Module - v0.1 (Build 2207)\n" +
+                $"> Utilities Module - v0.1 (Build 2207)\n\n" +
+                $"__*Documentation*__\n" +
+                $"> Change Log can be viewed by `!changelog`\n" +
+                $"> Commands can be viewed by executing `!help`";
+#endif
+#if RELEASE
+        string description = $"`Catalyst Version:`  Alpha v0.1 (Build 2207)\n\n" +
+            $"__*System Information*__\n" +
+            $"`Active Node:`  {Environment.MachineName}\n" +
+            $"`Operating System Platform:`  {operatingSystem}\n" +
+            $"`Operating System Version:`  {Environment.OSVersion.Version}\n" +
+            $"`64 Bit Operating System:`  {osEmote}\n" +
+            $"`64 Bit Process:`  {procEmote}\n" +
+            $"`.NET Version:`  {Environment.Version}\n\n" +
+            $"__*Created By:*__\n" +
+            $"> Catalyst#7894\n" +
+            $"> Tactical050#9264\n" +
+            $"> 1xs#0001\n" +
+            $"> lovelxrd#7895\n\n" +
+            $"__*Loaded Modules:*__\n" +
+            $"> Utilities Module - v0.1 (Build 2207)\n\n" +
+#endif
+
+            var embedded = new EmbedBuilder
+            {
+                Title = "Catalyst Version Information",
+                Description = description,
+                Color = new Color(0xF6CF57),
+                ImageUrl = "https://cdn.discordapp.com/attachments/994640322615324773/997325232215957514/unknown.png",
+                Footer = new EmbedFooterBuilder
+                {
+                    Text = $"Requested by {command.User.Username}#{command.User.DiscriminatorValue}",
+                    IconUrl = command.User.GetAvatarUrl()
+                },
+                Timestamp = DateTime.Now,
+                Author = new EmbedAuthorBuilder
+                {
+                    Name = "The Catalyst",
+                    IconUrl = "https://cdn.discordapp.com/attachments/994640322615324773/997325232215957514/unknown.png"
+                }
+            };
+
+            await command.RespondAsync(embed: embedded.Build());
+
+            await Logger.Log(LogSeverity.Verbose, $"[{command.GuildId}] ResponseSent", $"Application Version information sent to the {command.Channel.Name} channel.");
+        }
+
+        if (command.Data.Name == "release_notes")
+        {
+            await command.RespondAsync(":x: ***NOT IMPLEMENTED*** :x:\n" +
+                "This command is under active development and is not yet available.");
+        }
+
+        if (command.Data.Name == "help")
+        {
+            await command.RespondAsync(":x: ***NOT IMPLEMENTED*** :x:\n" +
+                "This command is under active development and is not yet available.");
+        }
+
         if (command.Data.Name == "temperature")
         {
             string? unit = command.Data.Options.Last().Value.ToString();
