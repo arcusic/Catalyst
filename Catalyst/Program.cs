@@ -22,16 +22,21 @@ await Logger.Log(LogSeverity.Debug, "SecretClientConfigured", $"Configured Azure
 var token = secretClient.GetSecret(config.GetRequiredSection("KeyVault")["SecretName"]);
 await Logger.Log(LogSeverity.Debug, "AuthTokenObtained", $"Successfully obtained token from Azure Key Vault. Secret ID: {token.Value.Id}");
 
-var client = new DiscordShardedClient();
+var client = new DiscordShardedClient(new DiscordSocketConfig
+{
+    LogLevel = LogSeverity.Debug,
+    MessageCacheSize = 1000,
+    TotalShards = 1,
+    GatewayIntents = GatewayIntents.All,
+    AlwaysDownloadUsers = true,
+    DefaultRetryMode = RetryMode.AlwaysRetry
+});
 
 var commands = new CommandService(new CommandServiceConfig
 {
-    // Again, log level:
-    LogLevel = LogSeverity.Info,
-
-    // There's a few more properties you can set,
-    // for example, case-insensitive commands.
-    CaseSensitiveCommands = false,
+    DefaultRunMode = RunMode.Async,
+    LogLevel = LogSeverity.Debug,
+    CaseSensitiveCommands = true
 });
 
 // Setup your DI container.
@@ -47,8 +52,65 @@ async Task MainAsync()
 {
     await Bootstrapper.ServiceProvider.GetRequiredService<ICommandHandler>().InitializeAsync();
 
+    var temperatureConversion = new SlashCommandBuilder()
+        .WithName("temperature")
+        .WithDescription("Temperature Conversion")
+        .AddOption(new SlashCommandOptionBuilder()
+            .WithName("temp")
+            .WithDescription("Temperature")
+            .WithRequired(true)
+            .WithType(ApplicationCommandOptionType.Number))
+        .AddOption(new SlashCommandOptionBuilder()
+            .WithName("unit")
+            .WithDescription("Unit of Measurement")
+            .WithRequired(true)
+            .AddChoice("Celsius", "C")
+            .AddChoice("Fahrenheit", "F")
+            .WithType(ApplicationCommandOptionType.String))
+        .Build();
+
+    var distanceConversion = new SlashCommandBuilder()
+        .WithName("distance")
+        .WithDescription("Distance Conversion")
+        .AddOption(new SlashCommandOptionBuilder()
+            .WithName("distance")
+            .WithDescription("Distance")
+            .WithRequired(true)
+            .WithType(ApplicationCommandOptionType.Number))
+        .AddOption(new SlashCommandOptionBuilder()
+            .WithName("sourceunit")
+            .WithDescription("Unit of Measurement")
+            .WithRequired(true)
+            .AddChoice("Kilometers", "km")
+            .AddChoice("Meters", "m")
+            .AddChoice("Centimeters", "cm")
+            .AddChoice("Miles", "mi")
+            .AddChoice("Yards", "yd")
+            .AddChoice("Feet", "ft")
+            .AddChoice("Inches", "in")
+            .WithType(ApplicationCommandOptionType.String))
+        .AddOption(new SlashCommandOptionBuilder()
+            .WithName("destinationunit")
+            .WithDescription("Unit of Measurement")
+            .WithRequired(true)
+            .AddChoice("Kilometers", "km")
+            .AddChoice("Meters", "m")
+            .AddChoice("Centimeters", "cm")
+            .AddChoice("Miles", "mi")
+            .AddChoice("Yards", "yd")
+            .AddChoice("Feet", "ft")
+            .AddChoice("Inches", "in")
+            .WithType(ApplicationCommandOptionType.String))
+        .Build();
+
     client.ShardReady += async shard =>
     {
+        await shard.CreateGlobalApplicationCommandAsync(temperatureConversion);
+        await Logger.Log(LogSeverity.Info, "CMDBuilt", $"Slash Command {temperatureConversion.Name} is built and ready!");
+
+        await shard.CreateGlobalApplicationCommandAsync(distanceConversion);
+        await Logger.Log(LogSeverity.Info, "CMDBuilt", $"Slash Command {distanceConversion.Name} is built and ready!");
+
         await Logger.Log(LogSeverity.Info, "ShardReady", $"Shard Number {shard.ShardId} is connected and ready!");
     };
 
@@ -63,6 +125,8 @@ async Task MainAsync()
     await Logger.Log(LogSeverity.Debug, $"Client{client.LoginState}", $"Discord Presence: {client.Status}.");
     
     await client.StartAsync();
+    await client.DownloadUsersAsync(guilds: client.Guilds);
+
     await Logger.Log(LogSeverity.Debug, $"ClientReady", $"Client is connected to Discord.");
 
     // Wait infinitely so your bot actually stays connected.
