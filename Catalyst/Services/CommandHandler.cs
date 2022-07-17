@@ -396,5 +396,90 @@ public class CommandHandler : ICommandHandler
 
             await command.RespondAsync($"{input} {distance:0.0} {destinationUnit}");
         }
+
+        if (command.Data.Name == "weight")
+        {
+            string? sourceUnit = command.Data.Options.ElementAt(1).Value.ToString();
+            string? destinationUnit = command.Data.Options.ElementAt(2).Value.ToString();
+            double weight = double.Parse(command.Data.Options.ElementAt(0).Value.ToString());
+            string input = $"`{weight} {sourceUnit}:`  ";
+
+            if (sourceUnit == "kg")
+            {
+                if (destinationUnit == "kg")
+                {
+                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {weight:0.0} {destinationUnit}");
+                }
+                else if (destinationUnit == "g")
+                {
+                    weight = weight * 1000;
+                }
+                else if (destinationUnit == "lb")
+                {
+                    weight = weight * 2.20462;
+                }
+                else if (destinationUnit == "oz")
+                {
+                    weight = weight * 35.274;
+                }
+            }
+            else if (sourceUnit == "g")
+            {
+                if (destinationUnit == "kg")
+                {
+                    weight = weight / 1000;
+                }
+                else if (destinationUnit == "g")
+                {
+                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {weight:0.0} {destinationUnit}");
+                }
+                else if (destinationUnit == "lb")
+                {
+                    weight = weight * 0.00220462;
+                }
+                else if (destinationUnit == "oz")
+                {
+                    weight = weight * 0.035274;
+                }
+            }
+            else if (sourceUnit == "lb")
+            {
+                if (destinationUnit == "kg")
+                {
+                    weight = weight / 2.20462;
+                }
+                else if (destinationUnit == "g")
+                {
+                    weight = weight * 453.592;
+                }
+                else if (destinationUnit == "lb")
+                {
+                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {weight:0.0} {destinationUnit}");
+                }
+                else if (destinationUnit == "oz")
+                {
+                    weight = weight * 16;
+                }
+            }
+            else if (sourceUnit == "oz")
+            {
+                if (destinationUnit == "kg")
+                {
+                    weight = weight / 35.274;
+                }
+                else if (destinationUnit == "g")
+                {
+                    weight = weight * 28.3495;
+                }
+                else if (destinationUnit == "lb")
+                {
+                    weight = weight / 16;
+                }
+                else if (destinationUnit == "oz")
+                {
+                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {weight:0.0} {destinationUnit}");
+                }
+            }
+        }
     }
 }
