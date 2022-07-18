@@ -480,6 +480,458 @@ public class CommandHandler : ICommandHandler
                     await command.RespondAsync($"Seriously... convert it yourself...\n{input} {weight:0.0} {destinationUnit}");
                 }
             }
+
+            await command.RespondAsync($"{input} {weight:0.0} {destinationUnit}");
+        }
+
+        if (command.Data.Name == "volume")
+        {
+            string? sourceUnit = command.Data.Options.ElementAt(1).Value.ToString();
+            string? destinationUnit = command.Data.Options.ElementAt(2).Value.ToString();
+            double volume = double.Parse(command.Data.Options.ElementAt(0).Value.ToString());
+            string input = $"`{volume} {sourceUnit}:`  ";
+
+            if (sourceUnit == "l")
+            {
+                if (destinationUnit == "l")
+                {
+                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {volume:0.0} {destinationUnit}");
+                }
+                else if (destinationUnit == "ml")
+                {
+                    volume = volume * 1000;
+                }
+                else if (destinationUnit == "gal")
+                {
+                    volume = volume * 0.264172;
+                }
+                else if (destinationUnit == "qt")
+                {
+                    volume = volume * 0.106919;
+                }
+                else if (destinationUnit == "pt")
+                {
+                    volume = volume * 0.0284131;
+                }
+                else if (destinationUnit == "cup")
+                {
+                    volume = volume * 0.00416667;
+                }
+                else if (destinationUnit == "fl oz")
+                {
+                    volume = volume * 29.5735;
+                }
+                else if (destinationUnit == "tbsp")
+                {
+                    volume = volume * 67.628;
+                }
+                else if (destinationUnit == "tsp")
+                {
+                    volume = volume * 202.884;
+                }
+            }
+            else if (sourceUnit == "ml")
+            {
+                if (destinationUnit == "l")
+                {
+                    volume = volume / 1000;
+                }
+                else if (destinationUnit == "ml")
+                {
+                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {volume:0.0} {destinationUnit}");
+                }
+                else if (destinationUnit == "gal")
+                {
+                    volume = volume * 0.000264172;
+                }
+                else if (destinationUnit == "qt")
+                {
+                    volume = volume * 0.000130772;
+                }
+                else if (destinationUnit == "pt")
+                {
+                    volume = volume * 0.0000492892;
+                }
+                else if (destinationUnit == "cup")
+                {
+                    volume = volume * 0.0000236588;
+                }
+                else if (destinationUnit == "fl oz")
+                {
+                    volume = volume * 0.33814;
+                }
+                else if (destinationUnit == "tbsp")
+                {
+                    volume = volume * 0.0692641;
+                }
+                else if (destinationUnit == "tsp")
+                {
+                    volume = volume * 0.20094;
+                }
+            }
+            else if (sourceUnit == "gal")
+            {
+                if (destinationUnit == "l")
+                {
+                    volume = volume / 0.264172;
+                }
+                else if (destinationUnit == "ml")
+                {
+                    volume = volume * 264.172;
+                }
+                else if (destinationUnit == "gal")
+                {
+                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {volume:0.0} {destinationUnit}");
+                }
+                else if (destinationUnit == "qt")
+                {
+                    volume = volume * 2.25;
+                }
+                else if (destinationUnit == "pt")
+                {
+                    volume = volume * 4.92892;
+                }
+                else if (destinationUnit == "cup")
+                {
+                    volume = volume * 2.36588;
+                }
+                else if (destinationUnit == "fl oz")
+                {
+                    volume = volume * 33.814;
+                }
+                else if (destinationUnit == "tbsp")
+                {
+                    volume = volume * 67.628;
+                }
+                else if (destinationUnit == "tsp")
+                {
+                    volume = volume * 202.884;
+                }
+            }
+            else if (sourceUnit == "qt")
+            {
+                if (destinationUnit == "l")
+                {
+                    volume = volume / 0.106919;
+                }
+                else if (destinationUnit == "ml")
+                {
+                    volume = volume * 1069.19;
+                }
+                else if (destinationUnit == "gal")
+                {
+                    volume = volume * 0.00378541;
+                }
+                else if (destinationUnit == "qt")
+                {
+                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {volume:0.0} {destinationUnit}");
+                }
+                else if (destinationUnit == "pt")
+                {
+                    volume = volume * 2.11338;
+                }
+                else if (destinationUnit == "cup")
+                {
+                    volume = volume * 1.05669;
+                }
+                else if (destinationUnit == "fl oz")
+                {
+                    volume = volume * 33.814;
+                }
+                else if (destinationUnit == "tbsp")
+                {
+                    volume = volume * 67.628;
+                }
+                else if (destinationUnit == "tsp")
+                {
+                    volume = volume * 202.884;
+                }
+            }
+            else if (sourceUnit == "pt")
+            {
+                if (destinationUnit == "l")
+                {
+                    volume = volume / 0.0284131;
+                }
+                else if (destinationUnit == "ml")
+                {
+                    volume = volume * 284.131;
+                }
+                else if (destinationUnit == "gal")
+                {
+                    volume = volume * 0.00284130;
+                }
+                else if (destinationUnit == "qt")
+                {
+                    volume = volume * 0.00131577;
+                }
+                else if (destinationUnit == "pt")
+                {
+                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {volume:0.0} {destinationUnit}");
+                }
+                else if (destinationUnit == "cup")
+                {
+                    volume = volume * 0.0692641;
+                }
+                else if (destinationUnit == "fl oz")
+                {
+                    volume = volume * 29.5735;
+                }
+                else if (destinationUnit == "tbsp")
+                {
+                    volume = volume * 67.628;
+                }
+                else if (destinationUnit == "tsp")
+                {
+                    volume = volume * 202.884;
+                }
+            }
+            else if (sourceUnit == "cup")
+            {
+                if (destinationUnit == "l")
+                {
+                    volume = volume / 0.00416667;
+                }
+                else if (destinationUnit == "ml")
+                {
+                    volume = volume * 4166.67;
+                }
+                else if (destinationUnit == "gal")
+                {
+                    volume = volume * 0.00211338;
+                }
+                else if (destinationUnit == "qt")
+                {
+                    volume = volume * 0.00105669;
+                }
+                else if (destinationUnit == "pt")
+                {
+                    volume = volume * 0.0284131;
+                }
+                else if (destinationUnit == "cup")
+                {
+                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {volume:0.0} {destinationUnit}");
+                }
+                else if (destinationUnit == "fl oz")
+                {
+                    volume = volume * 33.814;
+                }
+                else if (destinationUnit == "tbsp")
+                {
+                    volume = volume * 67.628;
+                }
+                else if (destinationUnit == "tsp")
+                {
+                    volume = volume * 202.884;
+                }
+            }
+            else if (sourceUnit == "fl oz")
+            {
+                if (destinationUnit == "l")
+                {
+                    volume = volume / 0.33814;
+                }
+                else if (destinationUnit == "ml")
+                {
+                    volume = volume * 33814;
+                }
+                else if (destinationUnit == "gal")
+                {
+                    volume = volume * 0.00295735;
+                }
+                else if (destinationUnit == "qt")
+                {
+                    volume = volume * 0.00147575;
+                }
+                else if (destinationUnit == "pt")
+                {
+                    volume = volume * 0.0284131;
+                }
+                else if (destinationUnit == "cup")
+                {
+                    volume = volume * 0.00416667;
+                }
+                else if (destinationUnit == "fl oz")
+                {
+                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {volume:0.0} {destinationUnit}");
+                }
+                else if (destinationUnit == "tbsp")
+                {
+                    volume = volume * 0.0692641;
+                }
+                else if (destinationUnit == "tsp")
+                {
+                    volume = volume * 0.20094;
+                }
+            }
+            else if (sourceUnit == "tbsp")
+            {
+                if (destinationUnit == "l")
+                {
+                    volume = volume / 0.676280;
+                }
+                else if (destinationUnit == "ml")
+                {
+                    volume = volume * 67.628;
+                }
+                else if (destinationUnit == "gal")
+                {
+                    volume = volume * 0.000692641;
+                }
+                else if (destinationUnit == "qt")
+                {
+                    volume = volume * 0.000284131;
+                }
+                else if (destinationUnit == "pt")
+                {
+                    volume = volume * 0.0284131;
+                }
+                else if (destinationUnit == "cup")
+                {
+                    volume = volume * 0.00416667;
+                }
+                else if (destinationUnit == "fl oz")
+                {
+                    volume = volume * 0.0692641;
+                }
+                else if (destinationUnit == "tbsp")
+                {
+                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {volume:0.0} {destinationUnit}");
+                }
+                else if (destinationUnit == "tsp")
+                {
+                    volume = volume * 3.96563;
+                }
+            }
+            else if (sourceUnit == "tsp")
+            {
+                if (destinationUnit == "l")
+                {
+                    volume = volume / 202.884;
+                }
+                else if (destinationUnit == "ml")
+                {
+                    volume = volume * 202.884;
+                }
+                else if (destinationUnit == "gal")
+                {
+                    volume = volume * 0.001;
+                }
+                else if (destinationUnit == "qt")
+                {
+                    volume = volume * 0.000202884;
+                }
+                else if (destinationUnit == "pt")
+                {
+                    volume = volume * 0.000284131;
+                }
+                else if (destinationUnit == "cup")
+                {
+                    volume = volume * 0.000416670;
+                }
+                else if (destinationUnit == "fl oz")
+                {
+                    volume = volume * 0.0692641;
+                }
+                else if (destinationUnit == "tbsp")
+                {
+                    volume = volume * 0.00676280;
+                }
+                else if (destinationUnit == "tsp")
+                {
+                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {volume:0.0} {destinationUnit}");
+                }
+            }
+
+            await command.RespondAsync($"{input} {volume:0.0} {destinationUnit}");
+        }
+
+        if (command.Data.Name == "speed")
+        {
+            string? sourceUnit = command.Data.Options.ElementAt(1).Value.ToString();
+            string? destinationUnit = command.Data.Options.ElementAt(2).Value.ToString();
+            double speed = double.Parse(command.Data.Options.ElementAt(0).Value.ToString());
+            string input = $"`{speed} {sourceUnit}:`  ";
+            
+
+            if (sourceUnit == "m/s")
+            {
+                if (destinationUnit == "m/s")
+                {
+                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {speed:0.0} {destinationUnit}");
+                }
+                else if (destinationUnit == "km/h")
+                {
+                    speed = speed * 3.6;
+                }
+                else if (destinationUnit == "mph")
+                {
+                    speed = speed * 2.23694;
+                }
+                else if (destinationUnit == "knot")
+                {
+                    speed = speed * 1.94384;
+                }
+            }
+            else if (sourceUnit == "km/h")
+            {
+                if (destinationUnit == "m/s")
+                {
+                    speed = speed / 3.6;
+                }
+                else if (destinationUnit == "km/h")
+                {
+                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {speed:0.0} {destinationUnit}");
+                }
+                else if (destinationUnit == "mph")
+                {
+                    speed = speed / 1.60934;
+                }
+                else if (destinationUnit == "knot")
+                {
+                    speed = speed / 1.852;
+                }
+            }
+            else if (sourceUnit == "mph")
+            {
+                if (destinationUnit == "m/s")
+                {
+                    speed = speed / 2.23694;
+                }
+                else if (destinationUnit == "km/h")
+                {
+                    speed = speed * 1.60934;
+                }
+                else if (destinationUnit == "mph")
+                {
+                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {speed:0.0} {destinationUnit}");
+                }
+                else if (destinationUnit == "knot")
+                {
+                    speed = speed * 1.15078;
+                }
+            }
+            else if (sourceUnit == "knot")
+            {
+                if (destinationUnit == "m/s")
+                {
+                    speed = speed / 1.852;
+                }
+                else if (destinationUnit == "km/h")
+                {
+                    speed = speed * 1.852;
+                }
+                else if (destinationUnit == "mph")
+                {
+                    speed = speed * 1.15078;
+                }
+                else if (destinationUnit == "knot")
+                {
+                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {speed:0.0} {destinationUnit}");
+                }
+            }
+
+            await command.RespondAsync($"{input} {speed:0.0} {destinationUnit}");
         }
     }
 }
