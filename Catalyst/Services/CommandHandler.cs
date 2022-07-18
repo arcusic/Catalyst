@@ -91,28 +91,23 @@ public class CommandHandler : ICommandHandler
                 $"> 1xs#0001\n" +
                 $"> lovelxrd#7895\n\n" +
                 $"__*Loaded Modules:*__\n" +
-                $"> Core Command Module - v0.1 (Build 2207)\n" +
-                $"> Utilities Module - v0.1 (Build 2207)\n\n" +
-                $"__*Documentation*__\n" +
-                $"> Change Log can be viewed by `!changelog`\n" +
-                $"> Commands can be viewed by executing `!help`";
-#endif
+                $"> Utilities Module - v0.1 (Build 2207)";
 #if RELEASE
-        string description = $"`Catalyst Version:`  Alpha v0.1 (Build 2207)\n\n" +
-            $"__*System Information*__\n" +
-            $"`Active Node:`  {Environment.MachineName}\n" +
-            $"`Operating System Platform:`  {operatingSystem}\n" +
-            $"`Operating System Version:`  {Environment.OSVersion.Version}\n" +
-            $"`64 Bit Operating System:`  {osEmote}\n" +
-            $"`64 Bit Process:`  {procEmote}\n" +
-            $"`.NET Version:`  {Environment.Version}\n\n" +
-            $"__*Created By:*__\n" +
-            $"> Catalyst#7894\n" +
-            $"> Tactical050#9264\n" +
-            $"> 1xs#0001\n" +
-            $"> lovelxrd#7895\n\n" +
-            $"__*Loaded Modules:*__\n" +
-            $"> Utilities Module - v0.1 (Build 2207)\n\n" +
+            string description = $"`Catalyst Version:`  Alpha v0.1 (Build 2207)\n\n" +
+                $"__*System Information*__\n" +
+                $"`Active Node:`  {Environment.MachineName}\n" +
+                $"`Operating System Platform:`  {operatingSystem}\n" +
+                $"`Operating System Version:`  {Environment.OSVersion.Version}\n" +
+                $"`64 Bit Operating System:`  {osEmote}\n" +
+                $"`64 Bit Process:`  {procEmote}\n" +
+                $"`.NET Version:`  {Environment.Version}\n\n" +
+                $"__*Created By:*__\n" +
+                $"> Catalyst#7894\n" +
+                $"> Tactical050#9264\n" +
+                $"> 1xs#0001\n" +
+                $"> lovelxrd#7895\n\n" +
+                $"__*Loaded Modules:*__\n" +
+                $"> Utilities Module - v0.1 (Build 2207)";
 #endif
 
             var embedded = new EmbedBuilder
