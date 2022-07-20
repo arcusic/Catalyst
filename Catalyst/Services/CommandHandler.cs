@@ -116,7 +116,7 @@ public class CommandHandler : ICommandHandler
                 Title = "Catalyst Version Information",
                 Description = description,
                 Color = new Color(0xF6CF57),
-                ImageUrl = "https://cdn.discordapp.com/attachments/994640322615324773/997325232215957514/unknown.png",
+                ImageUrl = "https://user-images.githubusercontent.com/48451054/180058631-21198849-dff8-40d7-a9aa-67f96acad1a1.gif",
                 Footer = new EmbedFooterBuilder
                 {
                     Text = $"Requested by {command.User.Username}#{command.User.DiscriminatorValue}",
@@ -126,7 +126,7 @@ public class CommandHandler : ICommandHandler
                 Author = new EmbedAuthorBuilder
                 {
                     Name = "The Catalyst",
-                    IconUrl = "https://cdn.discordapp.com/attachments/994640322615324773/997325232215957514/unknown.png"
+                    IconUrl = https://user-images.githubusercontent.com/48451054/179251245-db22826b-45fa-47b7-ad30-596678d19c63.png"
                 }
             };
 
