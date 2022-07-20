@@ -58,7 +58,7 @@ public class CommandHandler : ICommandHandler
         var context = new ShardedCommandContext(_client, msg);
         
         var markPos = 0;
-        if (msg.HasCharPrefix('!', ref markPos) || msg.HasCharPrefix('?', ref markPos))
+        if (msg.HasCharPrefix('.', ref markPos) || msg.HasCharPrefix('?', ref markPos))
         {
             var result = await _commands.ExecuteAsync(context, markPos, Bootstrapper.ServiceProvider);
         }
