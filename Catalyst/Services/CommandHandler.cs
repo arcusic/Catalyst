@@ -88,6 +88,7 @@ public class CommandHandler : ICommandHandler
                 $"__*Created By:*__\n" +
                 $"> Catalyst#7894\n" +
                 $"> Tactical050#9264\n" +
+                $"> jxckthxripper#1389\n" +
                 $"> 1xs#0001\n" +
                 $"> lovelxrd#7895\n\n" +
                 $"__*Loaded Modules:*__\n" +
@@ -105,6 +106,7 @@ public class CommandHandler : ICommandHandler
                 $"__*Created By:*__\n" +
                 $"> Catalyst#7894\n" +
                 $"> Tactical050#9264\n" +
+                $"> jxckthxripper#1389\n" +
                 $"> 1xs#0001\n" +
                 $"> lovelxrd#7895\n\n" +
                 $"__*Loaded Modules:*__\n" +
