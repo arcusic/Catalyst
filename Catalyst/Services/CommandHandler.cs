@@ -58,7 +58,7 @@ public class CommandHandler : ICommandHandler
         var context = new ShardedCommandContext(_client, msg);
         
         var markPos = 0;
-        if (msg.HasCharPrefix('!', ref markPos) || msg.HasCharPrefix('?', ref markPos))
+        if (msg.HasCharPrefix('.', ref markPos) || msg.HasCharPrefix('?', ref markPos))
         {
             var result = await _commands.ExecuteAsync(context, markPos, Bootstrapper.ServiceProvider);
         }
@@ -88,31 +88,29 @@ public class CommandHandler : ICommandHandler
                 $"__*Created By:*__\n" +
                 $"> Catalyst#7894\n" +
                 $"> Tactical050#9264\n" +
+                $"> jxckthxripper#1389\n" +
                 $"> 1xs#0001\n" +
                 $"> lovelxrd#7895\n\n" +
                 $"__*Loaded Modules:*__\n" +
-                $"> Core Command Module - v0.1 (Build 2207)\n" +
-                $"> Utilities Module - v0.1 (Build 2207)\n\n" +
-                $"__*Documentation*__\n" +
-                $"> Change Log can be viewed by `!changelog`\n" +
-                $"> Commands can be viewed by executing `!help`";
+                $"> Utilities Module - v0.1 (Build 2207)\n\n";
 #endif
 #if RELEASE
-        string description = $"`Catalyst Version:`  Alpha v0.1 (Build 2207)\n\n" +
-            $"__*System Information*__\n" +
-            $"`Active Node:`  {Environment.MachineName}\n" +
-            $"`Operating System Platform:`  {operatingSystem}\n" +
-            $"`Operating System Version:`  {Environment.OSVersion.Version}\n" +
-            $"`64 Bit Operating System:`  {osEmote}\n" +
-            $"`64 Bit Process:`  {procEmote}\n" +
-            $"`.NET Version:`  {Environment.Version}\n\n" +
-            $"__*Created By:*__\n" +
-            $"> Catalyst#7894\n" +
-            $"> Tactical050#9264\n" +
-            $"> 1xs#0001\n" +
-            $"> lovelxrd#7895\n\n" +
-            $"__*Loaded Modules:*__\n" +
-            $"> Utilities Module - v0.1 (Build 2207)\n\n" +
+            string description = $"`Catalyst Version:`  Alpha v0.1 (Build 2207)\n\n" +
+                $"__*System Information*__\n" +
+                $"`Active Node:`  {Environment.MachineName}\n" +
+                $"`Operating System Platform:`  {operatingSystem}\n" +
+                $"`Operating System Version:`  {Environment.OSVersion.Version}\n" +
+                $"`64 Bit Operating System:`  {osEmote}\n" +
+                $"`64 Bit Process:`  {procEmote}\n" +
+                $"`.NET Version:`  {Environment.Version}\n\n" +
+                $"__*Created By:*__\n" +
+                $"> Catalyst#7894\n" +
+                $"> Tactical050#9264\n" +
+                $"> jxckthxripper#1389\n" +
+                $"> 1xs#0001\n" +
+                $"> lovelxrd#7895\n\n" +
+                $"__*Loaded Modules:*__\n" +
+                $"> Utilities Module - v0.1 (Build 2207)\n\n";
 #endif
 
             var embedded = new EmbedBuilder
@@ -120,7 +118,7 @@ public class CommandHandler : ICommandHandler
                 Title = "Catalyst Version Information",
                 Description = description,
                 Color = new Color(0xF6CF57),
-                ImageUrl = "https://cdn.discordapp.com/attachments/994640322615324773/997325232215957514/unknown.png",
+                ImageUrl = "https://raw.githubusercontent.com/CodingCatalysts/Catalyst/main/Catalyst/Assets/Animated%20Logo/Bot_catalyst.gif",
                 Footer = new EmbedFooterBuilder
                 {
                     Text = $"Requested by {command.User.Username}#{command.User.DiscriminatorValue}",
@@ -130,7 +128,7 @@ public class CommandHandler : ICommandHandler
                 Author = new EmbedAuthorBuilder
                 {
                     Name = "The Catalyst",
-                    IconUrl = "https://cdn.discordapp.com/attachments/994640322615324773/997325232215957514/unknown.png"
+                    IconUrl = "https://raw.githubusercontent.com/CodingCatalysts/Catalyst/main/Catalyst/Assets/Animated%20Logo/Bot_catalyst.gif"
                 }
             };
 
