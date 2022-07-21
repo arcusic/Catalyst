@@ -1,5 +1,7 @@
 ## Welcome to GitHub Pages
 
+[![.NET](https://github.com/CodingCatalysts/Catalyst/actions/workflows/dotnet.yml/badge.svg)](https://github.com/CodingCatalysts/Catalyst/actions/workflows/dotnet.yml) [![CodeQL](https://github.com/CodingCatalysts/Catalyst/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/CodingCatalysts/Catalyst/actions/workflows/codeql-analysis.yml) [![Dependency Review](https://github.com/CodingCatalysts/Catalyst/actions/workflows/dependency-review.yml/badge.svg)](https://github.com/CodingCatalysts/Catalyst/actions/workflows/dependency-review.yml)
+
 You can use the [editor on GitHub](https://github.com/CodingCatalysts/Catalyst/edit/github-pages/docs/index.md) to maintain and preview the content for your website in Markdown files.
 
 Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
