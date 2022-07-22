@@ -182,34 +182,34 @@ public class CommandHandler : ICommandHandler
                 }
                 else if (destinationUnit == "km")
                 {
-                    distance = distance / 1000;
+                    distance /= 1000;
                 }
                 else if (destinationUnit == "mi")
                 {
-                    distance = distance / 1609.34;
+                    distance /= 1609.34;
                 }
                 else if (destinationUnit == "ft")
                 {
-                    distance = distance * 3.28084;
+                    distance *= 3.28084;
                 }
                 else if (destinationUnit == "yd")
                 {
-                    distance = distance * 1.09361;
+                    distance *= 1.09361;
                 }
                 else if (destinationUnit == "in")
                 {
-                    distance = distance * 39.37008;
+                    distance *= 39.37008;
                 }
                 else if (destinationUnit == "cm")
                 {
-                    distance = distance * 100;
+                    distance *= 100;
                 }
             }
             else if (sourceUnit == "km")
             {
                 if (destinationUnit == "m")
                 {
-                    distance = distance * 1000;
+                    distance *= 1000;
                 }
                 else if (destinationUnit == "km")
                 {
@@ -217,34 +217,34 @@ public class CommandHandler : ICommandHandler
                 }
                 else if (destinationUnit == "mi")
                 {
-                    distance = distance * 0.621371;
+                    distance *= 0.621371;
                 }
                 else if (destinationUnit == "ft")
                 {
-                    distance = distance * 3280.84;
+                    distance *= 3280.84;
                 }
                 else if (destinationUnit == "yd")
                 {
-                    distance = distance * 1093.61;
+                    distance *= 1093.61;
                 }
                 else if (destinationUnit == "in")
                 {
-                    distance = distance * 39370.08;
+                    distance *= 39370.08;
                 }
                 else if (destinationUnit == "cm")
                 {
-                    distance = distance * 100000;
+                    distance *= 100000;
                 }
             }
             else if (sourceUnit == "mi")
             {
                 if (destinationUnit == "m")
                 {
-                    distance = distance * 1609.34;
+                    distance *= 1609.34;
                 }
                 else if (destinationUnit == "km")
                 {
-                    distance = distance * 1.60934;
+                    distance *= 1.60934;
                 }
                 else if (destinationUnit == "mi")
                 {
@@ -252,34 +252,34 @@ public class CommandHandler : ICommandHandler
                 }
                 else if (destinationUnit == "ft")
                 {
-                    distance = distance * 5280;
+                    distance *= 5280;
                 }
                 else if (destinationUnit == "yd")
                 {
-                    distance = distance * 1760;
+                    distance *= 1760;
                 }
                 else if (destinationUnit == "in")
                 {
-                    distance = distance * 63360;
+                    distance *= 63360;
                 }
                 else if (destinationUnit == "cm")
                 {
-                    distance = distance * 1609340;
+                    distance *= 1609340;
                 }
             }
             else if (sourceUnit == "ft")
             {
                 if (destinationUnit == "m")
                 {
-                    distance = distance / 3.28084;
+                    distance /= 3.28084;
                 }
                 else if (destinationUnit == "km")
                 {
-                    distance = distance / 3280.84;
+                    distance /= 3280.84;
                 }
                 else if (destinationUnit == "mi")
                 {
-                    distance = distance / 5280;
+                    distance /= 5280;
                 }
                 else if (destinationUnit == "ft")
                 {
@@ -287,34 +287,34 @@ public class CommandHandler : ICommandHandler
                 }
                 else if (destinationUnit == "yd")
                 {
-                    distance = distance / 3;
+                    distance /= 3;
                 }
                 else if (destinationUnit == "in")
                 {
-                    distance = distance * 12;
+                    distance *= 12;
                 }
                 else if (destinationUnit == "cm")
                 {
-                    distance = distance * 30.48;
+                    distance *= 30.48;
                 }
             }
             else if (sourceUnit == "yd")
             {
                 if (destinationUnit == "m")
                 {
-                    distance = distance / 1.09361;
+                    distance /= 1.09361;
                 }
                 else if (destinationUnit == "km")
                 {
-                    distance = distance / 1093.61;
+                    distance /= 1093.61;
                 }
                 else if (destinationUnit == "mi")
                 {
-                    distance = distance / 1760;
+                    distance /= 1760;
                 }
                 else if (destinationUnit == "ft")
                 {
-                    distance = distance * 3;
+                    distance *= 3;
                 }
                 else if (destinationUnit == "yd")
                 {
@@ -322,34 +322,34 @@ public class CommandHandler : ICommandHandler
                 }
                 else if (destinationUnit == "in")
                 {
-                    distance = distance * 36;
+                    distance *= 36;
                 }
                 else if (destinationUnit == "cm")
                 {
-                    distance = distance * 91.44;
+                    distance *= 91.44;
                 }
             }
             else if (sourceUnit == "in")
             {
                 if (destinationUnit == "m")
                 {
-                    distance = distance / 39.37008;
+                    distance /= 39.37008;
                 }
                 else if (destinationUnit == "km")
                 {
-                    distance = distance / 39370.08;
+                    distance /= 39370.08;
                 }
                 else if (destinationUnit == "mi")
                 {
-                    distance = distance / 63360;
+                    distance /= 63360;
                 }
                 else if (destinationUnit == "ft")
                 {
-                    distance = distance / 12;
+                    distance /= 12;
                 }
                 else if (destinationUnit == "yd")
                 {
-                    distance = distance / 36;
+                    distance /= 36;
                 }
                 else if (destinationUnit == "in")
                 {
@@ -357,34 +357,34 @@ public class CommandHandler : ICommandHandler
                 }
                 else if (destinationUnit == "cm")
                 {
-                    distance = distance * 2.54;
+                    distance *= 2.54;
                 }
             }
             else if (sourceUnit == "cm")
             {
                 if (destinationUnit == "m")
                 {
-                    distance = distance / 100;
+                    distance /= 100;
                 }
                 else if (destinationUnit == "km")
                 {
-                    distance = distance / 100000;
+                    distance /= 100000;
                 }
                 else if (destinationUnit == "mi")
                 {
-                    distance = distance / 1609340;
+                    distance /= 1609340;
                 }
                 else if (destinationUnit == "ft")
                 {
-                    distance = distance / 30.48;
+                    distance /= 30.48;
                 }
                 else if (destinationUnit == "yd")
                 {
-                    distance = distance / 91.44;
+                    distance /= 91.44;
                 }
                 else if (destinationUnit == "in")
                 {
-                    distance = distance / 2.54;
+                    distance /= 2.54;
                 }
                 else if (destinationUnit == "cm")
                 {
