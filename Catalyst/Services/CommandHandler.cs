@@ -410,22 +410,22 @@ public class CommandHandler : ICommandHandler
                 }
                 else if (destinationUnit == "g")
                 {
-                    weight = weight * 1000;
+                    weight *= 1000;
                 }
                 else if (destinationUnit == "lb")
                 {
-                    weight = weight * 2.20462;
+                    weight *= 2.20462;
                 }
                 else if (destinationUnit == "oz")
                 {
-                    weight = weight * 35.274;
+                    weight *= 35.274;
                 }
             }
             else if (sourceUnit == "g")
             {
                 if (destinationUnit == "kg")
                 {
-                    weight = weight / 1000;
+                    weight /= 1000;
                 }
                 else if (destinationUnit == "g")
                 {
@@ -433,22 +433,22 @@ public class CommandHandler : ICommandHandler
                 }
                 else if (destinationUnit == "lb")
                 {
-                    weight = weight * 0.00220462;
+                    weight *= 0.00220462;
                 }
                 else if (destinationUnit == "oz")
                 {
-                    weight = weight * 0.035274;
+                    weight *= 0.035274;
                 }
             }
             else if (sourceUnit == "lb")
             {
                 if (destinationUnit == "kg")
                 {
-                    weight = weight / 2.20462;
+                    weight /= 2.20462;
                 }
                 else if (destinationUnit == "g")
                 {
-                    weight = weight * 453.592;
+                    weight *= 453.592;
                 }
                 else if (destinationUnit == "lb")
                 {
@@ -456,22 +456,22 @@ public class CommandHandler : ICommandHandler
                 }
                 else if (destinationUnit == "oz")
                 {
-                    weight = weight * 16;
+                    weight *= 16;
                 }
             }
             else if (sourceUnit == "oz")
             {
                 if (destinationUnit == "kg")
                 {
-                    weight = weight / 35.274;
+                    weight /= 35.274;
                 }
                 else if (destinationUnit == "g")
                 {
-                    weight = weight * 28.3495;
+                    weight *= 28.3495;
                 }
                 else if (destinationUnit == "lb")
                 {
-                    weight = weight / 16;
+                    weight /= 16;
                 }
                 else if (destinationUnit == "oz")
                 {
@@ -497,42 +497,42 @@ public class CommandHandler : ICommandHandler
                 }
                 else if (destinationUnit == "ml")
                 {
-                    volume = volume * 1000;
+                    volume *= 1000;
                 }
                 else if (destinationUnit == "gal")
                 {
-                    volume = volume * 0.264172;
+                    volume *= 0.264172;
                 }
                 else if (destinationUnit == "qt")
                 {
-                    volume = volume * 0.106919;
+                    volume *= 0.106919;
                 }
                 else if (destinationUnit == "pt")
                 {
-                    volume = volume * 0.0284131;
+                    volume *= 0.0284131;
                 }
                 else if (destinationUnit == "cup")
                 {
-                    volume = volume * 0.00416667;
+                    volume *= 0.00416667;
                 }
                 else if (destinationUnit == "fl oz")
                 {
-                    volume = volume * 29.5735;
+                    volume *= 29.5735;
                 }
                 else if (destinationUnit == "tbsp")
                 {
-                    volume = volume * 67.628;
+                    volume *= 67.628;
                 }
                 else if (destinationUnit == "tsp")
                 {
-                    volume = volume * 202.884;
+                    volume *= 202.884;
                 }
             }
             else if (sourceUnit == "ml")
             {
                 if (destinationUnit == "l")
                 {
-                    volume = volume / 1000;
+                    volume /= 1000;
                 }
                 else if (destinationUnit == "ml")
                 {
@@ -540,42 +540,42 @@ public class CommandHandler : ICommandHandler
                 }
                 else if (destinationUnit == "gal")
                 {
-                    volume = volume * 0.000264172;
+                    volume *= 0.000264172;
                 }
                 else if (destinationUnit == "qt")
                 {
-                    volume = volume * 0.000130772;
+                    volume *= 0.000130772;
                 }
                 else if (destinationUnit == "pt")
                 {
-                    volume = volume * 0.0000492892;
+                    volume *= 0.0000492892;
                 }
                 else if (destinationUnit == "cup")
                 {
-                    volume = volume * 0.0000236588;
+                    volume *= 0.0000236588;
                 }
                 else if (destinationUnit == "fl oz")
                 {
-                    volume = volume * 0.33814;
+                    volume *= 0.33814;
                 }
                 else if (destinationUnit == "tbsp")
                 {
-                    volume = volume * 0.0692641;
+                    volume *= 0.0692641;
                 }
                 else if (destinationUnit == "tsp")
                 {
-                    volume = volume * 0.20094;
+                    volume *= 0.20094;
                 }
             }
             else if (sourceUnit == "gal")
             {
                 if (destinationUnit == "l")
                 {
-                    volume = volume / 0.264172;
+                    volume /= 0.264172;
                 }
                 else if (destinationUnit == "ml")
                 {
-                    volume = volume * 264.172;
+                    volume *= 264.172;
                 }
                 else if (destinationUnit == "gal")
                 {
@@ -583,42 +583,42 @@ public class CommandHandler : ICommandHandler
                 }
                 else if (destinationUnit == "qt")
                 {
-                    volume = volume * 2.25;
+                    volume *= 2.25;
                 }
                 else if (destinationUnit == "pt")
                 {
-                    volume = volume * 4.92892;
+                    volume *= 4.92892;
                 }
                 else if (destinationUnit == "cup")
                 {
-                    volume = volume * 2.36588;
+                    volume *= 2.36588;
                 }
                 else if (destinationUnit == "fl oz")
                 {
-                    volume = volume * 33.814;
+                    volume *= 33.814;
                 }
                 else if (destinationUnit == "tbsp")
                 {
-                    volume = volume * 67.628;
+                    volume *= 67.628;
                 }
                 else if (destinationUnit == "tsp")
                 {
-                    volume = volume * 202.884;
+                    volume *= 202.884;
                 }
             }
             else if (sourceUnit == "qt")
             {
                 if (destinationUnit == "l")
                 {
-                    volume = volume / 0.106919;
+                    volume /= 0.106919;
                 }
                 else if (destinationUnit == "ml")
                 {
-                    volume = volume * 1069.19;
+                    volume *= 1069.19;
                 }
                 else if (destinationUnit == "gal")
                 {
-                    volume = volume * 0.00378541;
+                    volume *= 0.00378541;
                 }
                 else if (destinationUnit == "qt")
                 {
@@ -626,42 +626,42 @@ public class CommandHandler : ICommandHandler
                 }
                 else if (destinationUnit == "pt")
                 {
-                    volume = volume * 2.11338;
+                    volume *= 2.11338;
                 }
                 else if (destinationUnit == "cup")
                 {
-                    volume = volume * 1.05669;
+                    volume *= 1.05669;
                 }
                 else if (destinationUnit == "fl oz")
                 {
-                    volume = volume * 33.814;
+                    volume *= 33.814;
                 }
                 else if (destinationUnit == "tbsp")
                 {
-                    volume = volume * 67.628;
+                    volume *= 67.628;
                 }
                 else if (destinationUnit == "tsp")
                 {
-                    volume = volume * 202.884;
+                    volume *= 202.884;
                 }
             }
             else if (sourceUnit == "pt")
             {
                 if (destinationUnit == "l")
                 {
-                    volume = volume / 0.0284131;
+                    volume /= 0.0284131;
                 }
                 else if (destinationUnit == "ml")
                 {
-                    volume = volume * 284.131;
+                    volume *= 284.131;
                 }
                 else if (destinationUnit == "gal")
                 {
-                    volume = volume * 0.00284130;
+                    volume *= 0.00284130;
                 }
                 else if (destinationUnit == "qt")
                 {
-                    volume = volume * 0.00131577;
+                    volume *= 0.00131577;
                 }
                 else if (destinationUnit == "pt")
                 {
@@ -669,42 +669,42 @@ public class CommandHandler : ICommandHandler
                 }
                 else if (destinationUnit == "cup")
                 {
-                    volume = volume * 0.0692641;
+                    volume *= 0.0692641;
                 }
                 else if (destinationUnit == "fl oz")
                 {
-                    volume = volume * 29.5735;
+                    volume *= 29.5735;
                 }
                 else if (destinationUnit == "tbsp")
                 {
-                    volume = volume * 67.628;
+                    volume *= 67.628;
                 }
                 else if (destinationUnit == "tsp")
                 {
-                    volume = volume * 202.884;
+                    volume *= 202.884;
                 }
             }
             else if (sourceUnit == "cup")
             {
                 if (destinationUnit == "l")
                 {
-                    volume = volume / 0.00416667;
+                    volume /= 0.00416667;
                 }
                 else if (destinationUnit == "ml")
                 {
-                    volume = volume * 4166.67;
+                    volume *= 4166.67;
                 }
                 else if (destinationUnit == "gal")
                 {
-                    volume = volume * 0.00211338;
+                    volume *= 0.00211338;
                 }
                 else if (destinationUnit == "qt")
                 {
-                    volume = volume * 0.00105669;
+                    volume *= 0.00105669;
                 }
                 else if (destinationUnit == "pt")
                 {
-                    volume = volume * 0.0284131;
+                    volume *= 0.0284131;
                 }
                 else if (destinationUnit == "cup")
                 {
@@ -712,42 +712,42 @@ public class CommandHandler : ICommandHandler
                 }
                 else if (destinationUnit == "fl oz")
                 {
-                    volume = volume * 33.814;
+                    volume *= 33.814;
                 }
                 else if (destinationUnit == "tbsp")
                 {
-                    volume = volume * 67.628;
+                    volume *= 67.628;
                 }
                 else if (destinationUnit == "tsp")
                 {
-                    volume = volume * 202.884;
+                    volume *= 202.884;
                 }
             }
             else if (sourceUnit == "fl oz")
             {
                 if (destinationUnit == "l")
                 {
-                    volume = volume / 0.33814;
+                    volume /= 0.33814;
                 }
                 else if (destinationUnit == "ml")
                 {
-                    volume = volume * 33814;
+                    volume *= 33814;
                 }
                 else if (destinationUnit == "gal")
                 {
-                    volume = volume * 0.00295735;
+                    volume *= 0.00295735;
                 }
                 else if (destinationUnit == "qt")
                 {
-                    volume = volume * 0.00147575;
+                    volume *= 0.00147575;
                 }
                 else if (destinationUnit == "pt")
                 {
-                    volume = volume * 0.0284131;
+                    volume *= 0.0284131;
                 }
                 else if (destinationUnit == "cup")
                 {
-                    volume = volume * 0.00416667;
+                    volume *= 0.00416667;
                 }
                 else if (destinationUnit == "fl oz")
                 {
@@ -755,42 +755,42 @@ public class CommandHandler : ICommandHandler
                 }
                 else if (destinationUnit == "tbsp")
                 {
-                    volume = volume * 0.0692641;
+                    volume *= 0.0692641;
                 }
                 else if (destinationUnit == "tsp")
                 {
-                    volume = volume * 0.20094;
+                    volume *= 0.20094;
                 }
             }
             else if (sourceUnit == "tbsp")
             {
                 if (destinationUnit == "l")
                 {
-                    volume = volume / 0.676280;
+                    volume /= 0.676280;
                 }
                 else if (destinationUnit == "ml")
                 {
-                    volume = volume * 67.628;
+                    volume *= 67.628;
                 }
                 else if (destinationUnit == "gal")
                 {
-                    volume = volume * 0.000692641;
+                    volume *= 0.000692641;
                 }
                 else if (destinationUnit == "qt")
                 {
-                    volume = volume * 0.000284131;
+                    volume *= 0.000284131;
                 }
                 else if (destinationUnit == "pt")
                 {
-                    volume = volume * 0.0284131;
+                    volume *= 0.0284131;
                 }
                 else if (destinationUnit == "cup")
                 {
-                    volume = volume * 0.00416667;
+                    volume *= 0.00416667;
                 }
                 else if (destinationUnit == "fl oz")
                 {
-                    volume = volume * 0.0692641;
+                    volume *= 0.0692641;
                 }
                 else if (destinationUnit == "tbsp")
                 {
@@ -798,42 +798,42 @@ public class CommandHandler : ICommandHandler
                 }
                 else if (destinationUnit == "tsp")
                 {
-                    volume = volume * 3.96563;
+                    volume *= 3.96563;
                 }
             }
             else if (sourceUnit == "tsp")
             {
                 if (destinationUnit == "l")
                 {
-                    volume = volume / 202.884;
+                    volume /= 202.884;
                 }
                 else if (destinationUnit == "ml")
                 {
-                    volume = volume * 202.884;
+                    volume *= 202.884;
                 }
                 else if (destinationUnit == "gal")
                 {
-                    volume = volume * 0.001;
+                    volume *= 0.001;
                 }
                 else if (destinationUnit == "qt")
                 {
-                    volume = volume * 0.000202884;
+                    volume *= 0.000202884;
                 }
                 else if (destinationUnit == "pt")
                 {
-                    volume = volume * 0.000284131;
+                    volume *= 0.000284131;
                 }
                 else if (destinationUnit == "cup")
                 {
-                    volume = volume * 0.000416670;
+                    volume *= 0.000416670;
                 }
                 else if (destinationUnit == "fl oz")
                 {
-                    volume = volume * 0.0692641;
+                    volume *= 0.0692641;
                 }
                 else if (destinationUnit == "tbsp")
                 {
-                    volume = volume * 0.00676280;
+                    volume *= 0.00676280;
                 }
                 else if (destinationUnit == "tsp")
                 {
@@ -860,22 +860,22 @@ public class CommandHandler : ICommandHandler
                 }
                 else if (destinationUnit == "km/h")
                 {
-                    speed = speed * 3.6;
+                    speed *= 3.6;
                 }
                 else if (destinationUnit == "mph")
                 {
-                    speed = speed * 2.23694;
+                    speed *= 2.23694;
                 }
                 else if (destinationUnit == "knot")
                 {
-                    speed = speed * 1.94384;
+                    speed *= 1.94384;
                 }
             }
             else if (sourceUnit == "km/h")
             {
                 if (destinationUnit == "m/s")
                 {
-                    speed = speed / 3.6;
+                    speed /= 3.6;
                 }
                 else if (destinationUnit == "km/h")
                 {
@@ -883,22 +883,22 @@ public class CommandHandler : ICommandHandler
                 }
                 else if (destinationUnit == "mph")
                 {
-                    speed = speed / 1.60934;
+                    speed /= 1.60934;
                 }
                 else if (destinationUnit == "knot")
                 {
-                    speed = speed / 1.852;
+                    speed /= 1.852;
                 }
             }
             else if (sourceUnit == "mph")
             {
                 if (destinationUnit == "m/s")
                 {
-                    speed = speed / 2.23694;
+                    speed /= 2.23694;
                 }
                 else if (destinationUnit == "km/h")
                 {
-                    speed = speed * 1.60934;
+                    speed *= 1.60934;
                 }
                 else if (destinationUnit == "mph")
                 {
@@ -906,22 +906,22 @@ public class CommandHandler : ICommandHandler
                 }
                 else if (destinationUnit == "knot")
                 {
-                    speed = speed * 1.15078;
+                    speed *= 1.15078;
                 }
             }
             else if (sourceUnit == "knot")
             {
                 if (destinationUnit == "m/s")
                 {
-                    speed = speed / 1.852;
+                    speed /= 1.852;
                 }
                 else if (destinationUnit == "km/h")
                 {
-                    speed = speed * 1.852;
+                    speed *= 1.852;
                 }
                 else if (destinationUnit == "mph")
                 {
-                    speed = speed * 1.15078;
+                    speed *= 1.15078;
                 }
                 else if (destinationUnit == "knot")
                 {
