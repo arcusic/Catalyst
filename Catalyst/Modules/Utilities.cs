@@ -647,7 +647,7 @@ public class Utilities : ModuleBase<ShardedCommandContext>
     }
     
     [Command("taccat", RunMode = RunMode.Async)]
-    public async Task ZeroFiveZero()
+    public async Task TacCat()
     {
         var whiteCheckMark = new Emoji("\u2705");
         await Logger.Log(LogSeverity.Verbose, $"[{Context.Guild.Name}] CommandReceived", $"{Context.User.Username}#{Context.User.DiscriminatorValue} has invoked {Context.Message.Content} from the {Context.Channel.Name} channel.");
@@ -661,7 +661,7 @@ public class Utilities : ModuleBase<ShardedCommandContext>
     }
     
     [Command("cattac", RunMode = RunMode.Async)]
-    public async Task ZeroFiveZero()
+    public async Task CatTac()
     {
         var whiteCheckMark = new Emoji("\u2705");
         await Logger.Log(LogSeverity.Verbose, $"[{Context.Guild.Name}] CommandReceived", $"{Context.User.Username}#{Context.User.DiscriminatorValue} has invoked {Context.Message.Content} from the {Context.Channel.Name} channel.");
