@@ -489,13 +489,13 @@ public class CommandHandler : ICommandHandler
             double volume = double.Parse(command.Data.Options.ElementAt(0).Value.ToString());
             string input = $"`{volume} {sourceUnit}:`  ";
 
-            if (sourceUnit == "l")
+            if (sourceUnit == "L")
             {
-                if (destinationUnit == "l")
+                if (destinationUnit == "L")
                 {
                     await command.RespondAsync($"Seriously... convert it yourself...\n{input} {volume:0.0} {destinationUnit}");
                 }
-                else if (destinationUnit == "ml")
+                else if (destinationUnit == "mL")
                 {
                     volume *= 1000;
                 }
@@ -528,13 +528,13 @@ public class CommandHandler : ICommandHandler
                     volume *= 202.884;
                 }
             }
-            else if (sourceUnit == "ml")
+            else if (sourceUnit == "mL")
             {
-                if (destinationUnit == "l")
+                if (destinationUnit == "L")
                 {
                     volume /= 1000;
                 }
-                else if (destinationUnit == "ml")
+                else if (destinationUnit == "mL")
                 {
                     await command.RespondAsync($"Seriously... convert it yourself...\n{input} {volume:0.0} {destinationUnit}");
                 }
@@ -569,11 +569,11 @@ public class CommandHandler : ICommandHandler
             }
             else if (sourceUnit == "gal")
             {
-                if (destinationUnit == "l")
+                if (destinationUnit == "L")
                 {
                     volume /= 0.264172;
                 }
-                else if (destinationUnit == "ml")
+                else if (destinationUnit == "mL")
                 {
                     volume *= 264.172;
                 }
@@ -608,11 +608,11 @@ public class CommandHandler : ICommandHandler
             }
             else if (sourceUnit == "qt")
             {
-                if (destinationUnit == "l")
+                if (destinationUnit == "L")
                 {
                     volume /= 0.106919;
                 }
-                else if (destinationUnit == "ml")
+                else if (destinationUnit == "mL")
                 {
                     volume *= 1069.19;
                 }
@@ -647,11 +647,11 @@ public class CommandHandler : ICommandHandler
             }
             else if (sourceUnit == "pt")
             {
-                if (destinationUnit == "l")
+                if (destinationUnit == "L")
                 {
                     volume /= 0.0284131;
                 }
-                else if (destinationUnit == "ml")
+                else if (destinationUnit == "mL")
                 {
                     volume *= 284.131;
                 }
@@ -686,11 +686,11 @@ public class CommandHandler : ICommandHandler
             }
             else if (sourceUnit == "cup")
             {
-                if (destinationUnit == "l")
+                if (destinationUnit == "L")
                 {
                     volume /= 0.00416667;
                 }
-                else if (destinationUnit == "ml")
+                else if (destinationUnit == "mL")
                 {
                     volume *= 4166.67;
                 }
@@ -725,11 +725,11 @@ public class CommandHandler : ICommandHandler
             }
             else if (sourceUnit == "fl oz")
             {
-                if (destinationUnit == "l")
+                if (destinationUnit == "L")
                 {
                     volume /= 0.33814;
                 }
-                else if (destinationUnit == "ml")
+                else if (destinationUnit == "mL")
                 {
                     volume *= 33814;
                 }
@@ -764,11 +764,11 @@ public class CommandHandler : ICommandHandler
             }
             else if (sourceUnit == "tbsp")
             {
-                if (destinationUnit == "l")
+                if (destinationUnit == "L")
                 {
                     volume /= 0.676280;
                 }
-                else if (destinationUnit == "ml")
+                else if (destinationUnit == "mL")
                 {
                     volume *= 67.628;
                 }
@@ -803,11 +803,11 @@ public class CommandHandler : ICommandHandler
             }
             else if (sourceUnit == "tsp")
             {
-                if (destinationUnit == "l")
+                if (destinationUnit == "L")
                 {
                     volume /= 202.884;
                 }
-                else if (destinationUnit == "ml")
+                else if (destinationUnit == "mL")
                 {
                     volume *= 202.884;
                 }

@@ -119,7 +119,7 @@ async Task MainAsync()
             .AddChoice("Kilograms", "kg")
             .AddChoice("Grams", "g")
             .AddChoice("Milligrams", "mg")
-            .AddChoice("Pounds", "lbs")
+            .AddChoice("Pounds", "lb")
             .AddChoice("Ounces", "oz")
             .WithType(ApplicationCommandOptionType.String))
         .AddOption(new SlashCommandOptionBuilder()
@@ -129,7 +129,7 @@ async Task MainAsync()
             .AddChoice("Kilograms", "kg")
             .AddChoice("Grams", "g")
             .AddChoice("Milligrams", "mg")
-            .AddChoice("Pounds", "lbs")
+            .AddChoice("Pounds", "lb")
             .AddChoice("Ounces", "oz")
             .WithType(ApplicationCommandOptionType.String))
         .Build();
@@ -234,6 +234,15 @@ async Task MainAsync()
 
         await shard.CreateGlobalApplicationCommandAsync(distanceConversion);
         await Logger.Log(LogSeverity.Info, "CMDBuilt", $"Slash Command {distanceConversion.Name} is built and ready!");
+
+        await shard.CreateGlobalApplicationCommandAsync(weightConversion);
+        await Logger.Log(LogSeverity.Info, "CMDBuilt", $"Slash Command {weightConversion.Name} is built and ready!");
+
+        await shard.CreateGlobalApplicationCommandAsync(volumeConversion);
+        await Logger.Log(LogSeverity.Info, "CMDBuilt", $"Slash Command {volumeConversion.Name} is built and ready!");
+
+        await shard.CreateGlobalApplicationCommandAsync(speedConversion);
+        await Logger.Log(LogSeverity.Info, "CMDBuilt", $"Slash Command {speedConversion.Name} is built and ready!");
 
         await Logger.Log(LogSeverity.Info, "ShardReady", $"Shard Number {shard.ShardId} is connected and ready!");
     };
