@@ -731,4 +731,19 @@ public class Utilities : ModuleBase<ShardedCommandContext>
         var response = await Context.Message.ReplyAsync($"taccat");
         typingState.Dispose();
     }
+
+    [Command("rower", RunMode = RunMode.Async)]
+    public async Task Rower()
+    {
+        var whiteCheckMark = new Emoji("\u2705");
+        await Logger.Log(LogSeverity.Verbose, $"[{Context.Guild.Name}] CommandReceived", $"{Context.User.Username}#{Context.User.DiscriminatorValue} has invoked {Context.Message.Content} from the {Context.Channel.Name} channel.");
+
+        await Context.Message.AddReactionAsync(whiteCheckMark);
+        await Logger.Log(LogSeverity.Verbose, $"[{Context.Guild.Name}] CommandAcknowledged", $"Reacted with :white_check_mark: to {Context.User.Username}#{Context.User.DiscriminatorValue}'s message.");
+
+        var typingState = Context.Channel.TriggerTypingAsync();
+        var response = await Context.Message.ReplyAsync($"It's not a guillotine... it's a water rower.\n" +
+            $"https://ergatta.com/the-ergatta-rower-v2/");
+        typingState.Dispose();
+    }
 }
