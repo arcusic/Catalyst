@@ -424,7 +424,7 @@ public class CommandHandler : ICommandHandler
                 embed.Description = $"The server currently uses `Wick Bot` for moderation.\n" +
                 "This Guide will describe the commands that will be needed during an incident.\n\n" +
                 "> `PLEASE NOTE:` for commands that have multiple options\n" +
-                "> (ex.@User#0001 or UserID) `or` will be designated by `|`.\n" +
+                "> (ex. @User#0001 or UserID) `or` will be designated by `|`.\n" +
                 "> \n" +
                 "> `OPTIONAL INPUTS:` are denoted in braces { ex. } and are **not** required.\n" +
                 "> Not including these inputs may have consequences.\n\n" +
