@@ -28,6 +28,7 @@ public class CommandHandler : ICommandHandler
         // Subscribe a handler to see if a message invokes a command.
         _client.MessageReceived += HandleCommandAsync;
         _client.SlashCommandExecuted += SlashCommandHandler;
+        _client.ButtonExecuted += ButtonHandler;
         
         _commands.CommandExecuted += async (optional, context, result) =>
         {
@@ -393,6 +394,153 @@ public class CommandHandler : ICommandHandler
             }
 
             await command.RespondAsync($"{input} {distance:0.0} {destinationUnit}");
+        }
+    }
+    
+    public async Task ButtonHandler(SocketMessageComponent component)
+    {
+        var embed = new EmbedBuilder
+        {
+            Title = "Wick Command Reference Guide",
+            Color = new Color(0x00f7ff),
+            Footer = new EmbedFooterBuilder
+            {
+                Text = $"Requested by {component.User.Username}#{component.User.DiscriminatorValue}",
+                IconUrl = component.User.GetAvatarUrl()
+            },
+            Timestamp = DateTime.Now,
+            Author = new EmbedAuthorBuilder
+            {
+                Name = "The Catalyst",
+                IconUrl = "https://raw.githubusercontent.com/CodingCatalysts/Catalyst/main/Catalyst/Assets/Animated%20Logo/Bot_catalyst.gif"
+            },
+        };
+
+        // We can now check for our custom id
+        switch (component.Data.CustomId)
+        {
+            // Since we set our buttons custom id as 'custom-id', we can check for it like this:
+            case "overview":
+                embed.Description = $"The server currently uses `Wick Bot` for moderation.\n" +
+                "This Guide will describe the commands that will be needed during an incident.\n\n" +
+                "> `PLEASE NOTE:` for commands that have multiple options\n" +
+                "> (ex. @User#0001 or UserID) `or` will be designated by `|`.\n" +
+                "> \n" +
+                "> `OPTIONAL INPUTS:` are denoted in braces { ex. } and are **not** required.\n" +
+                "> Not including these inputs may have consequences.\n\n" +
+                "See docs included with each command for details.\n" +
+                "`Please click one of the buttons for command details.`\n\n" +
+                "`Done:`  Ends interaction, keeping this message open.\n" +
+                "`Close:`  Deletes this message.";
+
+                await component.UpdateAsync(msg => msg.Embed = embed.Build());
+                break;
+
+            case "mute":
+                // Lets respond by sending a message saying they clicked the button
+                embed.Title += " - Mute";
+                embed.Description = $"Muting a user prevents them from sending messages or connecting to voice.\n" +
+                    $"A DM will be sent to the user(s) warned informing them of the action.\n\n" +
+                    ":warning:  `Time is optional.`  **Not including a time will result in a Perma Mute!!!**  :warning:\n" +
+                    "```\n" +
+                    "Command Syntax:\n" +
+                    "+mute @User | UserID ?r You have been muted.  <Reason>.  Please review the Server Rules.  Repeat offenses will result in a longer duration or additional action. {?t #(m/h/d)}\n\n" +
+                    "+mute @1xs#0001 ?r You have been muted.  Come at me Server Owner.  Please review the Server Rules.  Repeat offenses will result in a longer duration or additional action. ?t 1h\n\n" +
+                    "+mute @1xs#0001, @Catalyst#7894 ?r You have been muted.  Come at me Mr. Server Owner. Please review the Server Rules.  Repeat offenses will result in a longer duration or additional action. ?t 1h\n\n" +
+                    "+mute 587220709382684673 ?r You have been muted.  Come at me Server Owner. Please review the Server Rules.  Repeat offenses will result in a longer duration or additional action.\n\n" +
+                    "```\n\n" +
+                    "See docs included with each command for details.\n" +
+                    "`Please click one of the buttons for command details.`\n\n" +
+                    "`Done:`  Ends interaction, keeping this message open.\n" +
+                    "`Close:`  Deletes this message.";
+
+                await component.UpdateAsync(msg => msg.Embed = embed.Build());
+                break;
+
+            case "warn":
+                // Lets respond by sending a message saying they clicked the button
+                embed.Title += " - Warnings";
+                embed.Description = $"Issue a warning to the user for a violation.  Too many warnings, action will be taken.\n" +
+                    $"A DM will be sent to the user(s) warned informing them of the action.\n\n" +
+                    $"```\n" +
+                    $"Command Syntax:\n" +
+                    $"+warn @User | UserID ?r <Reason>\n\n" +
+                    $"+warn Ascended#1023 ?r Didn't even realize who Catalyst#7894 was on Instagram.\n" +
+                    "```\n\n" +
+                    "See docs included with each command for details.\n" +
+                    "`Please click one of the buttons for command details.`\n\n" +
+                    "`Done:`  Ends interaction, keeping this message open.\n" +
+                    "`Close:`  Deletes this message.";
+
+                await component.UpdateAsync(msg => msg.Embed = embed.Build());
+                break;
+
+            case "kick":
+                // Lets respond by sending a message saying they clicked the button
+                embed.Title += " - Kick";
+                embed.Description = $"User will be immediately kicked from the server.\n" +
+                    $"A DM will be sent to the user(s) being kicked informing them of the action.\n\n" +
+                    $":warning:  A kicked user will be able to immediately rejoin the server.  :warning:\n" +
+                    $"```\n" +
+                    $"Command Syntax:\n" +
+                    $"+kick @User | UserID ?r <Reason>\n\n" +
+                    $"+kick @1xs#0001 ?r There is no way this command would ever work.\n\n" +
+                    $"+kick @Catalyst#7894, #Ascended#1023 ?r They lost GHXST's fit battle.\n" +
+                    "```\n\n" +
+                    "See docs included with each command for details.\n" +
+                    "`Please click one of the buttons for command details.`\n\n" +
+                    "`Done:`  Ends interaction, keeping this message open.\n" +
+                    "`Close:`  Deletes this message.";
+
+                await component.UpdateAsync(msg => msg.Embed = embed.Build());
+                break;
+
+            case "ban":
+                // Lets respond by sending a message saying they clicked the button
+                embed.Title += " - Bans";
+                embed.Description = "User will be immediately banned from the server.\n" +
+                    "A DM will be sent to the user(s) being banned informing them of the action.\n\n" +
+                    ":warning:  `Time is optional.`  **Not including a time will result in a Perma Ban!!!**  :warning:\n" +
+                    "```\n" +
+                    "Command Syntax:\n" +
+                    "+ban @User | UserID ?r <Reason> {?t #(m/h/d)}\n\n" +
+                    "+ban 1xs#0001 ?r How dare you actually take a vacation. ?t 14d\n\n" +
+                    "+ban 1xs#0001, Catalyst#7894 ?r Who needs IT Professionals anyway." +
+                    "```\n\n" +
+                    "See docs included with each command for details.\n" +
+                    "`Please click one of the buttons for command details.`\n\n" +
+                    "`Done:`  Ends interaction, keeping this message open.\n" +
+                    "`Close:`  Deletes this message.";
+
+                await component.UpdateAsync(msg => msg.Embed = embed.Build());
+                break;
+
+            case "purge":
+                // Lets respond by sending a message saying they clicked the button
+                embed.Title += " - Purge";
+                embed.Description = "Deletes number of specified recent messages within the channel executed.\n\n" +
+                    "```\n" +
+                    "Command Syntax:\n" +
+                    "+purge #\n\n" +
+                    "+purge 10\n" +
+                    "```\n\n" +
+                    "See docs included with each command for details.\n" +
+                    "`Please click one of the buttons for command details.`\n\n" +
+                    "`Done:`  Ends interaction, keeping this message open.\n" +
+                    "`Close:`  Deletes this message.";
+
+                await component.UpdateAsync(msg => msg.Embed = embed.Build());
+                break;
+            case "done":
+                // Lets respond by sending a message saying they clicked the button
+                await component.UpdateAsync(msg => msg.Components = null);
+                break;
+
+            case "close":
+                // Lets respond by sending a message saying they clicked the button
+                var message = component.Message;
+                await message.DeleteAsync();
+                break;
         }
     }
 }
