@@ -140,18 +140,28 @@ public class CommandHandler : ICommandHandler
 
         if (command.Data.Name == "release_notes")
         {
+            await Logger.Log(LogSeverity.Verbose, $"[{command.GuildId}] CommandReceived", $"{command.User.Username}#{command.User.DiscriminatorValue} has invoked {command.Data.Name} from the {command.Channel.Name} channel.");
+            
             await command.RespondAsync(":x: ***NOT IMPLEMENTED*** :x:\n" +
                 "This command is under active development and is not yet available.");
+
+            await Logger.Log(LogSeverity.Verbose, $"[{command.GuildId}] ResponseSent", $"Release Notes sent to the {command.Channel.Name} channel.");
         }
 
         if (command.Data.Name == "help")
         {
+            await Logger.Log(LogSeverity.Verbose, $"[{command.GuildId}] CommandReceived", $"{command.User.Username}#{command.User.DiscriminatorValue} has invoked {command.Data.Name} from the {command.Channel.Name} channel.");
+
             await command.RespondAsync(":x: ***NOT IMPLEMENTED*** :x:\n" +
                 "This command is under active development and is not yet available.");
+            
+            await Logger.Log(LogSeverity.Verbose, $"[{command.GuildId}] ResponseSent", $"Help sent to the {command.Channel.Name} channel.");
         }
 
         if (command.Data.Name == "temperature")
         {
+            await Logger.Log(LogSeverity.Verbose, $"[{command.GuildId}] CommandReceived", $"{command.User.Username}#{command.User.DiscriminatorValue} has invoked {command.Data.Name} from the {command.Channel.Name} channel.");
+
             string? unit = command.Data.Options.Last().Value.ToString();
             double temp = double.Parse(command.Data.Options.First().Value.ToString());
             string input = $"`{temp} {unit}:`  ";
@@ -165,11 +175,15 @@ public class CommandHandler : ICommandHandler
                 temp = (temp - 32) * 5 / 9;
                 unit = "C";
             }
+
             await command.RespondAsync($"{input} {temp:0.0} {unit}");
+            await Logger.Log(LogSeverity.Verbose, $"[{command.GuildId}] ResponseSent", $"Temperature Conversion sent to the {command.Channel.Name} channel.  [{input} {temp:0.0} {unit}]");
         }
 
         if (command.Data.Name == "distance")
         {
+            await Logger.Log(LogSeverity.Verbose, $"[{command.GuildId}] CommandReceived", $"{command.User.Username}#{command.User.DiscriminatorValue} has invoked {command.Data.Name} from the {command.Channel.Name} channel.");
+
             string? sourceUnit = command.Data.Options.ElementAt(1).Value.ToString();
             string? destinationUnit = command.Data.Options.ElementAt(2).Value.ToString();
             double distance = double.Parse(command.Data.Options.ElementAt(0).Value.ToString());
@@ -394,11 +408,13 @@ public class CommandHandler : ICommandHandler
             }
 
             await command.RespondAsync($"{input} {distance:0.0} {destinationUnit}");
+            await Logger.Log(LogSeverity.Verbose, $"[{command.GuildId}] ResponseSent", $"Distance Conversion sent to the {command.Channel.Name} channel.  [{input} {distance:0.0} {destinationUnit}]");
         }
     }
     
     public async Task ButtonHandler(SocketMessageComponent component)
     {
+        await Logger.Log(LogSeverity.Verbose, $"[{component.GuildId}] CommandReceived", $"{component.User.Username}#{component.User.DiscriminatorValue} has invoked {component.Data.CustomId} from the {component.Channel.Name} channel.");
         var embed = new EmbedBuilder
         {
             Title = "Wick Command Reference Guide",
@@ -434,6 +450,7 @@ public class CommandHandler : ICommandHandler
                 "`Close:`  Deletes this message.";
 
                 await component.UpdateAsync(msg => msg.Embed = embed.Build());
+                await Logger.Log(LogSeverity.Verbose, $"[{component.GuildId}] ResponseSent", $"{component.Data.CustomId} sent to the {component.Channel.Name} channel.");
                 break;
 
             case "mute":
@@ -455,6 +472,7 @@ public class CommandHandler : ICommandHandler
                     "`Close:`  Deletes this message.";
 
                 await component.UpdateAsync(msg => msg.Embed = embed.Build());
+                await Logger.Log(LogSeverity.Verbose, $"[{component.GuildId}] ResponseSent", $"{component.Data.CustomId} sent to the {component.Channel.Name} channel.");
                 break;
 
             case "warn":
@@ -473,6 +491,7 @@ public class CommandHandler : ICommandHandler
                     "`Close:`  Deletes this message.";
 
                 await component.UpdateAsync(msg => msg.Embed = embed.Build());
+                await Logger.Log(LogSeverity.Verbose, $"[{component.GuildId}] ResponseSent", $"{component.Data.CustomId} sent to the {component.Channel.Name} channel.");
                 break;
 
             case "kick":
@@ -493,6 +512,7 @@ public class CommandHandler : ICommandHandler
                     "`Close:`  Deletes this message.";
 
                 await component.UpdateAsync(msg => msg.Embed = embed.Build());
+                await Logger.Log(LogSeverity.Verbose, $"[{component.GuildId}] ResponseSent", $"{component.Data.CustomId} sent to the {component.Channel.Name} channel.");
                 break;
 
             case "ban":
@@ -513,6 +533,7 @@ public class CommandHandler : ICommandHandler
                     "`Close:`  Deletes this message.";
 
                 await component.UpdateAsync(msg => msg.Embed = embed.Build());
+                await Logger.Log(LogSeverity.Verbose, $"[{component.GuildId}] ResponseSent", $"{component.Data.CustomId} sent to the {component.Channel.Name} channel.");
                 break;
 
             case "purge":
@@ -530,16 +551,19 @@ public class CommandHandler : ICommandHandler
                     "`Close:`  Deletes this message.";
 
                 await component.UpdateAsync(msg => msg.Embed = embed.Build());
+                await Logger.Log(LogSeverity.Verbose, $"[{component.GuildId}] ResponseSent", $"{component.Data.CustomId} sent to the {component.Channel.Name} channel.");
                 break;
             case "done":
                 // Lets respond by sending a message saying they clicked the button
                 await component.UpdateAsync(msg => msg.Components = null);
+                await Logger.Log(LogSeverity.Verbose, $"[{component.GuildId}] ResponseSent", $"{component.Data.CustomId} executed from the {component.Channel.Name} channel.");
                 break;
 
             case "close":
                 // Lets respond by sending a message saying they clicked the button
                 var message = component.Message;
                 await message.DeleteAsync();
+                await Logger.Log(LogSeverity.Verbose, $"[{component.GuildId}] ResponseSent", $"{component.Data.CustomId} executed from the {component.Channel.Name} channel.");
                 break;
         }
     }
