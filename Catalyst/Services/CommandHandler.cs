@@ -177,7 +177,7 @@ public class CommandHandler : ICommandHandler
             }
 
             await command.RespondAsync($"{input} {temp:0.0} {unit}");
-            await Logger.Log(LogSeverity.Verbose, $"[{command.GuildId}] ResponseSent", $"Temperature Conversion sent to the {command.Channel.Name} channel.");
+            await Logger.Log(LogSeverity.Verbose, $"[{command.GuildId}] ResponseSent", $"Temperature Conversion sent to the {command.Channel.Name} channel.  [{input} {temp:0.0} {unit}]");
         }
 
         if (command.Data.Name == "distance")
@@ -408,7 +408,7 @@ public class CommandHandler : ICommandHandler
             }
 
             await command.RespondAsync($"{input} {distance:0.0} {destinationUnit}");
-            await Logger.Log(LogSeverity.Verbose, $"[{command.GuildId}] ResponseSent", $"Distance Conversion sent to the {command.Channel.Name} channel.");
+            await Logger.Log(LogSeverity.Verbose, $"[{command.GuildId}] ResponseSent", $"Distance Conversion sent to the {command.Channel.Name} channel.  [{input} {distance:0.0} {destinationUnit}]");
         }
     }
     
