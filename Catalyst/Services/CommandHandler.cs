@@ -1068,10 +1068,6 @@ public class CommandHandler : ICommandHandler
 
                 await component.UpdateAsync(msg => msg.Embed = embed.Build());
                 break;
-            case "done":
-                // Lets respond by sending a message saying they clicked the button
-                await component.UpdateAsync(msg => msg.Components = null);
-                break;
 
             case "close":
                 // Lets respond by sending a message saying they clicked the button
