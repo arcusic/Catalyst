@@ -660,10 +660,9 @@ public class Utilities : ModuleBase<ShardedCommandContext>
                 .WithButton("Mute", "mute", ButtonStyle.Primary)
                 .WithButton("Warning", "warn", ButtonStyle.Primary)
                 .WithButton("Kick", "kick", ButtonStyle.Primary)
-                .WithButton("Ban", "ban", ButtonStyle.Primary)
+                .WithButton("Ban", "ban", ButtonStyle.Secondary)
                 .WithButton("Purge", "purge", ButtonStyle.Primary)
                 .WithButton("Overview", "overview", ButtonStyle.Primary)
-                .WithButton("Done", "done", ButtonStyle.Success)
                 .WithButton("Close", "close", ButtonStyle.Danger);
 
             await Context.Message.ReplyAsync(embed: embed.Build(), components: buttons.Build());
