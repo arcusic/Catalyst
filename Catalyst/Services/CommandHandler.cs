@@ -988,7 +988,6 @@ public class CommandHandler : ICommandHandler
                     "```\n\n" +
                     "See docs included with each command for details.\n" +
                     "`Please click one of the buttons for command details.`\n\n" +
-                    "`Done:`  Ends interaction, keeping this message open.\n" +
                     "`Close:`  Deletes this message.";
 
                 await component.UpdateAsync(msg => msg.Embed = embed.Build());
@@ -1006,7 +1005,6 @@ public class CommandHandler : ICommandHandler
                     "```\n\n" +
                     "See docs included with each command for details.\n" +
                     "`Please click one of the buttons for command details.`\n\n" +
-                    "`Done:`  Ends interaction, keeping this message open.\n" +
                     "`Close:`  Deletes this message.";
 
                 await component.UpdateAsync(msg => msg.Embed = embed.Build());
@@ -1026,7 +1024,6 @@ public class CommandHandler : ICommandHandler
                     "```\n\n" +
                     "See docs included with each command for details.\n" +
                     "`Please click one of the buttons for command details.`\n\n" +
-                    "`Done:`  Ends interaction, keeping this message open.\n" +
                     "`Close:`  Deletes this message.";
 
                 await component.UpdateAsync(msg => msg.Embed = embed.Build());
@@ -1046,7 +1043,6 @@ public class CommandHandler : ICommandHandler
                     "```\n\n" +
                     "See docs included with each command for details.\n" +
                     "`Please click one of the buttons for command details.`\n\n" +
-                    "`Done:`  Ends interaction, keeping this message open.\n" +
                     "`Close:`  Deletes this message.";
 
                 await component.UpdateAsync(msg => msg.Embed = embed.Build());
@@ -1063,7 +1059,6 @@ public class CommandHandler : ICommandHandler
                     "```\n\n" +
                     "See docs included with each command for details.\n" +
                     "`Please click one of the buttons for command details.`\n\n" +
-                    "`Done:`  Ends interaction, keeping this message open.\n" +
                     "`Close:`  Deletes this message.";
 
                 await component.UpdateAsync(msg => msg.Embed = embed.Build());

@@ -657,13 +657,12 @@ public class Utilities : ModuleBase<ShardedCommandContext>
             };
 
             var buttons = new ComponentBuilder()
-                .WithButton("Mute", "mute", ButtonStyle.Primary)
                 .WithButton("Warning", "warn", ButtonStyle.Primary)
-                .WithButton("Kick", "kick", ButtonStyle.Primary)
-                .WithButton("Ban", "ban", ButtonStyle.Primary)
                 .WithButton("Purge", "purge", ButtonStyle.Primary)
+                .WithButton("Mute", "mute", ButtonStyle.Primary)
+                .WithButton("Kick", "kick", ButtonStyle.Primary)
+                .WithButton("Ban", "ban", ButtonStyle.Secondary)
                 .WithButton("Overview", "overview", ButtonStyle.Primary)
-                .WithButton("Done", "done", ButtonStyle.Success)
                 .WithButton("Close", "close", ButtonStyle.Danger);
 
             await Context.Message.ReplyAsync(embed: embed.Build(), components: buttons.Build());
