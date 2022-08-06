@@ -659,9 +659,9 @@ public class Utilities : ModuleBase<ShardedCommandContext>
             var buttons = new ComponentBuilder()
                 .WithButton("Mute", "mute", ButtonStyle.Primary)
                 .WithButton("Warning", "warn", ButtonStyle.Primary)
+                .WithButton("Purge", "purge", ButtonStyle.Primary)
                 .WithButton("Kick", "kick", ButtonStyle.Primary)
                 .WithButton("Ban", "ban", ButtonStyle.Secondary)
-                .WithButton("Purge", "purge", ButtonStyle.Primary)
                 .WithButton("Overview", "overview", ButtonStyle.Primary)
                 .WithButton("Close", "close", ButtonStyle.Danger);
 
