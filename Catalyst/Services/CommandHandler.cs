@@ -553,11 +553,6 @@ public class CommandHandler : ICommandHandler
                 await component.UpdateAsync(msg => msg.Embed = embed.Build());
                 await Logger.Log(LogSeverity.Verbose, $"[{component.GuildId}] ResponseSent", $"{component.Data.CustomId} sent to the {component.Channel.Name} channel.");
                 break;
-            case "done":
-                // Lets respond by sending a message saying they clicked the button
-                await component.UpdateAsync(msg => msg.Components = null);
-                await Logger.Log(LogSeverity.Verbose, $"[{component.GuildId}] ResponseSent", $"{component.Data.CustomId} executed from the {component.Channel.Name} channel.");
-                break;
 
             case "close":
                 // Lets respond by sending a message saying they clicked the button
