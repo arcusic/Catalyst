@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Catalyst": {
+      "commandName": "Project"
+    },
+    "Docker": {
+      "commandName": "Docker"
+    }
+  }
+}
