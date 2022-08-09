@@ -290,11 +290,11 @@ public class Utilities : ModuleBase<ShardedCommandContext>
         }
         else
         {
-            psInstance.AddCommand("speedtest");
+            psInstance.AddCommand("/app/Redistributables/SpeedTest/speedtest");
         }
 
         await response.ModifyAsync(msg => msg.Content = $"Executing infrastructure health check... please wait.\n\n`CURRENT STATUS:`  Executing Speed Test...");
-        await Logger.Log(LogSeverity.Debug, "SpeedTestStarting", $"Launching speedtest.exe... Please Wait.");
+        await Logger.Log(LogSeverity.Debug, "SpeedTestStarting", $"Launching speedtest... Please Wait.");
         var psOutput = psInstance.Invoke();
         psInstance.Dispose();
         await Logger.Log(LogSeverity.Debug, "SpeedTestResults", $"{psOutput[7]}");
