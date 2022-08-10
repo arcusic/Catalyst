@@ -957,7 +957,6 @@ public class CommandHandler : ICommandHandler
         // We can now check for our custom id
         switch (component.Data.CustomId)
         {
-            // Since we set our buttons custom id as 'custom-id', we can check for it like this:
             case "overview":
                 embed.Description = $"The server currently uses `Wick Bot` for moderation.\n" +
                 "This Guide will describe the commands that will be needed during an incident.\n\n" +
@@ -975,7 +974,6 @@ public class CommandHandler : ICommandHandler
                 break;
 
             case "mute":
-                // Lets respond by sending a message saying they clicked the button
                 embed.Title += " - Mute";
                 embed.Description = $"Muting a user prevents them from sending messages or connecting to voice.\n" +
                     $"A DM will be sent to the user(s) warned informing them of the action.\n\n" +
@@ -995,7 +993,6 @@ public class CommandHandler : ICommandHandler
                 break;
 
             case "warn":
-                // Lets respond by sending a message saying they clicked the button
                 embed.Title += " - Warnings";
                 embed.Description = $"Issue a warning to the user for a violation.  Too many warnings, action will be taken.\n" +
                     $"A DM will be sent to the user(s) warned informing them of the action.\n\n" +
@@ -1012,7 +1009,6 @@ public class CommandHandler : ICommandHandler
                 break;
 
             case "kick":
-                // Lets respond by sending a message saying they clicked the button
                 embed.Title += " - Kick";
                 embed.Description = $"User will be immediately kicked from the server.\n" +
                     $"A DM will be sent to the user(s) being kicked informing them of the action.\n\n" +
@@ -1031,7 +1027,6 @@ public class CommandHandler : ICommandHandler
                 break;
 
             case "ban":
-                // Lets respond by sending a message saying they clicked the button
                 embed.Title += " - Bans";
                 embed.Description = "User will be immediately banned from the server.\n" +
                     "A DM will be sent to the user(s) being banned informing them of the action.\n\n" +
@@ -1050,7 +1045,6 @@ public class CommandHandler : ICommandHandler
                 break;
 
             case "purge":
-                // Lets respond by sending a message saying they clicked the button
                 embed.Title += " - Purge";
                 embed.Description = "Deletes number of specified recent messages within the channel executed.\n\n" +
                     "```\n" +
@@ -1066,7 +1060,6 @@ public class CommandHandler : ICommandHandler
                 break;
 
             case "close":
-                // Lets respond by sending a message saying they clicked the button
                 var message = component.Message;
                 await message.DeleteAsync();
                 break;
