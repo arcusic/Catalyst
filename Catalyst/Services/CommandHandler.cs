@@ -76,9 +76,10 @@ public class CommandHandler : ICommandHandler
             string osEmote = Environment.Is64BitOperatingSystem ? ":white_check_mark:" : ":x:";
             string procEmote = Environment.Is64BitProcess ? ":white_check_mark:" : ":x:";
             string operatingSystem = Environment.OSVersion.ToString().Contains("Microsoft Windows") ? "Microsoft Windows" : Environment.OSVersion.ToString();
+            operatingSystem = Environment.OSVersion.ToString().Contains("Unix") ? "Unix" : Environment.OSVersion.ToString();
 #if DEBUG
             string description = $":warning: `THIS IS A PRE-RELEASE VERSION.` :warning:\n\n" +
-                $"`Catalyst Version:`  Alpha v0.2 (Build 2208)\n\n" +
+                $"`Catalyst Version:`  v0.2-DEV\n\n" +
                 $"__*System Information*__\n" +
                 $"`Active Node:`  {Environment.MachineName}\n" +
                 $"`Operating System Platform:`  {operatingSystem}\n" +
@@ -96,7 +97,7 @@ public class CommandHandler : ICommandHandler
                 $"> Utilities Module - v0.2 (Build 2208)\n\n";
 #endif
 #if RELEASE
-            string description = $"`Catalyst Version:`  Alpha v0.2 (Build 2208)\n\n" +
+            string description = $"`Catalyst Version:`  v0.2 (Build 2208)\n\n" +
                 $"__*System Information*__\n" +
                 $"`Active Node:`  {Environment.MachineName}\n" +
                 $"`Operating System Platform:`  {operatingSystem}\n" +
