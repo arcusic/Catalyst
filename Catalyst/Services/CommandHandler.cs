@@ -93,7 +93,7 @@ public class CommandHandler : ICommandHandler
                 $"> 1xs#0001\n" +
                 $"> lovelxrd#7895\n\n" +
                 $"__*Loaded Modules:*__\n" +
-                $"> Utilities Module - v0.1 (Build 2207)\n\n";
+                $"> Utilities Module - v0.2 (Build 2208)\n\n";
 #endif
 #if RELEASE
             string description = $"`Catalyst Version:`  Alpha v0.2 (Build 2208)\n\n" +
@@ -111,7 +111,7 @@ public class CommandHandler : ICommandHandler
                 $"> 1xs#0001\n" +
                 $"> lovelxrd#7895\n\n" +
                 $"__*Loaded Modules:*__\n" +
-                $"> Utilities Module - v0.1 (Build 2207)\n\n";
+                $"> Utilities Module - v0.2 (Build 2208)\n\n";
 #endif
 
             var embedded = new EmbedBuilder
