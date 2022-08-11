@@ -79,7 +79,7 @@ public class CommandHandler : ICommandHandler
             operatingSystem = Environment.OSVersion.ToString().Contains("Unix") ? "Unix" : Environment.OSVersion.ToString();
 #if DEBUG
             string description = $":warning: `THIS IS A PRE-RELEASE VERSION.` :warning:\n\n" +
-                $"`Catalyst Version:`  v{Assembly.GetEntryAssembly()?.GetName().Version.ToString()}-alpha (Build {Assembly.GetEntryAssembly().GetCustomAttribute<AssemblyFileVersionAttribute>().Version.ToString()})\n\n" +
+                $"`Catalyst Version:`  v{Assembly.GetEntryAssembly()?.GetName().Version}-alpha (Build {Assembly.GetEntryAssembly().GetCustomAttribute<AssemblyFileVersionAttribute>().Version})\n\n" +
                 $"__*System Information*__\n" +
                 $"`Active Node:`  {Environment.MachineName}\n" +
                 $"`Operating System Platform:`  {operatingSystem}\n" +
@@ -97,7 +97,7 @@ public class CommandHandler : ICommandHandler
                 $"> Utilities Module - v0.2 (Build 2208)\n\n";
 #endif
 #if RELEASE
-            string description = $"`Catalyst Version:`  v{Assembly.GetEntryAssembly()?.GetName().Version.ToString()} (Build {Assembly.GetEntryAssembly().GetCustomAttribute<AssemblyFileVersionAttribute>().Version.ToString()}\n\n" +
+            string description = $"`Catalyst Version:`  v{Assembly.GetEntryAssembly()?.GetName().Version} (Build {Assembly.GetEntryAssembly().GetCustomAttribute<AssemblyFileVersionAttribute>().Version}\n\n" +
                 $"__*System Information*__\n" +
                 $"`Active Node:`  {Environment.MachineName}\n" +
                 $"`Operating System Platform:`  {operatingSystem}\n" +
