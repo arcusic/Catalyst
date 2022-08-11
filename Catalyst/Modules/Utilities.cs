@@ -635,7 +635,6 @@ public class Utilities : ModuleBase<ShardedCommandContext>
                 "> Not including these inputs may have consequences.\n\n" +
                 "See docs included with each command for details.\n" +
                 "`Please click one of the buttons for command details.`\n\n" +
-                "`Done:`  Ends interaction, keeping this message open.\n" +
                 "`Close:`  Deletes this message.";
 
             var embed = new EmbedBuilder
@@ -665,7 +664,7 @@ public class Utilities : ModuleBase<ShardedCommandContext>
                 .WithButton("Warning", "warn", ButtonStyle.Primary,null,null,false,1)
                 .WithButton("Ban", "ban", ButtonStyle.Secondary, null, null, false, 1)
                 .WithButton("Unban", "unban", ButtonStyle.Secondary, null, null, false, 1)
-                .WithButton("Lockdown", "lockdown", ButtonStyle.Secondary, null, null, false, 1)
+                .WithButton("Lockdown", "lockdown", ButtonStyle.Danger, null, null, false, 1)
                 .WithButton("Overview", "overview", ButtonStyle.Primary, null, null, false, 2)
                 .WithButton("Close", "close", ButtonStyle.Danger, null, null, false, 2);
 
