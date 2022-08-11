@@ -664,7 +664,7 @@ public class Utilities : ModuleBase<ShardedCommandContext>
                 .WithButton("Warning", "warn", ButtonStyle.Primary,null,null,false,1)
                 .WithButton("Ban", "ban", ButtonStyle.Secondary, null, null, false, 1)
                 .WithButton("Unban", "unban", ButtonStyle.Secondary, null, null, false, 1)
-                .WithButton("Lockdown", "lockdown", ButtonStyle.Danger, null, null, false, 1)
+                .WithButton("Lockdown", "lockdown", ButtonStyle.Secondary, null, null, false, 1)
                 .WithButton("Overview", "overview", ButtonStyle.Primary, null, null, false, 2)
                 .WithButton("Close", "close", ButtonStyle.Danger, null, null, false, 2);
 
