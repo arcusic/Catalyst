@@ -1,4 +1,4 @@
-using System.Reflection;
+﻿using System.Reflection;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
@@ -1051,6 +1051,69 @@ public class CommandHandler : ICommandHandler
                     "Command Syntax:\n" +
                     "+purge #\n\n" +
                     "+purge 10\n" +
+                    "```\n\n" +
+                    "See docs included with each command for details.\n" +
+                    "`Please click one of the buttons for command details.`\n\n" +
+                    "`Close:`  Deletes this message.";
+
+                await component.UpdateAsync(msg => msg.Embed = embed.Build());
+                break;
+
+            case "unmute":
+                embed.Title += " - Removing Mutes";
+                embed.Description = "Unmutes the specified user(s).\n\n" +
+                    "```\n" +
+                    "Command Syntax:\n" +
+                    "+unmute @User | UserID\n\n" +
+                    "+unmute @Tactical050#9264, @Catalyst#7894\n" +
+                    "```\n\n" +
+                    "See docs included with each command for details.\n" +
+                    "`Please click one of the buttons for command details.`\n\n" +
+                    "`Close:`  Deletes this message.";
+
+                await component.UpdateAsync(msg => msg.Embed = embed.Build());
+                break;
+
+            case "unban":
+                embed.Title += " - Removing Bans";
+                embed.Description = "Removes a ban the specified user(s).\n\n" +
+                    "```\n" +
+                    "Command Syntax:\n" +
+                    "+unban @User | UserID\n\n" +
+                    "+unban @lovelxrd#7985\n" +
+                    "```\n\n" +
+                    "See docs included with each command for details.\n" +
+                    "`Please click one of the buttons for command details.`\n\n" +
+                    "`Close:`  Deletes this message.";
+
+                await component.UpdateAsync(msg => msg.Embed = embed.Build());
+                break;
+
+            case "slowmode":
+                embed.Title += " - Slow Mode";
+                embed.Description = "Enables slow mode for a specified channel.\n\n" +
+                    ":warning:  Duration must be between `1 second` and `6 hours`.  :warning:\n" +
+                    ":information_source:  To disable Slow Mode use a time entry of `0`.  :information_source:\n" +
+                    "```\n" +
+                    "Command Syntax:\n" +
+                    "+slowmode <#Channel_Name> #(s/m/h)\n\n" +
+                    "+slowmode #┃chat 5m\n\n" +
+                    "+slowmode #┃chat 0\n" +
+                    "```\n\n" +
+                    "See docs included with each command for details.\n" +
+                    "`Please click one of the buttons for command details.`\n\n" +
+                    "`Close:`  Deletes this message.";
+
+                await component.UpdateAsync(msg => msg.Embed = embed.Build());
+                break;
+
+            case "lockdown":
+                embed.Title += " - Lockdown";
+                embed.Description = "`NOT IMPLEMENTED`.\n\n" +
+                    "```\n" +
+                    "Command Syntax:\n" +
+                    "+{placeholder}\n\n" +
+                    "+{placeholder}\n" +
                     "```\n\n" +
                     "See docs included with each command for details.\n" +
                     "`Please click one of the buttons for command details.`\n\n" +
