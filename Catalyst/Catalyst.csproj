@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <Title>The Catalyst</Title>
-    <AssemblyVersion>0.2.1</AssemblyVersion>
+    <AssemblyVersion>0.2.1.1</AssemblyVersion>
     <FileVersion>2208</FileVersion>
   </PropertyGroup>
   <ItemGroup>
