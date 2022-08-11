@@ -5,6 +5,9 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <Title>The Catalyst</Title>
+    <AssemblyVersion>0.2.0</AssemblyVersion>
+    <FileVersion>2208</FileVersion>
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Discord.Net" />
