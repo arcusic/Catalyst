@@ -103,6 +103,102 @@ async Task MainAsync()
             .AddChoice("Inches", "in")
             .WithType(ApplicationCommandOptionType.String))
         .Build();
+    
+    var weightConversion = new SlashCommandBuilder()
+        .WithName("weight")
+        .WithDescription("Weight Conversion")
+        .AddOption(new SlashCommandOptionBuilder()
+            .WithName("weight")
+            .WithDescription("Weight")
+            .WithRequired(true)
+            .WithType(ApplicationCommandOptionType.Number))
+        .AddOption(new SlashCommandOptionBuilder()
+            .WithName("source_unit")
+            .WithDescription("Unit of Measurement")
+            .WithRequired(true)
+            .AddChoice("Kilograms", "kg")
+            .AddChoice("Grams", "g")
+            .AddChoice("Milligrams", "mg")
+            .AddChoice("Pounds", "lb")
+            .AddChoice("Ounces", "oz")
+            .WithType(ApplicationCommandOptionType.String))
+        .AddOption(new SlashCommandOptionBuilder()
+            .WithName("destination_unit")
+            .WithDescription("Unit of Measurement")
+            .WithRequired(true)
+            .AddChoice("Kilograms", "kg")
+            .AddChoice("Grams", "g")
+            .AddChoice("Milligrams", "mg")
+            .AddChoice("Pounds", "lb")
+            .AddChoice("Ounces", "oz")
+            .WithType(ApplicationCommandOptionType.String))
+        .Build();
+
+    var volumeConversion = new SlashCommandBuilder()
+        .WithName("volume")
+        .WithDescription("Volume Conversion")
+        .AddOption(new SlashCommandOptionBuilder()
+            .WithName("volume")
+            .WithDescription("Volume")
+            .WithRequired(true)
+            .WithType(ApplicationCommandOptionType.Number))
+        .AddOption(new SlashCommandOptionBuilder()
+            .WithName("source_unit")
+            .WithDescription("Unit of Measurement")
+            .WithRequired(true)
+            .AddChoice("Liters", "L")
+            .AddChoice("Milliliters", "mL")
+            .AddChoice("Gallons", "gal")
+            .AddChoice("Quarts", "qt")
+            .AddChoice("Pints", "pt")
+            .AddChoice("Cups", "cup")
+            .AddChoice("Fluid Ounces", "fl oz")
+            .AddChoice("Tablespoons", "tbsp")
+            .AddChoice("Teaspoons", "tsp")
+            .WithType(ApplicationCommandOptionType.String))
+        .AddOption(new SlashCommandOptionBuilder()
+            .WithName("destination_unit")
+            .WithDescription("Unit of Measurement")
+            .WithRequired(true)
+            .AddChoice("Liters", "L")
+            .AddChoice("Milliliters", "mL")
+            .AddChoice("Gallons", "gal")
+            .AddChoice("Quarts", "qt")
+            .AddChoice("Pints", "pt")
+            .AddChoice("Cups", "cup")
+            .AddChoice("Fluid Ounces", "fl oz")
+            .AddChoice("Tablespoons", "tbsp")
+            .AddChoice("Teaspoons", "tsp")
+            .WithType(ApplicationCommandOptionType.String))
+        .Build();
+    
+    var speedConversion = new SlashCommandBuilder()
+        .WithName("speed")
+        .WithDescription("Speed Conversion")
+        .AddOption(new SlashCommandOptionBuilder()
+            .WithName("speed")
+            .WithDescription("Speed")
+            .WithRequired(true)
+            .WithType(ApplicationCommandOptionType.Number))
+        .AddOption(new SlashCommandOptionBuilder()
+            .WithName("source_unit")
+            .WithDescription("Unit of Measurement")
+            .WithRequired(true)
+            .AddChoice("Kilometers per hour", "km/h")
+            .AddChoice("Meters per second", "m/s")
+            .AddChoice("Miles per hour", "mph")
+            .AddChoice("Knots", "kn")
+            .WithType(ApplicationCommandOptionType.String))
+        .AddOption(new SlashCommandOptionBuilder()
+            .WithName("destination_unit")
+            .WithDescription("Unit of Measurement")
+            .WithRequired(true)
+            .AddChoice("Kilometers per hour", "km/h")
+            .AddChoice("Meters per second", "m/s")
+            .AddChoice("Miles per hour", "mph")
+            .AddChoice("Knots", "kn")
+            .WithType(ApplicationCommandOptionType.String))
+        .Build();
     //End Conversion Module
 
     //Start About Module
@@ -138,6 +234,15 @@ async Task MainAsync()
 
         await shard.CreateGlobalApplicationCommandAsync(distanceConversion);
         await Logger.Log(LogSeverity.Info, "CMDBuilt", $"Slash Command {distanceConversion.Name} is built and ready!");
+
+        await shard.CreateGlobalApplicationCommandAsync(weightConversion);
+        await Logger.Log(LogSeverity.Info, "CMDBuilt", $"Slash Command {weightConversion.Name} is built and ready!");
+
+        await shard.CreateGlobalApplicationCommandAsync(volumeConversion);
+        await Logger.Log(LogSeverity.Info, "CMDBuilt", $"Slash Command {volumeConversion.Name} is built and ready!");
+
+        await shard.CreateGlobalApplicationCommandAsync(speedConversion);
+        await Logger.Log(LogSeverity.Info, "CMDBuilt", $"Slash Command {speedConversion.Name} is built and ready!");
 
         await Logger.Log(LogSeverity.Info, "ShardReady", $"Shard Number {shard.ShardId} is connected and ready!");
     };

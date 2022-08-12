@@ -1,4 +1,4 @@
-using System.Reflection;
+﻿using System.Reflection;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
@@ -76,9 +76,10 @@ public class CommandHandler : ICommandHandler
             string osEmote = Environment.Is64BitOperatingSystem ? ":white_check_mark:" : ":x:";
             string procEmote = Environment.Is64BitProcess ? ":white_check_mark:" : ":x:";
             string operatingSystem = Environment.OSVersion.ToString().Contains("Microsoft Windows") ? "Microsoft Windows" : Environment.OSVersion.ToString();
+            operatingSystem = Environment.OSVersion.ToString().Contains("Unix") ? "Unix" : Environment.OSVersion.ToString();
 #if DEBUG
             string description = $":warning: `THIS IS A PRE-RELEASE VERSION.` :warning:\n\n" +
-                $"`Catalyst Version:`  Alpha v0.1 (Build 2207)\n\n" +
+                $"`Catalyst Version:`  v{Assembly.GetEntryAssembly()?.GetName().Version}-alpha (Build {Assembly.GetEntryAssembly().GetCustomAttribute<AssemblyFileVersionAttribute>().Version})\n\n" +
                 $"__*System Information*__\n" +
                 $"`Active Node:`  {Environment.MachineName}\n" +
                 $"`Operating System Platform:`  {operatingSystem}\n" +
@@ -93,10 +94,10 @@ public class CommandHandler : ICommandHandler
                 $"> 1xs#0001\n" +
                 $"> lovelxrd#7895\n\n" +
                 $"__*Loaded Modules:*__\n" +
-                $"> Utilities Module - v0.1 (Build 2207)\n\n";
+                $"> Utilities Module - v0.2 (Build 2208)\n\n";
 #endif
 #if RELEASE
-            string description = $"`Catalyst Version:`  Alpha v0.1 (Build 2207)\n\n" +
+            string description = $"`Catalyst Version:`  v{Assembly.GetEntryAssembly()?.GetName().Version} (Build {Assembly.GetEntryAssembly().GetCustomAttribute<AssemblyFileVersionAttribute>().Version})\n\n" +
                 $"__*System Information*__\n" +
                 $"`Active Node:`  {Environment.MachineName}\n" +
                 $"`Operating System Platform:`  {operatingSystem}\n" +
@@ -111,7 +112,7 @@ public class CommandHandler : ICommandHandler
                 $"> 1xs#0001\n" +
                 $"> lovelxrd#7895\n\n" +
                 $"__*Loaded Modules:*__\n" +
-                $"> Utilities Module - v0.1 (Build 2207)\n\n";
+                $"> Utilities Module - v0.2 (Build 2208)\n\n";
 #endif
 
             var embedded = new EmbedBuilder
@@ -140,28 +141,18 @@ public class CommandHandler : ICommandHandler
 
         if (command.Data.Name == "release_notes")
         {
-            await Logger.Log(LogSeverity.Verbose, $"[{command.GuildId}] CommandReceived", $"{command.User.Username}#{command.User.DiscriminatorValue} has invoked {command.Data.Name} from the {command.Channel.Name} channel.");
-            
             await command.RespondAsync(":x: ***NOT IMPLEMENTED*** :x:\n" +
                 "This command is under active development and is not yet available.");
-
-            await Logger.Log(LogSeverity.Verbose, $"[{command.GuildId}] ResponseSent", $"Release Notes sent to the {command.Channel.Name} channel.");
         }
 
         if (command.Data.Name == "help")
         {
-            await Logger.Log(LogSeverity.Verbose, $"[{command.GuildId}] CommandReceived", $"{command.User.Username}#{command.User.DiscriminatorValue} has invoked {command.Data.Name} from the {command.Channel.Name} channel.");
-
             await command.RespondAsync(":x: ***NOT IMPLEMENTED*** :x:\n" +
                 "This command is under active development and is not yet available.");
-            
-            await Logger.Log(LogSeverity.Verbose, $"[{command.GuildId}] ResponseSent", $"Help sent to the {command.Channel.Name} channel.");
         }
 
         if (command.Data.Name == "temperature")
         {
-            await Logger.Log(LogSeverity.Verbose, $"[{command.GuildId}] CommandReceived", $"{command.User.Username}#{command.User.DiscriminatorValue} has invoked {command.Data.Name} from the {command.Channel.Name} channel.");
-
             string? unit = command.Data.Options.Last().Value.ToString();
             double temp = double.Parse(command.Data.Options.First().Value.ToString());
             string input = $"`{temp} {unit}:`  ";
@@ -175,15 +166,11 @@ public class CommandHandler : ICommandHandler
                 temp = (temp - 32) * 5 / 9;
                 unit = "C";
             }
-
             await command.RespondAsync($"{input} {temp:0.0} {unit}");
-            await Logger.Log(LogSeverity.Verbose, $"[{command.GuildId}] ResponseSent", $"Temperature Conversion sent to the {command.Channel.Name} channel.  [{input} {temp:0.0} {unit}]");
         }
 
         if (command.Data.Name == "distance")
         {
-            await Logger.Log(LogSeverity.Verbose, $"[{command.GuildId}] CommandReceived", $"{command.User.Username}#{command.User.DiscriminatorValue} has invoked {command.Data.Name} from the {command.Channel.Name} channel.");
-
             string? sourceUnit = command.Data.Options.ElementAt(1).Value.ToString();
             string? destinationUnit = command.Data.Options.ElementAt(2).Value.ToString();
             double distance = double.Parse(command.Data.Options.ElementAt(0).Value.ToString());
@@ -197,34 +184,34 @@ public class CommandHandler : ICommandHandler
                 }
                 else if (destinationUnit == "km")
                 {
-                    distance = distance / 1000;
+                    distance /= 1000;
                 }
                 else if (destinationUnit == "mi")
                 {
-                    distance = distance / 1609.34;
+                    distance /= 1609.34;
                 }
                 else if (destinationUnit == "ft")
                 {
-                    distance = distance * 3.28084;
+                    distance *= 3.28084;
                 }
                 else if (destinationUnit == "yd")
                 {
-                    distance = distance * 1.09361;
+                    distance *= 1.09361;
                 }
                 else if (destinationUnit == "in")
                 {
-                    distance = distance * 39.37008;
+                    distance *= 39.37008;
                 }
                 else if (destinationUnit == "cm")
                 {
-                    distance = distance * 100;
+                    distance *= 100;
                 }
             }
             else if (sourceUnit == "km")
             {
                 if (destinationUnit == "m")
                 {
-                    distance = distance * 1000;
+                    distance *= 1000;
                 }
                 else if (destinationUnit == "km")
                 {
@@ -232,34 +219,34 @@ public class CommandHandler : ICommandHandler
                 }
                 else if (destinationUnit == "mi")
                 {
-                    distance = distance * 0.621371;
+                    distance *= 0.621371;
                 }
                 else if (destinationUnit == "ft")
                 {
-                    distance = distance * 3280.84;
+                    distance *= 3280.84;
                 }
                 else if (destinationUnit == "yd")
                 {
-                    distance = distance * 1093.61;
+                    distance *= 1093.61;
                 }
                 else if (destinationUnit == "in")
                 {
-                    distance = distance * 39370.08;
+                    distance *= 39370.08;
                 }
                 else if (destinationUnit == "cm")
                 {
-                    distance = distance * 100000;
+                    distance *= 100000;
                 }
             }
             else if (sourceUnit == "mi")
             {
                 if (destinationUnit == "m")
                 {
-                    distance = distance * 1609.34;
+                    distance *= 1609.34;
                 }
                 else if (destinationUnit == "km")
                 {
-                    distance = distance * 1.60934;
+                    distance *= 1.60934;
                 }
                 else if (destinationUnit == "mi")
                 {
@@ -267,34 +254,34 @@ public class CommandHandler : ICommandHandler
                 }
                 else if (destinationUnit == "ft")
                 {
-                    distance = distance * 5280;
+                    distance *= 5280;
                 }
                 else if (destinationUnit == "yd")
                 {
-                    distance = distance * 1760;
+                    distance *= 1760;
                 }
                 else if (destinationUnit == "in")
                 {
-                    distance = distance * 63360;
+                    distance *= 63360;
                 }
                 else if (destinationUnit == "cm")
                 {
-                    distance = distance * 1609340;
+                    distance *= 1609340;
                 }
             }
             else if (sourceUnit == "ft")
             {
                 if (destinationUnit == "m")
                 {
-                    distance = distance / 3.28084;
+                    distance /= 3.28084;
                 }
                 else if (destinationUnit == "km")
                 {
-                    distance = distance / 3280.84;
+                    distance /= 3280.84;
                 }
                 else if (destinationUnit == "mi")
                 {
-                    distance = distance / 5280;
+                    distance /= 5280;
                 }
                 else if (destinationUnit == "ft")
                 {
@@ -302,34 +289,34 @@ public class CommandHandler : ICommandHandler
                 }
                 else if (destinationUnit == "yd")
                 {
-                    distance = distance / 3;
+                    distance /= 3;
                 }
                 else if (destinationUnit == "in")
                 {
-                    distance = distance * 12;
+                    distance *= 12;
                 }
                 else if (destinationUnit == "cm")
                 {
-                    distance = distance * 30.48;
+                    distance *= 30.48;
                 }
             }
             else if (sourceUnit == "yd")
             {
                 if (destinationUnit == "m")
                 {
-                    distance = distance / 1.09361;
+                    distance /= 1.09361;
                 }
                 else if (destinationUnit == "km")
                 {
-                    distance = distance / 1093.61;
+                    distance /= 1093.61;
                 }
                 else if (destinationUnit == "mi")
                 {
-                    distance = distance / 1760;
+                    distance /= 1760;
                 }
                 else if (destinationUnit == "ft")
                 {
-                    distance = distance * 3;
+                    distance *= 3;
                 }
                 else if (destinationUnit == "yd")
                 {
@@ -337,34 +324,34 @@ public class CommandHandler : ICommandHandler
                 }
                 else if (destinationUnit == "in")
                 {
-                    distance = distance * 36;
+                    distance *= 36;
                 }
                 else if (destinationUnit == "cm")
                 {
-                    distance = distance * 91.44;
+                    distance *= 91.44;
                 }
             }
             else if (sourceUnit == "in")
             {
                 if (destinationUnit == "m")
                 {
-                    distance = distance / 39.37008;
+                    distance /= 39.37008;
                 }
                 else if (destinationUnit == "km")
                 {
-                    distance = distance / 39370.08;
+                    distance /= 39370.08;
                 }
                 else if (destinationUnit == "mi")
                 {
-                    distance = distance / 63360;
+                    distance /= 63360;
                 }
                 else if (destinationUnit == "ft")
                 {
-                    distance = distance / 12;
+                    distance /= 12;
                 }
                 else if (destinationUnit == "yd")
                 {
-                    distance = distance / 36;
+                    distance /= 36;
                 }
                 else if (destinationUnit == "in")
                 {
@@ -372,34 +359,34 @@ public class CommandHandler : ICommandHandler
                 }
                 else if (destinationUnit == "cm")
                 {
-                    distance = distance * 2.54;
+                    distance *= 2.54;
                 }
             }
             else if (sourceUnit == "cm")
             {
                 if (destinationUnit == "m")
                 {
-                    distance = distance / 100;
+                    distance /= 100;
                 }
                 else if (destinationUnit == "km")
                 {
-                    distance = distance / 100000;
+                    distance /= 100000;
                 }
                 else if (destinationUnit == "mi")
                 {
-                    distance = distance / 1609340;
+                    distance /= 1609340;
                 }
                 else if (destinationUnit == "ft")
                 {
-                    distance = distance / 30.48;
+                    distance /= 30.48;
                 }
                 else if (destinationUnit == "yd")
                 {
-                    distance = distance / 91.44;
+                    distance /= 91.44;
                 }
                 else if (destinationUnit == "in")
                 {
-                    distance = distance / 2.54;
+                    distance /= 2.54;
                 }
                 else if (destinationUnit == "cm")
                 {
@@ -408,13 +395,548 @@ public class CommandHandler : ICommandHandler
             }
 
             await command.RespondAsync($"{input} {distance:0.0} {destinationUnit}");
-            await Logger.Log(LogSeverity.Verbose, $"[{command.GuildId}] ResponseSent", $"Distance Conversion sent to the {command.Channel.Name} channel.  [{input} {distance:0.0} {destinationUnit}]");
+        }
+
+        if (command.Data.Name == "weight")
+        {
+            string? sourceUnit = command.Data.Options.ElementAt(1).Value.ToString();
+            string? destinationUnit = command.Data.Options.ElementAt(2).Value.ToString();
+            double weight = double.Parse(command.Data.Options.ElementAt(0).Value.ToString());
+            string input = $"`{weight} {sourceUnit}:`  ";
+
+            if (sourceUnit == "kg")
+            {
+                if (destinationUnit == "kg")
+                {
+                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {weight:0.0} {destinationUnit}");
+                }
+                else if (destinationUnit == "g")
+                {
+                    weight *= 1000;
+                }
+                else if (destinationUnit == "lb")
+                {
+                    weight *= 2.20462;
+                }
+                else if (destinationUnit == "oz")
+                {
+                    weight *= 35.274;
+                }
+            }
+            else if (sourceUnit == "g")
+            {
+                if (destinationUnit == "kg")
+                {
+                    weight /= 1000;
+                }
+                else if (destinationUnit == "g")
+                {
+                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {weight:0.0} {destinationUnit}");
+                }
+                else if (destinationUnit == "lb")
+                {
+                    weight *= 0.00220462;
+                }
+                else if (destinationUnit == "oz")
+                {
+                    weight *= 0.035274;
+                }
+            }
+            else if (sourceUnit == "lb")
+            {
+                if (destinationUnit == "kg")
+                {
+                    weight /= 2.20462;
+                }
+                else if (destinationUnit == "g")
+                {
+                    weight *= 453.592;
+                }
+                else if (destinationUnit == "lb")
+                {
+                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {weight:0.0} {destinationUnit}");
+                }
+                else if (destinationUnit == "oz")
+                {
+                    weight *= 16;
+                }
+            }
+            else if (sourceUnit == "oz")
+            {
+                if (destinationUnit == "kg")
+                {
+                    weight /= 35.274;
+                }
+                else if (destinationUnit == "g")
+                {
+                    weight *= 28.3495;
+                }
+                else if (destinationUnit == "lb")
+                {
+                    weight /= 16;
+                }
+                else if (destinationUnit == "oz")
+                {
+                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {weight:0.0} {destinationUnit}");
+                }
+            }
+
+            await command.RespondAsync($"{input} {weight:0.0} {destinationUnit}");
+        }
+
+        if (command.Data.Name == "volume")
+        {
+            string? sourceUnit = command.Data.Options.ElementAt(1).Value.ToString();
+            string? destinationUnit = command.Data.Options.ElementAt(2).Value.ToString();
+            double volume = double.Parse(command.Data.Options.ElementAt(0).Value.ToString());
+            string input = $"`{volume} {sourceUnit}:`  ";
+
+            if (sourceUnit == "L")
+            {
+                if (destinationUnit == "L")
+                {
+                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {volume:0.0} {destinationUnit}");
+                }
+                else if (destinationUnit == "mL")
+                {
+                    volume *= 1000;
+                }
+                else if (destinationUnit == "gal")
+                {
+                    volume *= 0.264172;
+                }
+                else if (destinationUnit == "qt")
+                {
+                    volume *= 0.106919;
+                }
+                else if (destinationUnit == "pt")
+                {
+                    volume *= 0.0284131;
+                }
+                else if (destinationUnit == "cup")
+                {
+                    volume *= 0.00416667;
+                }
+                else if (destinationUnit == "fl oz")
+                {
+                    volume *= 29.5735;
+                }
+                else if (destinationUnit == "tbsp")
+                {
+                    volume *= 67.628;
+                }
+                else if (destinationUnit == "tsp")
+                {
+                    volume *= 202.884;
+                }
+            }
+            else if (sourceUnit == "mL")
+            {
+                if (destinationUnit == "L")
+                {
+                    volume /= 1000;
+                }
+                else if (destinationUnit == "mL")
+                {
+                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {volume:0.0} {destinationUnit}");
+                }
+                else if (destinationUnit == "gal")
+                {
+                    volume *= 0.000264172;
+                }
+                else if (destinationUnit == "qt")
+                {
+                    volume *= 0.000130772;
+                }
+                else if (destinationUnit == "pt")
+                {
+                    volume *= 0.0000492892;
+                }
+                else if (destinationUnit == "cup")
+                {
+                    volume *= 0.0000236588;
+                }
+                else if (destinationUnit == "fl oz")
+                {
+                    volume *= 0.33814;
+                }
+                else if (destinationUnit == "tbsp")
+                {
+                    volume *= 0.0692641;
+                }
+                else if (destinationUnit == "tsp")
+                {
+                    volume *= 0.20094;
+                }
+            }
+            else if (sourceUnit == "gal")
+            {
+                if (destinationUnit == "L")
+                {
+                    volume /= 0.264172;
+                }
+                else if (destinationUnit == "mL")
+                {
+                    volume *= 264.172;
+                }
+                else if (destinationUnit == "gal")
+                {
+                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {volume:0.0} {destinationUnit}");
+                }
+                else if (destinationUnit == "qt")
+                {
+                    volume *= 2.25;
+                }
+                else if (destinationUnit == "pt")
+                {
+                    volume *= 4.92892;
+                }
+                else if (destinationUnit == "cup")
+                {
+                    volume *= 2.36588;
+                }
+                else if (destinationUnit == "fl oz")
+                {
+                    volume *= 33.814;
+                }
+                else if (destinationUnit == "tbsp")
+                {
+                    volume *= 67.628;
+                }
+                else if (destinationUnit == "tsp")
+                {
+                    volume *= 202.884;
+                }
+            }
+            else if (sourceUnit == "qt")
+            {
+                if (destinationUnit == "L")
+                {
+                    volume /= 0.106919;
+                }
+                else if (destinationUnit == "mL")
+                {
+                    volume *= 1069.19;
+                }
+                else if (destinationUnit == "gal")
+                {
+                    volume *= 0.00378541;
+                }
+                else if (destinationUnit == "qt")
+                {
+                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {volume:0.0} {destinationUnit}");
+                }
+                else if (destinationUnit == "pt")
+                {
+                    volume *= 2.11338;
+                }
+                else if (destinationUnit == "cup")
+                {
+                    volume *= 1.05669;
+                }
+                else if (destinationUnit == "fl oz")
+                {
+                    volume *= 33.814;
+                }
+                else if (destinationUnit == "tbsp")
+                {
+                    volume *= 67.628;
+                }
+                else if (destinationUnit == "tsp")
+                {
+                    volume *= 202.884;
+                }
+            }
+            else if (sourceUnit == "pt")
+            {
+                if (destinationUnit == "L")
+                {
+                    volume /= 0.0284131;
+                }
+                else if (destinationUnit == "mL")
+                {
+                    volume *= 284.131;
+                }
+                else if (destinationUnit == "gal")
+                {
+                    volume *= 0.00284130;
+                }
+                else if (destinationUnit == "qt")
+                {
+                    volume *= 0.00131577;
+                }
+                else if (destinationUnit == "pt")
+                {
+                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {volume:0.0} {destinationUnit}");
+                }
+                else if (destinationUnit == "cup")
+                {
+                    volume *= 0.0692641;
+                }
+                else if (destinationUnit == "fl oz")
+                {
+                    volume *= 29.5735;
+                }
+                else if (destinationUnit == "tbsp")
+                {
+                    volume *= 67.628;
+                }
+                else if (destinationUnit == "tsp")
+                {
+                    volume *= 202.884;
+                }
+            }
+            else if (sourceUnit == "cup")
+            {
+                if (destinationUnit == "L")
+                {
+                    volume /= 0.00416667;
+                }
+                else if (destinationUnit == "mL")
+                {
+                    volume *= 4166.67;
+                }
+                else if (destinationUnit == "gal")
+                {
+                    volume *= 0.00211338;
+                }
+                else if (destinationUnit == "qt")
+                {
+                    volume *= 0.00105669;
+                }
+                else if (destinationUnit == "pt")
+                {
+                    volume *= 0.0284131;
+                }
+                else if (destinationUnit == "cup")
+                {
+                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {volume:0.0} {destinationUnit}");
+                }
+                else if (destinationUnit == "fl oz")
+                {
+                    volume *= 33.814;
+                }
+                else if (destinationUnit == "tbsp")
+                {
+                    volume *= 67.628;
+                }
+                else if (destinationUnit == "tsp")
+                {
+                    volume *= 202.884;
+                }
+            }
+            else if (sourceUnit == "fl oz")
+            {
+                if (destinationUnit == "L")
+                {
+                    volume /= 0.33814;
+                }
+                else if (destinationUnit == "mL")
+                {
+                    volume *= 33814;
+                }
+                else if (destinationUnit == "gal")
+                {
+                    volume *= 0.00295735;
+                }
+                else if (destinationUnit == "qt")
+                {
+                    volume *= 0.00147575;
+                }
+                else if (destinationUnit == "pt")
+                {
+                    volume *= 0.0284131;
+                }
+                else if (destinationUnit == "cup")
+                {
+                    volume *= 0.00416667;
+                }
+                else if (destinationUnit == "fl oz")
+                {
+                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {volume:0.0} {destinationUnit}");
+                }
+                else if (destinationUnit == "tbsp")
+                {
+                    volume *= 0.0692641;
+                }
+                else if (destinationUnit == "tsp")
+                {
+                    volume *= 0.20094;
+                }
+            }
+            else if (sourceUnit == "tbsp")
+            {
+                if (destinationUnit == "L")
+                {
+                    volume /= 0.676280;
+                }
+                else if (destinationUnit == "mL")
+                {
+                    volume *= 67.628;
+                }
+                else if (destinationUnit == "gal")
+                {
+                    volume *= 0.000692641;
+                }
+                else if (destinationUnit == "qt")
+                {
+                    volume *= 0.000284131;
+                }
+                else if (destinationUnit == "pt")
+                {
+                    volume *= 0.0284131;
+                }
+                else if (destinationUnit == "cup")
+                {
+                    volume *= 0.00416667;
+                }
+                else if (destinationUnit == "fl oz")
+                {
+                    volume *= 0.0692641;
+                }
+                else if (destinationUnit == "tbsp")
+                {
+                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {volume:0.0} {destinationUnit}");
+                }
+                else if (destinationUnit == "tsp")
+                {
+                    volume *= 3.96563;
+                }
+            }
+            else if (sourceUnit == "tsp")
+            {
+                if (destinationUnit == "L")
+                {
+                    volume /= 202.884;
+                }
+                else if (destinationUnit == "mL")
+                {
+                    volume *= 202.884;
+                }
+                else if (destinationUnit == "gal")
+                {
+                    volume *= 0.001;
+                }
+                else if (destinationUnit == "qt")
+                {
+                    volume *= 0.000202884;
+                }
+                else if (destinationUnit == "pt")
+                {
+                    volume *= 0.000284131;
+                }
+                else if (destinationUnit == "cup")
+                {
+                    volume *= 0.000416670;
+                }
+                else if (destinationUnit == "fl oz")
+                {
+                    volume *= 0.0692641;
+                }
+                else if (destinationUnit == "tbsp")
+                {
+                    volume *= 0.00676280;
+                }
+                else if (destinationUnit == "tsp")
+                {
+                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {volume:0.0} {destinationUnit}");
+                }
+            }
+
+            await command.RespondAsync($"{input} {volume:0.0} {destinationUnit}");
+        }
+
+        if (command.Data.Name == "speed")
+        {
+            string? sourceUnit = command.Data.Options.ElementAt(1).Value.ToString();
+            string? destinationUnit = command.Data.Options.ElementAt(2).Value.ToString();
+            double speed = double.Parse(command.Data.Options.ElementAt(0).Value.ToString());
+            string input = $"`{speed} {sourceUnit}:`  ";
+            
+
+            if (sourceUnit == "m/s")
+            {
+                if (destinationUnit == "m/s")
+                {
+                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {speed:0.0} {destinationUnit}");
+                }
+                else if (destinationUnit == "km/h")
+                {
+                    speed *= 3.6;
+                }
+                else if (destinationUnit == "mph")
+                {
+                    speed *= 2.23694;
+                }
+                else if (destinationUnit == "knot")
+                {
+                    speed *= 1.94384;
+                }
+            }
+            else if (sourceUnit == "km/h")
+            {
+                if (destinationUnit == "m/s")
+                {
+                    speed /= 3.6;
+                }
+                else if (destinationUnit == "km/h")
+                {
+                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {speed:0.0} {destinationUnit}");
+                }
+                else if (destinationUnit == "mph")
+                {
+                    speed /= 1.60934;
+                }
+                else if (destinationUnit == "knot")
+                {
+                    speed /= 1.852;
+                }
+            }
+            else if (sourceUnit == "mph")
+            {
+                if (destinationUnit == "m/s")
+                {
+                    speed /= 2.23694;
+                }
+                else if (destinationUnit == "km/h")
+                {
+                    speed *= 1.60934;
+                }
+                else if (destinationUnit == "mph")
+                {
+                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {speed:0.0} {destinationUnit}");
+                }
+                else if (destinationUnit == "knot")
+                {
+                    speed *= 1.15078;
+                }
+            }
+            else if (sourceUnit == "knot")
+            {
+                if (destinationUnit == "m/s")
+                {
+                    speed /= 1.852;
+                }
+                else if (destinationUnit == "km/h")
+                {
+                    speed *= 1.852;
+                }
+                else if (destinationUnit == "mph")
+                {
+                    speed *= 1.15078;
+                }
+                else if (destinationUnit == "knot")
+                {
+                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {speed:0.0} {destinationUnit}");
+                }
+            }
+
+            await command.RespondAsync($"{input} {speed:0.0} {destinationUnit}");
         }
     }
     
     public async Task ButtonHandler(SocketMessageComponent component)
     {
-        await Logger.Log(LogSeverity.Verbose, $"[{component.GuildId}] CommandReceived", $"{component.User.Username}#{component.User.DiscriminatorValue} has invoked {component.Data.CustomId} from the {component.Channel.Name} channel.");
         var embed = new EmbedBuilder
         {
             Title = "Wick Command Reference Guide",
@@ -435,7 +957,6 @@ public class CommandHandler : ICommandHandler
         // We can now check for our custom id
         switch (component.Data.CustomId)
         {
-            // Since we set our buttons custom id as 'custom-id', we can check for it like this:
             case "overview":
                 embed.Description = $"The server currently uses `Wick Bot` for moderation.\n" +
                 "This Guide will describe the commands that will be needed during an incident.\n\n" +
@@ -450,11 +971,9 @@ public class CommandHandler : ICommandHandler
                 "`Close:`  Deletes this message.";
 
                 await component.UpdateAsync(msg => msg.Embed = embed.Build());
-                await Logger.Log(LogSeverity.Verbose, $"[{component.GuildId}] ResponseSent", $"{component.Data.CustomId} sent to the {component.Channel.Name} channel.");
                 break;
 
             case "mute":
-                // Lets respond by sending a message saying they clicked the button
                 embed.Title += " - Mute";
                 embed.Description = $"Muting a user prevents them from sending messages or connecting to voice.\n" +
                     $"A DM will be sent to the user(s) warned informing them of the action.\n\n" +
@@ -468,15 +987,12 @@ public class CommandHandler : ICommandHandler
                     "```\n\n" +
                     "See docs included with each command for details.\n" +
                     "`Please click one of the buttons for command details.`\n\n" +
-                    "`Done:`  Ends interaction, keeping this message open.\n" +
                     "`Close:`  Deletes this message.";
 
                 await component.UpdateAsync(msg => msg.Embed = embed.Build());
-                await Logger.Log(LogSeverity.Verbose, $"[{component.GuildId}] ResponseSent", $"{component.Data.CustomId} sent to the {component.Channel.Name} channel.");
                 break;
 
             case "warn":
-                // Lets respond by sending a message saying they clicked the button
                 embed.Title += " - Warnings";
                 embed.Description = $"Issue a warning to the user for a violation.  Too many warnings, action will be taken.\n" +
                     $"A DM will be sent to the user(s) warned informing them of the action.\n\n" +
@@ -487,15 +1003,12 @@ public class CommandHandler : ICommandHandler
                     "```\n\n" +
                     "See docs included with each command for details.\n" +
                     "`Please click one of the buttons for command details.`\n\n" +
-                    "`Done:`  Ends interaction, keeping this message open.\n" +
                     "`Close:`  Deletes this message.";
 
                 await component.UpdateAsync(msg => msg.Embed = embed.Build());
-                await Logger.Log(LogSeverity.Verbose, $"[{component.GuildId}] ResponseSent", $"{component.Data.CustomId} sent to the {component.Channel.Name} channel.");
                 break;
 
             case "kick":
-                // Lets respond by sending a message saying they clicked the button
                 embed.Title += " - Kick";
                 embed.Description = $"User will be immediately kicked from the server.\n" +
                     $"A DM will be sent to the user(s) being kicked informing them of the action.\n\n" +
@@ -508,15 +1021,12 @@ public class CommandHandler : ICommandHandler
                     "```\n\n" +
                     "See docs included with each command for details.\n" +
                     "`Please click one of the buttons for command details.`\n\n" +
-                    "`Done:`  Ends interaction, keeping this message open.\n" +
                     "`Close:`  Deletes this message.";
 
                 await component.UpdateAsync(msg => msg.Embed = embed.Build());
-                await Logger.Log(LogSeverity.Verbose, $"[{component.GuildId}] ResponseSent", $"{component.Data.CustomId} sent to the {component.Channel.Name} channel.");
                 break;
 
             case "ban":
-                // Lets respond by sending a message saying they clicked the button
                 embed.Title += " - Bans";
                 embed.Description = "User will be immediately banned from the server.\n" +
                     "A DM will be sent to the user(s) being banned informing them of the action.\n\n" +
@@ -529,36 +1039,94 @@ public class CommandHandler : ICommandHandler
                     "```\n\n" +
                     "See docs included with each command for details.\n" +
                     "`Please click one of the buttons for command details.`\n\n" +
-                    "`Done:`  Ends interaction, keeping this message open.\n" +
                     "`Close:`  Deletes this message.";
 
                 await component.UpdateAsync(msg => msg.Embed = embed.Build());
-                await Logger.Log(LogSeverity.Verbose, $"[{component.GuildId}] ResponseSent", $"{component.Data.CustomId} sent to the {component.Channel.Name} channel.");
                 break;
 
             case "purge":
-                // Lets respond by sending a message saying they clicked the button
                 embed.Title += " - Purge";
                 embed.Description = "Deletes number of specified recent messages within the channel executed.\n\n" +
+                    ":warning:  `User is optional.`  **Including a user will target their messages only!!!**  :warning:\n" +
                     "```\n" +
                     "Command Syntax:\n" +
-                    "+purge #\n\n" +
+                    "+purge # {@user | UserID}\n\n" +
                     "+purge 10\n" +
+                    "+purge 25 @GHXST#2586\n" +
                     "```\n\n" +
                     "See docs included with each command for details.\n" +
                     "`Please click one of the buttons for command details.`\n\n" +
-                    "`Done:`  Ends interaction, keeping this message open.\n" +
                     "`Close:`  Deletes this message.";
 
                 await component.UpdateAsync(msg => msg.Embed = embed.Build());
-                await Logger.Log(LogSeverity.Verbose, $"[{component.GuildId}] ResponseSent", $"{component.Data.CustomId} sent to the {component.Channel.Name} channel.");
+                break;
+
+            case "unmute":
+                embed.Title += " - Removing Mutes";
+                embed.Description = "Unmutes the specified user(s).\n\n" +
+                    "```\n" +
+                    "Command Syntax:\n" +
+                    "+unmute @User | UserID\n\n" +
+                    "+unmute @Tactical050#9264, @Catalyst#7894\n" +
+                    "```\n\n" +
+                    "See docs included with each command for details.\n" +
+                    "`Please click one of the buttons for command details.`\n\n" +
+                    "`Close:`  Deletes this message.";
+
+                await component.UpdateAsync(msg => msg.Embed = embed.Build());
+                break;
+
+            case "unban":
+                embed.Title += " - Removing Bans";
+                embed.Description = "Removes a ban the specified user(s).\n\n" +
+                    "```\n" +
+                    "Command Syntax:\n" +
+                    "+unban @User | UserID\n\n" +
+                    "+unban @lovelxrd#7985\n" +
+                    "```\n\n" +
+                    "See docs included with each command for details.\n" +
+                    "`Please click one of the buttons for command details.`\n\n" +
+                    "`Close:`  Deletes this message.";
+
+                await component.UpdateAsync(msg => msg.Embed = embed.Build());
+                break;
+
+            case "slowmode":
+                embed.Title += " - Slow Mode";
+                embed.Description = "Enables slow mode for a specified channel.\n\n" +
+                    ":warning:  Duration must be between `1 second` and `6 hours`.  :warning:\n" +
+                    ":information_source:  To disable Slow Mode use a time entry of `0`.  :information_source:\n" +
+                    "```\n" +
+                    "Command Syntax:\n" +
+                    "+slowmode <#Channel_Name> #(s/m/h)\n\n" +
+                    "+slowmode #┃chat 5m\n\n" +
+                    "+slowmode #┃chat 0\n" +
+                    "```\n\n" +
+                    "See docs included with each command for details.\n" +
+                    "`Please click one of the buttons for command details.`\n\n" +
+                    "`Close:`  Deletes this message.";
+
+                await component.UpdateAsync(msg => msg.Embed = embed.Build());
+                break;
+
+            case "lockdown":
+                embed.Title += " - Lockdown";
+                embed.Description = "`NOT IMPLEMENTED`.\n\n" +
+                    "```\n" +
+                    "Command Syntax:\n" +
+                    "+{placeholder}\n\n" +
+                    "+{placeholder}\n" +
+                    "```\n\n" +
+                    "See docs included with each command for details.\n" +
+                    "`Please click one of the buttons for command details.`\n\n" +
+                    "`Close:`  Deletes this message.";
+
+                await component.UpdateAsync(msg => msg.Embed = embed.Build());
                 break;
 
             case "close":
-                // Lets respond by sending a message saying they clicked the button
                 var message = component.Message;
                 await message.DeleteAsync();
-                await Logger.Log(LogSeverity.Verbose, $"[{component.GuildId}] ResponseSent", $"{component.Data.CustomId} executed from the {component.Channel.Name} channel.");
                 break;
         }
     }

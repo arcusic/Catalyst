@@ -290,11 +290,11 @@ public class Utilities : ModuleBase<ShardedCommandContext>
         }
         else
         {
-            psInstance.AddCommand("speedtest");
+            psInstance.AddCommand("/app/Redistributables/SpeedTest/speedtest");
         }
 
         await response.ModifyAsync(msg => msg.Content = $"Executing infrastructure health check... please wait.\n\n`CURRENT STATUS:`  Executing Speed Test...");
-        await Logger.Log(LogSeverity.Debug, "SpeedTestStarting", $"Launching speedtest.exe... Please Wait.");
+        await Logger.Log(LogSeverity.Debug, "SpeedTestStarting", $"Launching speedtest... Please Wait.");
         var psOutput = psInstance.Invoke();
         psInstance.Dispose();
         await Logger.Log(LogSeverity.Debug, "SpeedTestResults", $"{psOutput[7]}");
@@ -635,7 +635,6 @@ public class Utilities : ModuleBase<ShardedCommandContext>
                 "> Not including these inputs may have consequences.\n\n" +
                 "See docs included with each command for details.\n" +
                 "`Please click one of the buttons for command details.`\n\n" +
-                "`Done:`  Ends interaction, keeping this message open.\n" +
                 "`Close:`  Deletes this message.";
 
             var embed = new EmbedBuilder
@@ -657,13 +656,17 @@ public class Utilities : ModuleBase<ShardedCommandContext>
             };
 
             var buttons = new ComponentBuilder()
-                .WithButton("Mute", "mute", ButtonStyle.Primary)
-                .WithButton("Warning", "warn", ButtonStyle.Primary)
-                .WithButton("Purge", "purge", ButtonStyle.Primary)
-                .WithButton("Kick", "kick", ButtonStyle.Primary)
-                .WithButton("Ban", "ban", ButtonStyle.Secondary)
-                .WithButton("Overview", "overview", ButtonStyle.Primary)
-                .WithButton("Close", "close", ButtonStyle.Danger);
+                .WithButton("Purge", "purge", ButtonStyle.Primary, null, null, false, 0)
+                .WithButton("Mute", "mute", ButtonStyle.Primary, null, null, false, 0)
+                .WithButton("Unmute", "unmute", ButtonStyle.Primary, null, null, false, 0)
+                .WithButton("Kick", "kick", ButtonStyle.Primary, null, null, false, 0)
+                .WithButton("Slow Mode", "slowmode", ButtonStyle.Primary, null, null, false, 0)
+                .WithButton("Warning", "warn", ButtonStyle.Primary,null,null,false,1)
+                .WithButton("Ban", "ban", ButtonStyle.Secondary, null, null, false, 1)
+                .WithButton("Unban", "unban", ButtonStyle.Secondary, null, null, false, 1)
+                .WithButton("Lockdown", "lockdown", ButtonStyle.Secondary, null, null, false, 1)
+                .WithButton("Overview", "overview", ButtonStyle.Primary, null, null, false, 2)
+                .WithButton("Close", "close", ButtonStyle.Danger, null, null, false, 2);
 
             await Context.Message.ReplyAsync(embed: embed.Build(), components: buttons.Build());
 
@@ -728,6 +731,21 @@ public class Utilities : ModuleBase<ShardedCommandContext>
 
         var typingState = Context.Channel.TriggerTypingAsync();
         var response = await Context.Message.ReplyAsync($"taccat");
+        typingState.Dispose();
+    }
+
+    [Command("rower", RunMode = RunMode.Async)]
+    public async Task Rower()
+    {
+        var whiteCheckMark = new Emoji("\u2705");
+        await Logger.Log(LogSeverity.Verbose, $"[{Context.Guild.Name}] CommandReceived", $"{Context.User.Username}#{Context.User.DiscriminatorValue} has invoked {Context.Message.Content} from the {Context.Channel.Name} channel.");
+
+        await Context.Message.AddReactionAsync(whiteCheckMark);
+        await Logger.Log(LogSeverity.Verbose, $"[{Context.Guild.Name}] CommandAcknowledged", $"Reacted with :white_check_mark: to {Context.User.Username}#{Context.User.DiscriminatorValue}'s message.");
+
+        var typingState = Context.Channel.TriggerTypingAsync();
+        var response = await Context.Message.ReplyAsync($"It's not a guillotine... it's a water rower.\n" +
+            $"https://ergatta.com/the-ergatta-rower-v2/");
         typingState.Dispose();
     }
 }
