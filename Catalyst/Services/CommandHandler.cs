@@ -1047,7 +1047,7 @@ public class CommandHandler : ICommandHandler
             case "purge":
                 embed.Title += " - Purge";
                 embed.Description = "Deletes number of specified recent messages within the channel executed.\n\n" +
-                    ":warning:  `User is optional.`  **Including a user will only delete messages from that user!!!**  :warning:\n" +
+                    ":warning:  `User is optional.`  **Including a user will target their messages only!!!**  :warning:\n" +
                     "```\n" +
                     "Command Syntax:\n" +
                     "+purge # {@user | UserID}\n\n" +
