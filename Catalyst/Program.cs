@@ -8,6 +8,7 @@ using Catalyst.Init;
 using Catalyst.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System.Reflection;
 
 // Initialize Local Configuration File
 var config = new ConfigurationBuilder()
@@ -262,6 +263,16 @@ async Task MainAsync()
 
     await Logger.Log(LogSeverity.Debug, $"ClientReady", $"Client is connected to Discord.");
 
+#if DEBUG
+    await client.SetGameAsync($"v{Assembly.GetEntryAssembly().GetName().Version}-alpha");
+    await client.SetStatusAsync(UserStatus.DoNotDisturb);
+#endif
+
+#if RELEASE
+    await client.SetGameAsync($"v{Assembly.GetEntryAssembly().GetName().Version}");
+    await client.SetStatusAsync(UserStatus.Online);
+#endif
+    
     // Wait infinitely so your bot actually stays connected.
     await Task.Delay(Timeout.Infinite);
 }
