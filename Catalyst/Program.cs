@@ -263,13 +263,16 @@ async Task MainAsync()
 
     await Logger.Log(LogSeverity.Debug, $"ClientReady", $"Client is connected to Discord.");
 
+    string version = Assembly.GetEntryAssembly().GetName().Version.ToString();
+    version = version.Replace(".0", "");
+
 #if DEBUG
-    await client.SetGameAsync($"v{Assembly.GetEntryAssembly().GetName().Version}-alpha");
+    await client.SetGameAsync($"v{version}-alpha");
     await client.SetStatusAsync(UserStatus.DoNotDisturb);
 #endif
 
 #if RELEASE
-    await client.SetGameAsync($"v{Assembly.GetEntryAssembly().GetName().Version}");
+    await client.SetGameAsync($"v{version}");
     await client.SetStatusAsync(UserStatus.Online);
 #endif
     

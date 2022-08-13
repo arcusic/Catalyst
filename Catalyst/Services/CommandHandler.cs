@@ -77,9 +77,12 @@ public class CommandHandler : ICommandHandler
             string procEmote = Environment.Is64BitProcess ? ":white_check_mark:" : ":x:";
             string operatingSystem = Environment.OSVersion.ToString().Contains("Microsoft Windows") ? "Microsoft Windows" : Environment.OSVersion.ToString();
             operatingSystem = Environment.OSVersion.ToString().Contains("Unix") ? "Unix" : Environment.OSVersion.ToString();
+
+            string version = Assembly.GetEntryAssembly().GetName().Version.ToString();
+            version = version.Replace(".0", "");
 #if DEBUG
             string description = $":warning: `THIS IS A PRE-RELEASE VERSION.` :warning:\n\n" +
-                $"`Catalyst Version:`  v{Assembly.GetEntryAssembly()?.GetName().Version}-alpha (Build {Assembly.GetEntryAssembly().GetCustomAttribute<AssemblyFileVersionAttribute>().Version})\n\n" +
+                $"`Catalyst Version:`  v{version}-alpha (Build {Assembly.GetEntryAssembly().GetCustomAttribute<AssemblyFileVersionAttribute>().Version})\n\n" +
                 $"__*System Information*__\n" +
                 $"`Active Node:`  {Environment.MachineName}\n" +
                 $"`Operating System Platform:`  {operatingSystem}\n" +
@@ -94,10 +97,10 @@ public class CommandHandler : ICommandHandler
                 $"> 1xs#0001\n" +
                 $"> lovelxrd#7895\n\n" +
                 $"__*Loaded Modules:*__\n" +
-                $"> Utilities Module - v0.2 (Build 2208)\n\n";
+                $"> Utilities Module - v{version} (Build 2208)\n\n";
 #endif
 #if RELEASE
-            string description = $"`Catalyst Version:`  v{Assembly.GetEntryAssembly()?.GetName().Version} (Build {Assembly.GetEntryAssembly().GetCustomAttribute<AssemblyFileVersionAttribute>().Version})\n\n" +
+            string description = $"`Catalyst Version:`  v{version} (Build {Assembly.GetEntryAssembly().GetCustomAttribute<AssemblyFileVersionAttribute>().Version})\n\n" +
                 $"__*System Information*__\n" +
                 $"`Active Node:`  {Environment.MachineName}\n" +
                 $"`Operating System Platform:`  {operatingSystem}\n" +
@@ -112,7 +115,7 @@ public class CommandHandler : ICommandHandler
                 $"> 1xs#0001\n" +
                 $"> lovelxrd#7895\n\n" +
                 $"__*Loaded Modules:*__\n" +
-                $"> Utilities Module - v0.2 (Build 2208)\n\n";
+                $"> Utilities Module - v{version} (Build 2208)\n\n";
 #endif
 
             var embedded = new EmbedBuilder
