@@ -79,7 +79,14 @@ public class CommandHandler : ICommandHandler
             operatingSystem = Environment.OSVersion.ToString().Contains("Unix") ? "Unix" : Environment.OSVersion.ToString();
 
             string version = Assembly.GetEntryAssembly().GetName().Version.ToString();
-            var dateTime = DateTime.Now;
+#if DEBUG
+            var dateTime = DateTime.UtcNow;
+#endif
+
+#if RELEASE
+            string path = "/root/.config/ookla/build.txt";
+            var dateTime = File.GetLastWriteTimeUtc(path);
+#endif
             string build = dateTime.ToString("yyMMddHHmm");
             version = version.Replace(".0", "");
 #if DEBUG
@@ -100,7 +107,7 @@ public class CommandHandler : ICommandHandler
                 $"> lovelxrd#7895\n\n" +
                 $"__*Loaded Modules:*__\n" +
                 $"> Utilities Module - v{version}-alpha\n\n" +
-                $"`Built On:` {dateTime}";
+                $"`Built On:` {dateTime} UTC";
 #endif
 #if RELEASE
             string description = $"`Catalyst Version:`  v{version} ({build})\n\n" +
@@ -119,7 +126,7 @@ public class CommandHandler : ICommandHandler
                 $"> lovelxrd#7895\n\n" +
                 $"__*Loaded Modules:*__\n" +
                 $"> Utilities Module - v{version}\n\n" +
-                $"`Built On:` {dateTime}";
+                $"`Built On:` {dateTime} UTC";
 #endif
 
             var embedded = new EmbedBuilder

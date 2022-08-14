@@ -20,6 +20,7 @@
     <None Remove="Microsoft.EntityFrameworkCore.Tools" />
     <None Remove="Discord.Net.Analyzers" />
     <None Remove="SSH.NET" />
+    <None Remove="Redistributables\Build\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Azure.Identity" Version="1.6.1" />

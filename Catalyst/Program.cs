@@ -266,6 +266,12 @@ async Task MainAsync()
     string version = Assembly.GetEntryAssembly().GetName().Version.ToString();
     version = version.Replace(".0", "");
 
+#if RELEASE
+    if (!File.Exists("/root/.config/ookla/build.txt"))
+    {
+        File.WriteAllText("/root/.config/ookla/build.txt", DateTime.UtcNow.ToString());
+    }
+#endif
 
 #if DEBUG
     await client.SetGameAsync($"v{version}-alpha");
