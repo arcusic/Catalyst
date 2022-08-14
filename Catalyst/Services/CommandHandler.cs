@@ -79,7 +79,16 @@ public class CommandHandler : ICommandHandler
             operatingSystem = Environment.OSVersion.ToString().Contains("Unix") ? "Unix" : Environment.OSVersion.ToString();
 
             string version = Assembly.GetEntryAssembly().GetName().Version.ToString();
-            var dateTime = DateTime.Now;
+            string path = Environment.CurrentDirectory;
+#if DEBUG
+            path += "/AlphaBuildDate.txt";
+            var dateTime = File.GetLastWriteTimeUtc(path);
+#endif
+
+#if RELEASE
+            path += "/BuildDate.txt";
+            var dateTime = File.GetLastWriteTimeUtc(path);
+#endif
             string build = dateTime.ToString("yyMMddHHmm");
             version = version.Replace(".0", "");
 #if DEBUG
