@@ -1134,7 +1134,7 @@ public class CommandHandler : ICommandHandler
                     "+ld ?t c\n\n" +
                     "+ld ?t sc\n\n" +
                     "```\n" +
-                    "`Endling a Server Lockdown:`\n" +
+                    "`Ending a Server Lockdown:`\n" +
                     ":warning:  `sc` will unlock all channels.  `c` will unlock the current channel.  :warning:" +
                     "```\n" +
                     "Command Syntax:\n" +
