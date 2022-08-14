@@ -266,6 +266,7 @@ async Task MainAsync()
     string version = Assembly.GetEntryAssembly().GetName().Version.ToString();
     version = version.Replace(".0", "");
 
+
 #if DEBUG
     await client.SetGameAsync($"v{version}-alpha");
     await client.SetStatusAsync(UserStatus.DoNotDisturb);
