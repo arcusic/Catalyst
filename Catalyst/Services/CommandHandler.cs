@@ -107,7 +107,7 @@ public class CommandHandler : ICommandHandler
                 $"> lovelxrd#7895\n\n" +
                 $"__*Loaded Modules:*__\n" +
                 $"> Utilities Module - v{version}-alpha\n\n" +
-                $"`Built On:` {dateTime}";
+                $"`Built On:` {dateTime} UTC";
 #endif
 #if RELEASE
             string description = $"`Catalyst Version:`  v{version} ({build})\n\n" +
@@ -126,7 +126,7 @@ public class CommandHandler : ICommandHandler
                 $"> lovelxrd#7895\n\n" +
                 $"__*Loaded Modules:*__\n" +
                 $"> Utilities Module - v{version}\n\n" +
-                $"`Built On:` {dateTime}";
+                $"`Built On:` {dateTime} UTC";
 #endif
 
             var embedded = new EmbedBuilder
