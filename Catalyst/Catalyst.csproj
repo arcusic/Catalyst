@@ -8,28 +8,6 @@
     <Title>The Catalyst</Title>
     <AssemblyVersion>0.2.3</AssemblyVersion>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <CustomCommands>
-      <CustomCommands>
-        <Command>
-          <type>BeforeBuild</type>
-          <command>date &gt; AlphaBuildDate.txt</command>
-          <externalConsole>True</externalConsole>
-        </Command>
-      </CustomCommands>
-    </CustomCommands>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <CustomCommands>
-      <CustomCommands>
-        <Command>
-          <type>BeforeBuild</type>
-          <command>date &gt; BuildDate.txt</command>
-          <externalConsole>True</externalConsole>
-        </Command>
-      </CustomCommands>
-    </CustomCommands>
-  </PropertyGroup>
   <ItemGroup>
     <None Remove="Discord.Net" />
     <None Remove="Lextm.SharpSnmpLib" />
@@ -42,6 +20,7 @@
     <None Remove="Microsoft.EntityFrameworkCore.Tools" />
     <None Remove="Discord.Net.Analyzers" />
     <None Remove="SSH.NET" />
+    <None Remove="Redistributables\Build\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Azure.Identity" Version="1.6.1" />
@@ -86,12 +65,6 @@
     </None>
     <None Update="Redistributables\SpeedTest\speedtest.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="AlphaBuildDate.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="BuildDate.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 </Project>
