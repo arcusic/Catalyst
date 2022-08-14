@@ -1114,11 +1114,35 @@ public class CommandHandler : ICommandHandler
 
             case "lockdown":
                 embed.Title += " - Lockdown";
-                embed.Description = "`NOT IMPLEMENTED`.\n\n" +
+                embed.Description = "This command has two variants, lockdown, and unlocking the server.\n\n" +
+                    "`Locking Down the Server:`\n" +
+                    ":warning:  `sc` will lockdown all channels.  `c` will lockdown the current channel.  :warning:" +
                     "```\n" +
                     "Command Syntax:\n" +
-                    "+{placeholder}\n\n" +
-                    "+{placeholder}\n" +
+                    "+ld ?t sc | c\n\n" +
+                    "+ld ?t c\n\n" +
+                    "+ld ?t sc\n\n" +
+                    "```\n" +
+                    "`Endling a Server Lockdown:`\n" +
+                    ":warning:  `sc` will unlock all channels.  `c` will unlock the current channel.  :warning:" +
+                    "```\n" +
+                    "Command Syntax:\n" +
+                    "+ul ?t sc | c\n\n" +
+                    "+ul ?t c\n\n" +
+                    "+ul ?t sc\n\n" +
+                    "```\n" +
+                    "`Sending Status Updates:`\n" +
+                    "```\n" +
+                    "Command Syntax:\n" +
+                    "+ld <Message> ?t update\n\n" +
+                    "+ld Hello, we have had to lockdown this server due to an ongoing incident.  Updates will be provided shortly... ?t update\n\n" +
+                    "+ld Server staff are still actively working on the issue.  An update will be provided shortly... ?t update\n\n" +
+                    "+ld The incident has been resolved.  Please be patient while Staff finish up and unlock the server. ?t update\n\n" +
+                    "```\n\n" +
+                    "`Troubleshooting Lockdown Issues:`\n" +
+                    "```\n" +
+                    "Command Syntax:\n" +
+                    "+tshoot lockdown\n\n" +
                     "```\n\n" +
                     "See docs included with each command for details.\n" +
                     "`Please click one of the buttons for command details.`\n\n" +
