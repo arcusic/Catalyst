@@ -1142,7 +1142,7 @@ public class CommandHandler : ICommandHandler
                     "+ld Hello, we have had to lockdown this server due to an ongoing incident.  Updates will be provided shortly... ?t update\n\n" +
                     "+ld Server staff are still actively working on the issue.  An update will be provided shortly... ?t update\n\n" +
                     "+ld The incident has been resolved.  Please be patient while Staff finish up and unlock the server. ?t update\n\n" +
-                    "```\n\n" +
+                    "```\n" +
                     "`Troubleshooting Lockdown Issues:`\n" +
                     "```\n" +
                     "Command Syntax:\n" +
