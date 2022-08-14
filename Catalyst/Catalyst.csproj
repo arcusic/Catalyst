@@ -13,7 +13,8 @@
       <CustomCommands>
         <Command>
           <type>BeforeBuild</type>
-          <command>date &gt; AlphaBuildDate.txt</command>
+          <command>date &gt; Redistributables/Build/BuildDate.txt</command>
+          <workingdir></workingdir>
           <externalConsole>True</externalConsole>
         </Command>
       </CustomCommands>
@@ -24,7 +25,8 @@
       <CustomCommands>
         <Command>
           <type>BeforeBuild</type>
-          <command>date &gt; BuildDate.txt</command>
+          <command>date &gt; Redistributables/Build/BuildDate.txt</command>
+          <workingdir></workingdir>
           <externalConsole>True</externalConsole>
         </Command>
       </CustomCommands>
@@ -42,6 +44,7 @@
     <None Remove="Microsoft.EntityFrameworkCore.Tools" />
     <None Remove="Discord.Net.Analyzers" />
     <None Remove="SSH.NET" />
+    <None Remove="Redistributables\Build\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Azure.Identity" Version="1.6.1" />
@@ -87,11 +90,11 @@
     <None Update="Redistributables\SpeedTest\speedtest.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="AlphaBuildDate.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <None Update="Redistributables\Build\BuildDate.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="BuildDate.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Redistributables\Build\" />
   </ItemGroup>
 </Project>

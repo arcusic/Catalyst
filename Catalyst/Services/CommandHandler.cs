@@ -86,7 +86,7 @@ public class CommandHandler : ICommandHandler
 #endif
 
 #if RELEASE
-            path += "/BuildDate.txt";
+            path += "/app/Redistributables/Build/BuildDate.txt";
             var dateTime = File.GetLastWriteTimeUtc(path);
 #endif
             string build = dateTime.ToString("yyMMddHHmm");
