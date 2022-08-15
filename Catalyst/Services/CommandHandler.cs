@@ -177,6 +177,7 @@ public class CommandHandler : ICommandHandler
 
             string input = $"`{inputTemp}°{unit}:`  ";
             UnitsNet.Temperature temp;
+
             if (unit == "C")
             {
                 temp = Temperature.From(inputTemp, UnitsNet.Units.TemperatureUnit.DegreeCelsius).ToUnit(UnitsNet.Units.TemperatureUnit.DegreeFahrenheit);
@@ -192,228 +193,273 @@ public class CommandHandler : ICommandHandler
         {
             string? sourceUnit = command.Data.Options.ElementAt(1).Value.ToString();
             string? destinationUnit = command.Data.Options.ElementAt(2).Value.ToString();
-            double distance = double.Parse(command.Data.Options.ElementAt(0).Value.ToString());
-            string input = $"`{distance} {sourceUnit}:`  ";
+
+#pragma warning disable CS8604 // Possible null reference argument.
+            double inputDistance = double.Parse(command.Data.Options.ElementAt(0).Value.ToString(), CultureInfo.InvariantCulture.NumberFormat);
+#pragma warning restore CS8604 // Possible null reference argument.
+
+            string input = $"`{inputDistance} {sourceUnit}:`  ";
+            UnitsNet.Length distance;
 
             if (sourceUnit == "m")
             {
                 if (destinationUnit == "m")
                 {
-                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {distance:n2} {destinationUnit}");
+                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {inputDistance:n2} {destinationUnit}");
                 }
                 else if (destinationUnit == "km")
                 {
-                    distance /= 1000;
+                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Meter).ToUnit(UnitsNet.Units.LengthUnit.Kilometer);
+                    await command.RespondAsync($"{input} {distance}");
                 }
                 else if (destinationUnit == "mi")
                 {
-                    distance /= 1609.34;
+                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Meter).ToUnit(UnitsNet.Units.LengthUnit.Mile);
+                    await command.RespondAsync($"{input} {distance}");
                 }
                 else if (destinationUnit == "ft")
                 {
-                    distance *= 3.28084;
+                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Meter).ToUnit(UnitsNet.Units.LengthUnit.Foot);
+                    await command.RespondAsync($"{input} {distance}");
                 }
                 else if (destinationUnit == "yd")
                 {
-                    distance *= 1.09361;
+                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Meter).ToUnit(UnitsNet.Units.LengthUnit.Yard);
+                    await command.RespondAsync($"{input} {distance}");
                 }
                 else if (destinationUnit == "in")
                 {
-                    distance *= 39.37008;
+                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Meter).ToUnit(UnitsNet.Units.LengthUnit.Inch);
+                    await command.RespondAsync($"{input} {distance}");
                 }
                 else if (destinationUnit == "cm")
                 {
-                    distance *= 100;
+                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Meter).ToUnit(UnitsNet.Units.LengthUnit.Centimeter);
+                    await command.RespondAsync($"{input} {distance}");
                 }
             }
             else if (sourceUnit == "km")
             {
                 if (destinationUnit == "m")
                 {
-                    distance *= 1000;
+                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Kilometer).ToUnit(UnitsNet.Units.LengthUnit.Meter);
+                    await command.RespondAsync($"{input} {distance}");
                 }
                 else if (destinationUnit == "km")
                 {
-                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {distance:n2} {destinationUnit}");
+                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {inputDistance:n2} {destinationUnit}");
                 }
                 else if (destinationUnit == "mi")
                 {
-                    distance *= 0.621371;
+                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Kilometer).ToUnit(UnitsNet.Units.LengthUnit.Mile);
+                    await command.RespondAsync($"{input} {distance}");
                 }
                 else if (destinationUnit == "ft")
                 {
-                    distance *= 3280.84;
+                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Kilometer).ToUnit(UnitsNet.Units.LengthUnit.Foot);
+                    await command.RespondAsync($"{input} {distance}");
                 }
                 else if (destinationUnit == "yd")
                 {
-                    distance *= 1093.61;
+                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Kilometer).ToUnit(UnitsNet.Units.LengthUnit.Yard);
+                    await command.RespondAsync($"{input} {distance}");
                 }
                 else if (destinationUnit == "in")
                 {
-                    distance *= 39370.08;
+                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Kilometer).ToUnit(UnitsNet.Units.LengthUnit.Inch);
+                    await command.RespondAsync($"{input} {distance}");
                 }
                 else if (destinationUnit == "cm")
                 {
-                    distance *= 100000;
+                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Kilometer).ToUnit(UnitsNet.Units.LengthUnit.Centimeter);
+                    await command.RespondAsync($"{input} {distance}");
                 }
             }
             else if (sourceUnit == "mi")
             {
                 if (destinationUnit == "m")
                 {
-                    distance *= 1609.34;
+                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Mile).ToUnit(UnitsNet.Units.LengthUnit.Meter);
+                    await command.RespondAsync($"{input} {distance}");
                 }
                 else if (destinationUnit == "km")
                 {
-                    distance *= 1.60934;
+                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Mile).ToUnit(UnitsNet.Units.LengthUnit.Kilometer);
+                    await command.RespondAsync($"{input} {distance}");
                 }
                 else if (destinationUnit == "mi")
                 {
-                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {distance:n2} {destinationUnit}");
+                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {inputDistance:n2} {destinationUnit}");
                 }
                 else if (destinationUnit == "ft")
                 {
-                    distance *= 5280;
+                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Mile).ToUnit(UnitsNet.Units.LengthUnit.Foot);
+                    await command.RespondAsync($"{input} {distance}");
                 }
                 else if (destinationUnit == "yd")
                 {
-                    distance *= 1760;
+                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Mile).ToUnit(UnitsNet.Units.LengthUnit.Yard);
+                    await command.RespondAsync($"{input} {distance}");
                 }
                 else if (destinationUnit == "in")
                 {
-                    distance *= 63360;
+                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Mile).ToUnit(UnitsNet.Units.LengthUnit.Inch);
+                    await command.RespondAsync($"{input} {distance}");
                 }
                 else if (destinationUnit == "cm")
                 {
-                    distance *= 1609340;
+                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Mile).ToUnit(UnitsNet.Units.LengthUnit.Centimeter);
+                    await command.RespondAsync($"{input} {distance}");
                 }
             }
             else if (sourceUnit == "ft")
             {
                 if (destinationUnit == "m")
                 {
-                    distance /= 3.28084;
+                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Foot).ToUnit(UnitsNet.Units.LengthUnit.Meter);
+                    await command.RespondAsync($"{input} {distance}");
                 }
                 else if (destinationUnit == "km")
                 {
-                    distance /= 3280.84;
+                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Foot).ToUnit(UnitsNet.Units.LengthUnit.Kilometer);
+                    await command.RespondAsync($"{input} {distance}");
                 }
                 else if (destinationUnit == "mi")
                 {
-                    distance /= 5280;
+                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Foot).ToUnit(UnitsNet.Units.LengthUnit.Mile);
+                    await command.RespondAsync($"{input} {distance}");
                 }
                 else if (destinationUnit == "ft")
                 {
-                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {distance:n2} {destinationUnit}");
+                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {inputDistance:n2} {destinationUnit}");
                 }
                 else if (destinationUnit == "yd")
                 {
-                    distance /= 3;
+                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Foot).ToUnit(UnitsNet.Units.LengthUnit.Yard);
+                    await command.RespondAsync($"{input} {distance}");
                 }
                 else if (destinationUnit == "in")
                 {
-                    distance *= 12;
+                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Foot).ToUnit(UnitsNet.Units.LengthUnit.Inch);
+                    await command.RespondAsync($"{input} {distance}");
                 }
                 else if (destinationUnit == "cm")
                 {
-                    distance *= 30.48;
+                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Foot).ToUnit(UnitsNet.Units.LengthUnit.Centimeter);
+                    await command.RespondAsync($"{input} {distance}");
                 }
             }
             else if (sourceUnit == "yd")
             {
                 if (destinationUnit == "m")
                 {
-                    distance /= 1.09361;
+                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Yard).ToUnit(UnitsNet.Units.LengthUnit.Meter);
+                    await command.RespondAsync($"{input} {distance}");
                 }
                 else if (destinationUnit == "km")
                 {
-                    distance /= 1093.61;
+                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Yard).ToUnit(UnitsNet.Units.LengthUnit.Kilometer);
+                    await command.RespondAsync($"{input} {distance}");
                 }
                 else if (destinationUnit == "mi")
                 {
-                    distance /= 1760;
+                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Yard).ToUnit(UnitsNet.Units.LengthUnit.Mile);
+                    await command.RespondAsync($"{input} {distance}");
                 }
                 else if (destinationUnit == "ft")
                 {
-                    distance *= 3;
+                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Yard).ToUnit(UnitsNet.Units.LengthUnit.Foot);
+                    await command.RespondAsync($"{input} {distance}");
                 }
                 else if (destinationUnit == "yd")
                 {
-                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {distance:n2} {destinationUnit}");
+                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {inputDistance:n2} {destinationUnit}");
                 }
                 else if (destinationUnit == "in")
                 {
-                    distance *= 36;
+                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Yard).ToUnit(UnitsNet.Units.LengthUnit.Inch);
+                    await command.RespondAsync($"{input} {distance}");
                 }
                 else if (destinationUnit == "cm")
                 {
-                    distance *= 91.44;
+                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Yard).ToUnit(UnitsNet.Units.LengthUnit.Centimeter);
+                    await command.RespondAsync($"{input} {distance}");
                 }
             }
             else if (sourceUnit == "in")
             {
                 if (destinationUnit == "m")
                 {
-                    distance /= 39.37008;
+                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Inch).ToUnit(UnitsNet.Units.LengthUnit.Meter);
+                    await command.RespondAsync($"{input} {distance}");
                 }
                 else if (destinationUnit == "km")
                 {
-                    distance /= 39370.08;
+                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Inch).ToUnit(UnitsNet.Units.LengthUnit.Kilometer);
+                    await command.RespondAsync($"{input} {distance}");
                 }
                 else if (destinationUnit == "mi")
                 {
-                    distance /= 63360;
+                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Inch).ToUnit(UnitsNet.Units.LengthUnit.Mile);
+                    await command.RespondAsync($"{input} {distance}");
                 }
                 else if (destinationUnit == "ft")
                 {
-                    distance /= 12;
+                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Inch).ToUnit(UnitsNet.Units.LengthUnit.Foot);
+                    await command.RespondAsync($"{input} {distance}");
                 }
                 else if (destinationUnit == "yd")
                 {
-                    distance /= 36;
+                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Inch).ToUnit(UnitsNet.Units.LengthUnit.Yard);
+                    await command.RespondAsync($"{input} {distance}");
                 }
                 else if (destinationUnit == "in")
                 {
-                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {distance:n2} {destinationUnit}");
+                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {inputDistance:n2} {destinationUnit}");
                 }
                 else if (destinationUnit == "cm")
                 {
-                    distance *= 2.54;
+                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Inch).ToUnit(UnitsNet.Units.LengthUnit.Centimeter);
+                    await command.RespondAsync($"{input} {distance}");
                 }
             }
             else if (sourceUnit == "cm")
             {
                 if (destinationUnit == "m")
                 {
-                    distance /= 100;
+                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Centimeter).ToUnit(UnitsNet.Units.LengthUnit.Meter);
+                    await command.RespondAsync($"{input} {distance}");
                 }
                 else if (destinationUnit == "km")
                 {
-                    distance /= 100000;
+                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Centimeter).ToUnit(UnitsNet.Units.LengthUnit.Kilometer);
+                    await command.RespondAsync($"{input} {distance}");
                 }
                 else if (destinationUnit == "mi")
                 {
-                    distance /= 1609340;
+                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Centimeter).ToUnit(UnitsNet.Units.LengthUnit.Mile);
+                    await command.RespondAsync($"{input} {distance}");
                 }
                 else if (destinationUnit == "ft")
                 {
-                    distance /= 30.48;
+                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Centimeter).ToUnit(UnitsNet.Units.LengthUnit.Foot);
+                    await command.RespondAsync($"{input} {distance}");
                 }
                 else if (destinationUnit == "yd")
                 {
-                    distance /= 91.44;
+                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Centimeter).ToUnit(UnitsNet.Units.LengthUnit.Yard);
+                    await command.RespondAsync($"{input} {distance}");
                 }
                 else if (destinationUnit == "in")
                 {
-                    distance /= 2.54;
+                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Centimeter).ToUnit(UnitsNet.Units.LengthUnit.Inch);
+                    await command.RespondAsync($"{input} {distance}");
                 }
                 else if (destinationUnit == "cm")
                 {
-                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {distance:n2} {destinationUnit}");
+                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {inputDistance:n2} {destinationUnit}");
                 }
             }
-
-            await command.RespondAsync($"{input} {distance:n2} {destinationUnit}");
         }
 
         if (command.Data.Name == "weight")
