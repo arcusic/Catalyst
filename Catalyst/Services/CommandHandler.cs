@@ -553,7 +553,11 @@ public class CommandHandler : ICommandHandler
         {
             string? sourceUnit = command.Data.Options.ElementAt(1).Value.ToString();
             string? destinationUnit = command.Data.Options.ElementAt(2).Value.ToString();
-            double volume = double.Parse(command.Data.Options.ElementAt(0).Value.ToString());
+
+#pragma warning disable CS8604 // Possible null reference argument.
+            double volume = double.Parse(command.Data.Options.ElementAt(0).Value.ToString(), CultureInfo.InvariantCulture.NumberFormat);
+#pragma warning restore CS8604 // Possible null reference argument.
+
             string input = $"`{volume} {sourceUnit}:`  ";
 
             if (sourceUnit == "L")
