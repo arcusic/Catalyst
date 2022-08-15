@@ -5,6 +5,7 @@ using Discord.WebSocket;
 using Catalyst.Common;
 using Catalyst.Init;
 using UnitsNet;
+using System.Globalization;
 
 namespace Catalyst.Services;
 
@@ -169,7 +170,11 @@ public class CommandHandler : ICommandHandler
         if (command.Data.Name == "temperature")
         {
             string? unit = command.Data.Options.Last().Value.ToString();
-            double inputTemp = double.Parse(command.Data.Options.First().Value.ToString());
+
+#pragma warning disable CS8604 // Possible null reference argument.
+            double inputTemp = double.Parse(command.Data.Options.First().Value.ToString(), CultureInfo.InvariantCulture.NumberFormat);
+#pragma warning restore CS8604 // Possible null reference argument.
+
             string input = $"`{inputTemp}°{unit}:`  ";
             UnitsNet.Temperature temp;
             if (unit == "C")
