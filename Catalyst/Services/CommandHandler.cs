@@ -4,6 +4,8 @@ using Discord.Commands;
 using Discord.WebSocket;
 using Catalyst.Common;
 using Catalyst.Init;
+using UnitsNet;
+using System.Globalization;
 
 namespace Catalyst.Services;
 
@@ -168,784 +170,937 @@ public class CommandHandler : ICommandHandler
         if (command.Data.Name == "temperature")
         {
             string? unit = command.Data.Options.Last().Value.ToString();
-            double temp = double.Parse(command.Data.Options.First().Value.ToString());
-            string input = $"`{temp} {unit}:`  ";
+
+#pragma warning disable CS8604 // Possible null reference argument.
+            double inputTemp = double.Parse(command.Data.Options.First().Value.ToString(), CultureInfo.InvariantCulture.NumberFormat);
+#pragma warning restore CS8604 // Possible null reference argument.
+
+            string input = $"`{inputTemp}°{unit}:`  ";
+            UnitsNet.Temperature temp;
+
             if (unit == "C")
             {
-                temp = temp * 9 / 5 + 32;
-                unit = "F";
+                temp = Temperature.From(inputTemp, UnitsNet.Units.TemperatureUnit.DegreeCelsius).ToUnit(UnitsNet.Units.TemperatureUnit.DegreeFahrenheit);
             }
             else
             {
-                temp = (temp - 32) * 5 / 9;
-                unit = "C";
+                temp = Temperature.From(inputTemp, UnitsNet.Units.TemperatureUnit.DegreeFahrenheit).ToUnit(UnitsNet.Units.TemperatureUnit.DegreeCelsius);
             }
-            await command.RespondAsync($"{input} {temp:0.0} {unit}");
+            await command.RespondAsync($"{input} {temp}");
         }
 
         if (command.Data.Name == "distance")
         {
             string? sourceUnit = command.Data.Options.ElementAt(1).Value.ToString();
             string? destinationUnit = command.Data.Options.ElementAt(2).Value.ToString();
-            double distance = double.Parse(command.Data.Options.ElementAt(0).Value.ToString());
-            string input = $"`{distance} {sourceUnit}:`  ";
+
+#pragma warning disable CS8604 // Possible null reference argument.
+            double inputDistance = double.Parse(command.Data.Options.ElementAt(0).Value.ToString(), CultureInfo.InvariantCulture.NumberFormat);
+#pragma warning restore CS8604 // Possible null reference argument.
+
+            string input = $"`{inputDistance} {sourceUnit}:`  ";
+            UnitsNet.Length distance;
 
             if (sourceUnit == "m")
             {
                 if (destinationUnit == "m")
                 {
-                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {distance:0.0} {destinationUnit}");
+                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {inputDistance:n2} {destinationUnit}");
                 }
                 else if (destinationUnit == "km")
                 {
-                    distance /= 1000;
+                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Meter).ToUnit(UnitsNet.Units.LengthUnit.Kilometer);
+                    await command.RespondAsync($"{input} {distance}");
                 }
                 else if (destinationUnit == "mi")
                 {
-                    distance /= 1609.34;
+                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Meter).ToUnit(UnitsNet.Units.LengthUnit.Mile);
+                    await command.RespondAsync($"{input} {distance}");
                 }
                 else if (destinationUnit == "ft")
                 {
-                    distance *= 3.28084;
+                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Meter).ToUnit(UnitsNet.Units.LengthUnit.Foot);
+                    await command.RespondAsync($"{input} {distance}");
                 }
                 else if (destinationUnit == "yd")
                 {
-                    distance *= 1.09361;
+                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Meter).ToUnit(UnitsNet.Units.LengthUnit.Yard);
+                    await command.RespondAsync($"{input} {distance}");
                 }
                 else if (destinationUnit == "in")
                 {
-                    distance *= 39.37008;
+                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Meter).ToUnit(UnitsNet.Units.LengthUnit.Inch);
+                    await command.RespondAsync($"{input} {distance}");
                 }
                 else if (destinationUnit == "cm")
                 {
-                    distance *= 100;
+                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Meter).ToUnit(UnitsNet.Units.LengthUnit.Centimeter);
+                    await command.RespondAsync($"{input} {distance}");
                 }
             }
             else if (sourceUnit == "km")
             {
                 if (destinationUnit == "m")
                 {
-                    distance *= 1000;
+                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Kilometer).ToUnit(UnitsNet.Units.LengthUnit.Meter);
+                    await command.RespondAsync($"{input} {distance}");
                 }
                 else if (destinationUnit == "km")
                 {
-                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {distance:0.0} {destinationUnit}");
+                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {inputDistance:n2} {destinationUnit}");
                 }
                 else if (destinationUnit == "mi")
                 {
-                    distance *= 0.621371;
+                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Kilometer).ToUnit(UnitsNet.Units.LengthUnit.Mile);
+                    await command.RespondAsync($"{input} {distance}");
                 }
                 else if (destinationUnit == "ft")
                 {
-                    distance *= 3280.84;
+                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Kilometer).ToUnit(UnitsNet.Units.LengthUnit.Foot);
+                    await command.RespondAsync($"{input} {distance}");
                 }
                 else if (destinationUnit == "yd")
                 {
-                    distance *= 1093.61;
+                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Kilometer).ToUnit(UnitsNet.Units.LengthUnit.Yard);
+                    await command.RespondAsync($"{input} {distance}");
                 }
                 else if (destinationUnit == "in")
                 {
-                    distance *= 39370.08;
+                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Kilometer).ToUnit(UnitsNet.Units.LengthUnit.Inch);
+                    await command.RespondAsync($"{input} {distance}");
                 }
                 else if (destinationUnit == "cm")
                 {
-                    distance *= 100000;
+                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Kilometer).ToUnit(UnitsNet.Units.LengthUnit.Centimeter);
+                    await command.RespondAsync($"{input} {distance}");
                 }
             }
             else if (sourceUnit == "mi")
             {
                 if (destinationUnit == "m")
                 {
-                    distance *= 1609.34;
+                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Mile).ToUnit(UnitsNet.Units.LengthUnit.Meter);
+                    await command.RespondAsync($"{input} {distance}");
                 }
                 else if (destinationUnit == "km")
                 {
-                    distance *= 1.60934;
+                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Mile).ToUnit(UnitsNet.Units.LengthUnit.Kilometer);
+                    await command.RespondAsync($"{input} {distance}");
                 }
                 else if (destinationUnit == "mi")
                 {
-                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {distance:0.0} {destinationUnit}");
+                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {inputDistance:n2} {destinationUnit}");
                 }
                 else if (destinationUnit == "ft")
                 {
-                    distance *= 5280;
+                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Mile).ToUnit(UnitsNet.Units.LengthUnit.Foot);
+                    await command.RespondAsync($"{input} {distance}");
                 }
                 else if (destinationUnit == "yd")
                 {
-                    distance *= 1760;
+                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Mile).ToUnit(UnitsNet.Units.LengthUnit.Yard);
+                    await command.RespondAsync($"{input} {distance}");
                 }
                 else if (destinationUnit == "in")
                 {
-                    distance *= 63360;
+                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Mile).ToUnit(UnitsNet.Units.LengthUnit.Inch);
+                    await command.RespondAsync($"{input} {distance}");
                 }
                 else if (destinationUnit == "cm")
                 {
-                    distance *= 1609340;
+                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Mile).ToUnit(UnitsNet.Units.LengthUnit.Centimeter);
+                    await command.RespondAsync($"{input} {distance}");
                 }
             }
             else if (sourceUnit == "ft")
             {
                 if (destinationUnit == "m")
                 {
-                    distance /= 3.28084;
+                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Foot).ToUnit(UnitsNet.Units.LengthUnit.Meter);
+                    await command.RespondAsync($"{input} {distance}");
                 }
                 else if (destinationUnit == "km")
                 {
-                    distance /= 3280.84;
+                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Foot).ToUnit(UnitsNet.Units.LengthUnit.Kilometer);
+                    await command.RespondAsync($"{input} {distance}");
                 }
                 else if (destinationUnit == "mi")
                 {
-                    distance /= 5280;
+                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Foot).ToUnit(UnitsNet.Units.LengthUnit.Mile);
+                    await command.RespondAsync($"{input} {distance}");
                 }
                 else if (destinationUnit == "ft")
                 {
-                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {distance:0.0} {destinationUnit}");
+                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {inputDistance:n2} {destinationUnit}");
                 }
                 else if (destinationUnit == "yd")
                 {
-                    distance /= 3;
+                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Foot).ToUnit(UnitsNet.Units.LengthUnit.Yard);
+                    await command.RespondAsync($"{input} {distance}");
                 }
                 else if (destinationUnit == "in")
                 {
-                    distance *= 12;
+                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Foot).ToUnit(UnitsNet.Units.LengthUnit.Inch);
+                    await command.RespondAsync($"{input} {distance}");
                 }
                 else if (destinationUnit == "cm")
                 {
-                    distance *= 30.48;
+                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Foot).ToUnit(UnitsNet.Units.LengthUnit.Centimeter);
+                    await command.RespondAsync($"{input} {distance}");
                 }
             }
             else if (sourceUnit == "yd")
             {
                 if (destinationUnit == "m")
                 {
-                    distance /= 1.09361;
+                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Yard).ToUnit(UnitsNet.Units.LengthUnit.Meter);
+                    await command.RespondAsync($"{input} {distance}");
                 }
                 else if (destinationUnit == "km")
                 {
-                    distance /= 1093.61;
+                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Yard).ToUnit(UnitsNet.Units.LengthUnit.Kilometer);
+                    await command.RespondAsync($"{input} {distance}");
                 }
                 else if (destinationUnit == "mi")
                 {
-                    distance /= 1760;
+                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Yard).ToUnit(UnitsNet.Units.LengthUnit.Mile);
+                    await command.RespondAsync($"{input} {distance}");
                 }
                 else if (destinationUnit == "ft")
                 {
-                    distance *= 3;
+                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Yard).ToUnit(UnitsNet.Units.LengthUnit.Foot);
+                    await command.RespondAsync($"{input} {distance}");
                 }
                 else if (destinationUnit == "yd")
                 {
-                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {distance:0.0} {destinationUnit}");
+                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {inputDistance:n2} {destinationUnit}");
                 }
                 else if (destinationUnit == "in")
                 {
-                    distance *= 36;
+                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Yard).ToUnit(UnitsNet.Units.LengthUnit.Inch);
+                    await command.RespondAsync($"{input} {distance}");
                 }
                 else if (destinationUnit == "cm")
                 {
-                    distance *= 91.44;
+                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Yard).ToUnit(UnitsNet.Units.LengthUnit.Centimeter);
+                    await command.RespondAsync($"{input} {distance}");
                 }
             }
             else if (sourceUnit == "in")
             {
                 if (destinationUnit == "m")
                 {
-                    distance /= 39.37008;
+                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Inch).ToUnit(UnitsNet.Units.LengthUnit.Meter);
+                    await command.RespondAsync($"{input} {distance}");
                 }
                 else if (destinationUnit == "km")
                 {
-                    distance /= 39370.08;
+                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Inch).ToUnit(UnitsNet.Units.LengthUnit.Kilometer);
+                    await command.RespondAsync($"{input} {distance}");
                 }
                 else if (destinationUnit == "mi")
                 {
-                    distance /= 63360;
+                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Inch).ToUnit(UnitsNet.Units.LengthUnit.Mile);
+                    await command.RespondAsync($"{input} {distance}");
                 }
                 else if (destinationUnit == "ft")
                 {
-                    distance /= 12;
+                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Inch).ToUnit(UnitsNet.Units.LengthUnit.Foot);
+                    await command.RespondAsync($"{input} {distance}");
                 }
                 else if (destinationUnit == "yd")
                 {
-                    distance /= 36;
+                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Inch).ToUnit(UnitsNet.Units.LengthUnit.Yard);
+                    await command.RespondAsync($"{input} {distance}");
                 }
                 else if (destinationUnit == "in")
                 {
-                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {distance:0.0} {destinationUnit}");
+                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {inputDistance:n2} {destinationUnit}");
                 }
                 else if (destinationUnit == "cm")
                 {
-                    distance *= 2.54;
+                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Inch).ToUnit(UnitsNet.Units.LengthUnit.Centimeter);
+                    await command.RespondAsync($"{input} {distance}");
                 }
             }
             else if (sourceUnit == "cm")
             {
                 if (destinationUnit == "m")
                 {
-                    distance /= 100;
+                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Centimeter).ToUnit(UnitsNet.Units.LengthUnit.Meter);
+                    await command.RespondAsync($"{input} {distance}");
                 }
                 else if (destinationUnit == "km")
                 {
-                    distance /= 100000;
+                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Centimeter).ToUnit(UnitsNet.Units.LengthUnit.Kilometer);
+                    await command.RespondAsync($"{input} {distance}");
                 }
                 else if (destinationUnit == "mi")
                 {
-                    distance /= 1609340;
+                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Centimeter).ToUnit(UnitsNet.Units.LengthUnit.Mile);
+                    await command.RespondAsync($"{input} {distance}");
                 }
                 else if (destinationUnit == "ft")
                 {
-                    distance /= 30.48;
+                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Centimeter).ToUnit(UnitsNet.Units.LengthUnit.Foot);
+                    await command.RespondAsync($"{input} {distance}");
                 }
                 else if (destinationUnit == "yd")
                 {
-                    distance /= 91.44;
+                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Centimeter).ToUnit(UnitsNet.Units.LengthUnit.Yard);
+                    await command.RespondAsync($"{input} {distance}");
                 }
                 else if (destinationUnit == "in")
                 {
-                    distance /= 2.54;
+                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Centimeter).ToUnit(UnitsNet.Units.LengthUnit.Inch);
+                    await command.RespondAsync($"{input} {distance}");
                 }
                 else if (destinationUnit == "cm")
                 {
-                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {distance:0.0} {destinationUnit}");
+                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {inputDistance:n2} {destinationUnit}");
                 }
             }
-
-            await command.RespondAsync($"{input} {distance:0.0} {destinationUnit}");
         }
 
         if (command.Data.Name == "weight")
         {
             string? sourceUnit = command.Data.Options.ElementAt(1).Value.ToString();
             string? destinationUnit = command.Data.Options.ElementAt(2).Value.ToString();
-            double weight = double.Parse(command.Data.Options.ElementAt(0).Value.ToString());
-            string input = $"`{weight} {sourceUnit}:`  ";
+
+#pragma warning disable CS8604 // Possible null reference argument.
+            double inputWeight = double.Parse(command.Data.Options.ElementAt(0).Value.ToString(), CultureInfo.InvariantCulture.NumberFormat);
+#pragma warning restore CS8604 // Possible null reference argument.
+
+            string input = $"`{inputWeight} {sourceUnit}:`  ";
+            UnitsNet.Mass weight;
 
             if (sourceUnit == "kg")
             {
                 if (destinationUnit == "kg")
                 {
-                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {weight:0.0} {destinationUnit}");
+                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {inputWeight:0.0} {destinationUnit}");
                 }
                 else if (destinationUnit == "g")
                 {
-                    weight *= 1000;
+                    weight = Mass.From(inputWeight, UnitsNet.Units.MassUnit.Kilogram).ToUnit(UnitsNet.Units.MassUnit.Gram);
+                    await command.RespondAsync($"{input} {weight}");
                 }
                 else if (destinationUnit == "lb")
                 {
-                    weight *= 2.20462;
+                    weight = Mass.From(inputWeight, UnitsNet.Units.MassUnit.Kilogram).ToUnit(UnitsNet.Units.MassUnit.Pound);
+                    await command.RespondAsync($"{input} {weight}");
                 }
                 else if (destinationUnit == "oz")
                 {
-                    weight *= 35.274;
+                    weight = Mass.From(inputWeight, UnitsNet.Units.MassUnit.Kilogram).ToUnit(UnitsNet.Units.MassUnit.Ounce);
+                    await command.RespondAsync($"{input} {weight}");
                 }
             }
             else if (sourceUnit == "g")
             {
                 if (destinationUnit == "kg")
                 {
-                    weight /= 1000;
+                    weight = Mass.From(inputWeight, UnitsNet.Units.MassUnit.Gram).ToUnit(UnitsNet.Units.MassUnit.Kilogram);
+                    await command.RespondAsync($"{input} {weight}");
                 }
                 else if (destinationUnit == "g")
                 {
-                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {weight:0.0} {destinationUnit}");
+                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {inputWeight:0.0} {destinationUnit}");
                 }
                 else if (destinationUnit == "lb")
                 {
-                    weight *= 0.00220462;
+                    weight = Mass.From(inputWeight, UnitsNet.Units.MassUnit.Gram).ToUnit(UnitsNet.Units.MassUnit.Pound);
+                    await command.RespondAsync($"{input} {weight}");
                 }
                 else if (destinationUnit == "oz")
                 {
-                    weight *= 0.035274;
+                    weight = Mass.From(inputWeight, UnitsNet.Units.MassUnit.Gram).ToUnit(UnitsNet.Units.MassUnit.Ounce);
+                    await command.RespondAsync($"{input} {weight}");
                 }
             }
             else if (sourceUnit == "lb")
             {
                 if (destinationUnit == "kg")
                 {
-                    weight /= 2.20462;
+                    weight = Mass.From(inputWeight, UnitsNet.Units.MassUnit.Pound).ToUnit(UnitsNet.Units.MassUnit.Kilogram);
+                    await command.RespondAsync($"{input} {weight}");
                 }
                 else if (destinationUnit == "g")
                 {
-                    weight *= 453.592;
+                    weight = Mass.From(inputWeight, UnitsNet.Units.MassUnit.Pound).ToUnit(UnitsNet.Units.MassUnit.Gram);
+                    await command.RespondAsync($"{input} {weight}");
                 }
                 else if (destinationUnit == "lb")
                 {
-                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {weight:0.0} {destinationUnit}");
+                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {inputWeight:0.0} {destinationUnit}");
                 }
                 else if (destinationUnit == "oz")
                 {
-                    weight *= 16;
+                    weight = Mass.From(inputWeight, UnitsNet.Units.MassUnit.Pound).ToUnit(UnitsNet.Units.MassUnit.Ounce);
+                    await command.RespondAsync($"{input} {weight}");
                 }
             }
             else if (sourceUnit == "oz")
             {
                 if (destinationUnit == "kg")
                 {
-                    weight /= 35.274;
+                    weight = Mass.From(inputWeight, UnitsNet.Units.MassUnit.Ounce).ToUnit(UnitsNet.Units.MassUnit.Kilogram);
+                    await command.RespondAsync($"{input} {weight}");
                 }
                 else if (destinationUnit == "g")
                 {
-                    weight *= 28.3495;
+                    weight = Mass.From(inputWeight, UnitsNet.Units.MassUnit.Ounce).ToUnit(UnitsNet.Units.MassUnit.Gram);
+                    await command.RespondAsync($"{input} {weight}");
                 }
                 else if (destinationUnit == "lb")
                 {
-                    weight /= 16;
+                    weight = Mass.From(inputWeight, UnitsNet.Units.MassUnit.Ounce).ToUnit(UnitsNet.Units.MassUnit.Pound);
+                    await command.RespondAsync($"{input} {weight}");
                 }
                 else if (destinationUnit == "oz")
                 {
-                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {weight:0.0} {destinationUnit}");
+                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {inputWeight:0.0} {destinationUnit}");
                 }
             }
-
-            await command.RespondAsync($"{input} {weight:0.0} {destinationUnit}");
         }
 
         if (command.Data.Name == "volume")
         {
             string? sourceUnit = command.Data.Options.ElementAt(1).Value.ToString();
             string? destinationUnit = command.Data.Options.ElementAt(2).Value.ToString();
-            double volume = double.Parse(command.Data.Options.ElementAt(0).Value.ToString());
-            string input = $"`{volume} {sourceUnit}:`  ";
+
+#pragma warning disable CS8604 // Possible null reference argument.
+            double inputVolume = double.Parse(command.Data.Options.ElementAt(0).Value.ToString(), CultureInfo.InvariantCulture.NumberFormat);
+#pragma warning restore CS8604 // Possible null reference argument.
+
+            string input = $"`{inputVolume} {sourceUnit}:`  ";
+            UnitsNet.Volume volume;
 
             if (sourceUnit == "L")
             {
                 if (destinationUnit == "L")
                 {
-                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {volume:0.0} {destinationUnit}");
+                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {inputVolume:0.0} {destinationUnit}");
                 }
                 else if (destinationUnit == "mL")
                 {
-                    volume *= 1000;
+                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.Liter).ToUnit(UnitsNet.Units.VolumeUnit.Milliliter);
+                    await command.RespondAsync($"{input} {volume}");
                 }
                 else if (destinationUnit == "gal")
                 {
-                    volume *= 0.264172;
+                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.Liter).ToUnit(UnitsNet.Units.VolumeUnit.UsGallon);
+                    await command.RespondAsync($"{input} {volume}");
                 }
                 else if (destinationUnit == "qt")
                 {
-                    volume *= 0.106919;
+                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.Liter).ToUnit(UnitsNet.Units.VolumeUnit.UsQuart);
+                    await command.RespondAsync($"{input} {volume}");
                 }
                 else if (destinationUnit == "pt")
                 {
-                    volume *= 0.0284131;
+                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.Liter).ToUnit(UnitsNet.Units.VolumeUnit.UsPint);
+                    await command.RespondAsync($"{input} {volume}");
                 }
                 else if (destinationUnit == "cup")
                 {
-                    volume *= 0.00416667;
+                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.Liter).ToUnit(UnitsNet.Units.VolumeUnit.UsCustomaryCup);
+                    await command.RespondAsync($"{input} {volume}");
                 }
                 else if (destinationUnit == "fl oz")
                 {
-                    volume *= 29.5735;
+                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.Liter).ToUnit(UnitsNet.Units.VolumeUnit.UsOunce);
+                    await command.RespondAsync($"{input} {volume}");
                 }
                 else if (destinationUnit == "tbsp")
                 {
-                    volume *= 67.628;
+                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.Liter).ToUnit(UnitsNet.Units.VolumeUnit.UsTablespoon);
+                    await command.RespondAsync($"{input} {volume}");
                 }
                 else if (destinationUnit == "tsp")
                 {
-                    volume *= 202.884;
+                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.Liter).ToUnit(UnitsNet.Units.VolumeUnit.UsTeaspoon);
+                    await command.RespondAsync($"{input} {volume}");
                 }
             }
             else if (sourceUnit == "mL")
             {
                 if (destinationUnit == "L")
                 {
-                    volume /= 1000;
+                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.Milliliter).ToUnit(UnitsNet.Units.VolumeUnit.Liter);
+                    await command.RespondAsync($"{input} {volume}");
                 }
                 else if (destinationUnit == "mL")
                 {
-                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {volume:0.0} {destinationUnit}");
+                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {inputVolume:0.0} {destinationUnit}");
                 }
                 else if (destinationUnit == "gal")
                 {
-                    volume *= 0.000264172;
+                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.Milliliter).ToUnit(UnitsNet.Units.VolumeUnit.UsGallon);
+                    await command.RespondAsync($"{input} {volume}");
                 }
                 else if (destinationUnit == "qt")
                 {
-                    volume *= 0.000130772;
+                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.Milliliter).ToUnit(UnitsNet.Units.VolumeUnit.UsQuart);
+                    await command.RespondAsync($"{input} {volume}");
                 }
                 else if (destinationUnit == "pt")
                 {
-                    volume *= 0.0000492892;
+                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.Milliliter).ToUnit(UnitsNet.Units.VolumeUnit.UsPint);
+                    await command.RespondAsync($"{input} {volume}");
                 }
                 else if (destinationUnit == "cup")
                 {
-                    volume *= 0.0000236588;
+                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.Milliliter).ToUnit(UnitsNet.Units.VolumeUnit.UsCustomaryCup);
+                    await command.RespondAsync($"{input} {volume}");
                 }
                 else if (destinationUnit == "fl oz")
                 {
-                    volume *= 0.33814;
+                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.Milliliter).ToUnit(UnitsNet.Units.VolumeUnit.UsOunce);
+                    await command.RespondAsync($"{input} {volume}");
                 }
                 else if (destinationUnit == "tbsp")
                 {
-                    volume *= 0.0692641;
+                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.Milliliter).ToUnit(UnitsNet.Units.VolumeUnit.UsTablespoon);
+                    await command.RespondAsync($"{input} {volume}");
                 }
                 else if (destinationUnit == "tsp")
                 {
-                    volume *= 0.20094;
+                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.Milliliter).ToUnit(UnitsNet.Units.VolumeUnit.UsTeaspoon);
+                    await command.RespondAsync($"{input} {volume}");
                 }
             }
             else if (sourceUnit == "gal")
             {
                 if (destinationUnit == "L")
                 {
-                    volume /= 0.264172;
+                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsGallon).ToUnit(UnitsNet.Units.VolumeUnit.Liter);
+                    await command.RespondAsync($"{input} {volume}");
                 }
                 else if (destinationUnit == "mL")
                 {
-                    volume *= 264.172;
+                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsGallon).ToUnit(UnitsNet.Units.VolumeUnit.Milliliter);
+                    await command.RespondAsync($"{input} {volume}");
                 }
                 else if (destinationUnit == "gal")
                 {
-                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {volume:0.0} {destinationUnit}");
+                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {inputVolume:0.0} {destinationUnit}");
                 }
                 else if (destinationUnit == "qt")
                 {
-                    volume *= 2.25;
+                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsGallon).ToUnit(UnitsNet.Units.VolumeUnit.UsQuart);
+                    await command.RespondAsync($"{input} {volume}");
                 }
                 else if (destinationUnit == "pt")
                 {
-                    volume *= 4.92892;
+                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsGallon).ToUnit(UnitsNet.Units.VolumeUnit.UsPint);
+                    await command.RespondAsync($"{input} {volume}");
                 }
                 else if (destinationUnit == "cup")
                 {
-                    volume *= 2.36588;
+                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsGallon).ToUnit(UnitsNet.Units.VolumeUnit.UsCustomaryCup);
+                    await command.RespondAsync($"{input} {volume}");
                 }
                 else if (destinationUnit == "fl oz")
                 {
-                    volume *= 33.814;
+                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsGallon).ToUnit(UnitsNet.Units.VolumeUnit.UsOunce);
+                    await command.RespondAsync($"{input} {volume}");
                 }
                 else if (destinationUnit == "tbsp")
                 {
-                    volume *= 67.628;
+                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsGallon).ToUnit(UnitsNet.Units.VolumeUnit.UsTablespoon);
+                    await command.RespondAsync($"{input} {volume}");
                 }
                 else if (destinationUnit == "tsp")
                 {
-                    volume *= 202.884;
+                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsGallon).ToUnit(UnitsNet.Units.VolumeUnit.UsTeaspoon);
+                    await command.RespondAsync($"{input} {volume}");
                 }
             }
             else if (sourceUnit == "qt")
             {
                 if (destinationUnit == "L")
                 {
-                    volume /= 0.106919;
+                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsQuart).ToUnit(UnitsNet.Units.VolumeUnit.Liter);
+                    await command.RespondAsync($"{input} {volume}");
                 }
                 else if (destinationUnit == "mL")
                 {
-                    volume *= 1069.19;
+                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsQuart).ToUnit(UnitsNet.Units.VolumeUnit.Milliliter);
+                    await command.RespondAsync($"{input} {volume}");
                 }
                 else if (destinationUnit == "gal")
                 {
-                    volume *= 0.00378541;
+                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsQuart).ToUnit(UnitsNet.Units.VolumeUnit.UsGallon);
+                    await command.RespondAsync($"{input} {volume}");
                 }
                 else if (destinationUnit == "qt")
                 {
-                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {volume:0.0} {destinationUnit}");
+                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {inputVolume:0.0} {destinationUnit}");
                 }
                 else if (destinationUnit == "pt")
                 {
-                    volume *= 2.11338;
+                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsQuart).ToUnit(UnitsNet.Units.VolumeUnit.UsPint);
+                    await command.RespondAsync($"{input} {volume}");
                 }
                 else if (destinationUnit == "cup")
                 {
-                    volume *= 1.05669;
+                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsQuart).ToUnit(UnitsNet.Units.VolumeUnit.UsCustomaryCup);
+                    await command.RespondAsync($"{input} {volume}");
                 }
                 else if (destinationUnit == "fl oz")
                 {
-                    volume *= 33.814;
+                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsQuart).ToUnit(UnitsNet.Units.VolumeUnit.UsOunce);
+                    await command.RespondAsync($"{input} {volume}");
                 }
                 else if (destinationUnit == "tbsp")
                 {
-                    volume *= 67.628;
+                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsQuart).ToUnit(UnitsNet.Units.VolumeUnit.UsTablespoon);
+                    await command.RespondAsync($"{input} {volume}");
                 }
                 else if (destinationUnit == "tsp")
                 {
-                    volume *= 202.884;
+                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsQuart).ToUnit(UnitsNet.Units.VolumeUnit.UsTeaspoon);
+                    await command.RespondAsync($"{input} {volume}");
                 }
             }
             else if (sourceUnit == "pt")
             {
                 if (destinationUnit == "L")
                 {
-                    volume /= 0.0284131;
+                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsPint).ToUnit(UnitsNet.Units.VolumeUnit.Liter);
+                    await command.RespondAsync($"{input} {volume}");
                 }
                 else if (destinationUnit == "mL")
                 {
-                    volume *= 284.131;
+                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsPint).ToUnit(UnitsNet.Units.VolumeUnit.Milliliter);
+                    await command.RespondAsync($"{input} {volume}");
                 }
                 else if (destinationUnit == "gal")
                 {
-                    volume *= 0.00284130;
+                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsPint).ToUnit(UnitsNet.Units.VolumeUnit.UsGallon);
+                    await command.RespondAsync($"{input} {volume}");
                 }
                 else if (destinationUnit == "qt")
                 {
-                    volume *= 0.00131577;
+                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsPint).ToUnit(UnitsNet.Units.VolumeUnit.UsQuart);
+                    await command.RespondAsync($"{input} {volume}");
                 }
                 else if (destinationUnit == "pt")
                 {
-                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {volume:0.0} {destinationUnit}");
+                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {inputVolume:0.0} {destinationUnit}");
                 }
                 else if (destinationUnit == "cup")
                 {
-                    volume *= 0.0692641;
+                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsPint).ToUnit(UnitsNet.Units.VolumeUnit.UsCustomaryCup);
+                    await command.RespondAsync($"{input} {volume}");
                 }
                 else if (destinationUnit == "fl oz")
                 {
-                    volume *= 29.5735;
+                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsPint).ToUnit(UnitsNet.Units.VolumeUnit.UsOunce);
+                    await command.RespondAsync($"{input} {volume}");
                 }
                 else if (destinationUnit == "tbsp")
                 {
-                    volume *= 67.628;
+                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsPint).ToUnit(UnitsNet.Units.VolumeUnit.UsTablespoon);
+                    await command.RespondAsync($"{input} {volume}");
                 }
                 else if (destinationUnit == "tsp")
                 {
-                    volume *= 202.884;
+                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsPint).ToUnit(UnitsNet.Units.VolumeUnit.UsTeaspoon);
+                    await command.RespondAsync($"{input} {volume}");
                 }
             }
             else if (sourceUnit == "cup")
             {
                 if (destinationUnit == "L")
                 {
-                    volume /= 0.00416667;
+                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsCustomaryCup).ToUnit(UnitsNet.Units.VolumeUnit.Liter);
+                    await command.RespondAsync($"{input} {volume}");
                 }
                 else if (destinationUnit == "mL")
                 {
-                    volume *= 4166.67;
+                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsCustomaryCup).ToUnit(UnitsNet.Units.VolumeUnit.Milliliter);
+                    await command.RespondAsync($"{input} {volume}");
                 }
                 else if (destinationUnit == "gal")
                 {
-                    volume *= 0.00211338;
+                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsCustomaryCup).ToUnit(UnitsNet.Units.VolumeUnit.UsGallon);
+                    await command.RespondAsync($"{input} {volume}");
                 }
                 else if (destinationUnit == "qt")
                 {
-                    volume *= 0.00105669;
+                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsCustomaryCup).ToUnit(UnitsNet.Units.VolumeUnit.UsQuart);
+                    await command.RespondAsync($"{input} {volume}");
                 }
                 else if (destinationUnit == "pt")
                 {
-                    volume *= 0.0284131;
+                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsCustomaryCup).ToUnit(UnitsNet.Units.VolumeUnit.UsPint);
+                    await command.RespondAsync($"{input} {volume}");
                 }
                 else if (destinationUnit == "cup")
                 {
-                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {volume:0.0} {destinationUnit}");
+                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {inputVolume:0.0} {destinationUnit}");
                 }
                 else if (destinationUnit == "fl oz")
                 {
-                    volume *= 33.814;
+                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsCustomaryCup).ToUnit(UnitsNet.Units.VolumeUnit.UsOunce);
+                    await command.RespondAsync($"{input} {volume}");
                 }
                 else if (destinationUnit == "tbsp")
                 {
-                    volume *= 67.628;
+                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsCustomaryCup).ToUnit(UnitsNet.Units.VolumeUnit.UsTablespoon);
+                    await command.RespondAsync($"{input} {volume}");
                 }
                 else if (destinationUnit == "tsp")
                 {
-                    volume *= 202.884;
+                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsCustomaryCup).ToUnit(UnitsNet.Units.VolumeUnit.UsTeaspoon);
+                    await command.RespondAsync($"{input} {volume}");
                 }
             }
             else if (sourceUnit == "fl oz")
             {
                 if (destinationUnit == "L")
                 {
-                    volume /= 0.33814;
+                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsOunce).ToUnit(UnitsNet.Units.VolumeUnit.Liter);
+                    await command.RespondAsync($"{input} {volume}");
                 }
                 else if (destinationUnit == "mL")
                 {
-                    volume *= 33814;
+                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsOunce).ToUnit(UnitsNet.Units.VolumeUnit.Milliliter);
+                    await command.RespondAsync($"{input} {volume}");
                 }
                 else if (destinationUnit == "gal")
                 {
-                    volume *= 0.00295735;
+                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsOunce).ToUnit(UnitsNet.Units.VolumeUnit.UsGallon);
+                    await command.RespondAsync($"{input} {volume}");
                 }
                 else if (destinationUnit == "qt")
                 {
-                    volume *= 0.00147575;
+                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsOunce).ToUnit(UnitsNet.Units.VolumeUnit.UsQuart);
+                    await command.RespondAsync($"{input} {volume}");
                 }
                 else if (destinationUnit == "pt")
                 {
-                    volume *= 0.0284131;
+                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsOunce).ToUnit(UnitsNet.Units.VolumeUnit.UsPint);
+                    await command.RespondAsync($"{input} {volume}");
                 }
                 else if (destinationUnit == "cup")
                 {
-                    volume *= 0.00416667;
+                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsOunce).ToUnit(UnitsNet.Units.VolumeUnit.UsCustomaryCup);
+                    await command.RespondAsync($"{input} {volume}");
                 }
                 else if (destinationUnit == "fl oz")
                 {
-                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {volume:0.0} {destinationUnit}");
+                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {inputVolume:0.0} {destinationUnit}");
                 }
                 else if (destinationUnit == "tbsp")
                 {
-                    volume *= 0.0692641;
+                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsOunce).ToUnit(UnitsNet.Units.VolumeUnit.UsTablespoon);
+                    await command.RespondAsync($"{input} {volume}");
                 }
                 else if (destinationUnit == "tsp")
                 {
-                    volume *= 0.20094;
+                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsOunce).ToUnit(UnitsNet.Units.VolumeUnit.UsTeaspoon);
+                    await command.RespondAsync($"{input} {volume}");
                 }
             }
             else if (sourceUnit == "tbsp")
             {
                 if (destinationUnit == "L")
                 {
-                    volume /= 0.676280;
+                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsTablespoon).ToUnit(UnitsNet.Units.VolumeUnit.Liter);
+                    await command.RespondAsync($"{input} {volume}");
                 }
                 else if (destinationUnit == "mL")
                 {
-                    volume *= 67.628;
+                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsTablespoon).ToUnit(UnitsNet.Units.VolumeUnit.Milliliter);
+                    await command.RespondAsync($"{input} {volume}");
                 }
                 else if (destinationUnit == "gal")
                 {
-                    volume *= 0.000692641;
+                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsTablespoon).ToUnit(UnitsNet.Units.VolumeUnit.UsGallon);
+                    await command.RespondAsync($"{input} {volume}");
                 }
                 else if (destinationUnit == "qt")
                 {
-                    volume *= 0.000284131;
+                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsTablespoon).ToUnit(UnitsNet.Units.VolumeUnit.UsQuart);
+                    await command.RespondAsync($"{input} {volume}");
                 }
                 else if (destinationUnit == "pt")
                 {
-                    volume *= 0.0284131;
+                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsTablespoon).ToUnit(UnitsNet.Units.VolumeUnit.UsPint);
+                    await command.RespondAsync($"{input} {volume}");
                 }
                 else if (destinationUnit == "cup")
                 {
-                    volume *= 0.00416667;
+                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsTablespoon).ToUnit(UnitsNet.Units.VolumeUnit.UsCustomaryCup);
+                    await command.RespondAsync($"{input} {volume}");
                 }
                 else if (destinationUnit == "fl oz")
                 {
-                    volume *= 0.0692641;
+                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsTablespoon).ToUnit(UnitsNet.Units.VolumeUnit.UsOunce);
+                    await command.RespondAsync($"{input} {volume}");
                 }
                 else if (destinationUnit == "tbsp")
                 {
-                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {volume:0.0} {destinationUnit}");
+                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {inputVolume:0.0} {destinationUnit}");
                 }
                 else if (destinationUnit == "tsp")
                 {
-                    volume *= 3.96563;
+                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsTablespoon).ToUnit(UnitsNet.Units.VolumeUnit.UsTeaspoon);
+                    await command.RespondAsync($"{input} {volume}");
                 }
             }
             else if (sourceUnit == "tsp")
             {
                 if (destinationUnit == "L")
                 {
-                    volume /= 202.884;
+                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsTeaspoon).ToUnit(UnitsNet.Units.VolumeUnit.Liter);
+                    await command.RespondAsync($"{input} {volume}");
                 }
                 else if (destinationUnit == "mL")
                 {
-                    volume *= 202.884;
+                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsTeaspoon).ToUnit(UnitsNet.Units.VolumeUnit.Milliliter);
+                    await command.RespondAsync($"{input} {volume}");
                 }
                 else if (destinationUnit == "gal")
                 {
-                    volume *= 0.001;
+                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsTeaspoon).ToUnit(UnitsNet.Units.VolumeUnit.UsGallon);
+                    await command.RespondAsync($"{input} {volume}");
                 }
                 else if (destinationUnit == "qt")
                 {
-                    volume *= 0.000202884;
+                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsTeaspoon).ToUnit(UnitsNet.Units.VolumeUnit.UsQuart);
+                    await command.RespondAsync($"{input} {volume}");
                 }
                 else if (destinationUnit == "pt")
                 {
-                    volume *= 0.000284131;
+                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsTeaspoon).ToUnit(UnitsNet.Units.VolumeUnit.UsPint);
+                    await command.RespondAsync($"{input} {volume}");
                 }
                 else if (destinationUnit == "cup")
                 {
-                    volume *= 0.000416670;
+                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsTeaspoon).ToUnit(UnitsNet.Units.VolumeUnit.UsCustomaryCup);
+                    await command.RespondAsync($"{input} {volume}");
                 }
                 else if (destinationUnit == "fl oz")
                 {
-                    volume *= 0.0692641;
+                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsTeaspoon).ToUnit(UnitsNet.Units.VolumeUnit.UsOunce);
+                    await command.RespondAsync($"{input} {volume}");
                 }
                 else if (destinationUnit == "tbsp")
                 {
-                    volume *= 0.00676280;
+                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsTeaspoon).ToUnit(UnitsNet.Units.VolumeUnit.UsTablespoon);
+                    await command.RespondAsync($"{input} {volume}");
                 }
                 else if (destinationUnit == "tsp")
                 {
-                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {volume:0.0} {destinationUnit}");
+                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {inputVolume:0.0} {destinationUnit}");
                 }
             }
-
-            await command.RespondAsync($"{input} {volume:0.0} {destinationUnit}");
         }
 
         if (command.Data.Name == "speed")
         {
             string? sourceUnit = command.Data.Options.ElementAt(1).Value.ToString();
             string? destinationUnit = command.Data.Options.ElementAt(2).Value.ToString();
-            double speed = double.Parse(command.Data.Options.ElementAt(0).Value.ToString());
-            string input = $"`{speed} {sourceUnit}:`  ";
-            
+
+#pragma warning disable CS8604 // Possible null reference argument.
+            double inputSpeed = double.Parse(command.Data.Options.ElementAt(0).Value.ToString(), CultureInfo.InvariantCulture.NumberFormat);
+#pragma warning restore CS8604 // Possible null reference argument.
+
+            string input = $"`{inputSpeed} {sourceUnit}:`  ";
+            UnitsNet.Speed speed;
 
             if (sourceUnit == "m/s")
             {
                 if (destinationUnit == "m/s")
                 {
-                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {speed:0.0} {destinationUnit}");
+                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {inputSpeed:0.0} {destinationUnit}");
                 }
                 else if (destinationUnit == "km/h")
                 {
-                    speed *= 3.6;
+                    speed = Speed.From(inputSpeed, UnitsNet.Units.SpeedUnit.CentimeterPerSecond).ToUnit(UnitsNet.Units.SpeedUnit.KilometerPerHour);
+                    await command.RespondAsync($"{input} {speed}");
                 }
                 else if (destinationUnit == "mph")
                 {
-                    speed *= 2.23694;
+                    speed = Speed.From(inputSpeed, UnitsNet.Units.SpeedUnit.CentimeterPerSecond).ToUnit(UnitsNet.Units.SpeedUnit.MilePerHour);
+                    await command.RespondAsync($"{input} {speed}");
                 }
                 else if (destinationUnit == "knot")
                 {
-                    speed *= 1.94384;
+                    speed = Speed.From(inputSpeed, UnitsNet.Units.SpeedUnit.CentimeterPerSecond).ToUnit(UnitsNet.Units.SpeedUnit.Knot);
+                    await command.RespondAsync($"{input} {speed}");
                 }
             }
             else if (sourceUnit == "km/h")
             {
                 if (destinationUnit == "m/s")
                 {
-                    speed /= 3.6;
+                    speed = Speed.From(inputSpeed, UnitsNet.Units.SpeedUnit.KilometerPerHour).ToUnit(UnitsNet.Units.SpeedUnit.MeterPerSecond);
+                    await command.RespondAsync($"{input} {speed}");
                 }
                 else if (destinationUnit == "km/h")
                 {
-                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {speed:0.0} {destinationUnit}");
+                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {inputSpeed:0.0} {destinationUnit}");
                 }
                 else if (destinationUnit == "mph")
                 {
-                    speed /= 1.60934;
+                    speed = Speed.From(inputSpeed, UnitsNet.Units.SpeedUnit.KilometerPerHour).ToUnit(UnitsNet.Units.SpeedUnit.MilePerHour);
+                    await command.RespondAsync($"{input} {speed}");
                 }
                 else if (destinationUnit == "knot")
                 {
-                    speed /= 1.852;
+                    speed = Speed.From(inputSpeed, UnitsNet.Units.SpeedUnit.KilometerPerHour).ToUnit(UnitsNet.Units.SpeedUnit.Knot);
+                    await command.RespondAsync($"{input} {speed}");
                 }
             }
             else if (sourceUnit == "mph")
             {
                 if (destinationUnit == "m/s")
                 {
-                    speed /= 2.23694;
+                    speed = Speed.From(inputSpeed, UnitsNet.Units.SpeedUnit.MilePerHour).ToUnit(UnitsNet.Units.SpeedUnit.MeterPerSecond);
+                    await command.RespondAsync($"{input} {speed}");
                 }
                 else if (destinationUnit == "km/h")
                 {
-                    speed *= 1.60934;
+                    speed = Speed.From(inputSpeed, UnitsNet.Units.SpeedUnit.MilePerHour).ToUnit(UnitsNet.Units.SpeedUnit.KilometerPerHour);
+                    await command.RespondAsync($"{input} {speed}");
                 }
                 else if (destinationUnit == "mph")
                 {
-                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {speed:0.0} {destinationUnit}");
+                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {inputSpeed:0.0} {destinationUnit}");
                 }
                 else if (destinationUnit == "knot")
                 {
-                    speed *= 1.15078;
+                    speed = Speed.From(inputSpeed, UnitsNet.Units.SpeedUnit.MilePerHour).ToUnit(UnitsNet.Units.SpeedUnit.Knot);
+                    await command.RespondAsync($"{input} {speed}");
                 }
             }
             else if (sourceUnit == "knot")
             {
                 if (destinationUnit == "m/s")
                 {
-                    speed /= 1.852;
+                    speed = Speed.From(inputSpeed, UnitsNet.Units.SpeedUnit.Knot).ToUnit(UnitsNet.Units.SpeedUnit.MeterPerSecond);
+                    await command.RespondAsync($"{input} {speed}");
                 }
                 else if (destinationUnit == "km/h")
                 {
-                    speed *= 1.852;
+                    speed = Speed.From(inputSpeed, UnitsNet.Units.SpeedUnit.Knot).ToUnit(UnitsNet.Units.SpeedUnit.KilometerPerHour);
+                    await command.RespondAsync($"{input} {speed}");
                 }
                 else if (destinationUnit == "mph")
                 {
-                    speed *= 1.15078;
+                    speed = Speed.From(inputSpeed, UnitsNet.Units.SpeedUnit.Knot).ToUnit(UnitsNet.Units.SpeedUnit.MilePerHour);
+                    await command.RespondAsync($"{input} {speed}");
                 }
                 else if (destinationUnit == "knot")
                 {
-                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {speed:0.0} {destinationUnit}");
+                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {inputSpeed:0.0} {destinationUnit}");
                 }
             }
-
-            await command.RespondAsync($"{input} {speed:0.0} {destinationUnit}");
         }
     }
     
