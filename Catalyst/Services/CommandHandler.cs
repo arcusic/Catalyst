@@ -4,6 +4,7 @@ using Discord.Commands;
 using Discord.WebSocket;
 using Catalyst.Common;
 using Catalyst.Init;
+using UnitsNet;
 
 namespace Catalyst.Services;
 
@@ -168,19 +169,18 @@ public class CommandHandler : ICommandHandler
         if (command.Data.Name == "temperature")
         {
             string? unit = command.Data.Options.Last().Value.ToString();
-            double temp = double.Parse(command.Data.Options.First().Value.ToString());
-            string input = $"`{temp} {unit}:`  ";
+            double inputTemp = double.Parse(command.Data.Options.First().Value.ToString());
+            string input = $"`{inputTemp}°{unit}:`  ";
+            UnitsNet.Temperature temp;
             if (unit == "C")
             {
-                temp = temp * 9 / 5 + 32;
-                unit = "F";
+                temp = Temperature.From(inputTemp, UnitsNet.Units.TemperatureUnit.DegreeCelsius).ToUnit(UnitsNet.Units.TemperatureUnit.DegreeFahrenheit);
             }
             else
             {
-                temp = (temp - 32) * 5 / 9;
-                unit = "C";
+                temp = Temperature.From(inputTemp, UnitsNet.Units.TemperatureUnit.DegreeFahrenheit).ToUnit(UnitsNet.Units.TemperatureUnit.DegreeCelsius);
             }
-            await command.RespondAsync($"{input} {temp:0.0} {unit}");
+            await command.RespondAsync($"{input} {temp}");
         }
 
         if (command.Data.Name == "distance")
