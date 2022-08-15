@@ -466,7 +466,7 @@ public class CommandHandler : ICommandHandler
         {
             string? sourceUnit = command.Data.Options.ElementAt(1).Value.ToString();
             string? destinationUnit = command.Data.Options.ElementAt(2).Value.ToString();
-            double weight = double.Parse(command.Data.Options.ElementAt(0).Value.ToString());
+            double weight = double.Parse(command.Data.Options.ElementAt(0).Value.ToString(), CultureInfo.InvariantCulture.NumberFormat);
             string input = $"`{weight} {sourceUnit}:`  ";
 
             if (sourceUnit == "kg")
