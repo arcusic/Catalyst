@@ -194,7 +194,7 @@ public class CommandHandler : ICommandHandler
             {
                 if (destinationUnit == "m")
                 {
-                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {distance:0.0} {destinationUnit}");
+                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {distance:n2} {destinationUnit}");
                 }
                 else if (destinationUnit == "km")
                 {
@@ -229,7 +229,7 @@ public class CommandHandler : ICommandHandler
                 }
                 else if (destinationUnit == "km")
                 {
-                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {distance:0.0} {destinationUnit}");
+                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {distance:n2} {destinationUnit}");
                 }
                 else if (destinationUnit == "mi")
                 {
@@ -264,7 +264,7 @@ public class CommandHandler : ICommandHandler
                 }
                 else if (destinationUnit == "mi")
                 {
-                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {distance:0.0} {destinationUnit}");
+                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {distance:n2} {destinationUnit}");
                 }
                 else if (destinationUnit == "ft")
                 {
@@ -299,7 +299,7 @@ public class CommandHandler : ICommandHandler
                 }
                 else if (destinationUnit == "ft")
                 {
-                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {distance:0.0} {destinationUnit}");
+                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {distance:n2} {destinationUnit}");
                 }
                 else if (destinationUnit == "yd")
                 {
@@ -334,7 +334,7 @@ public class CommandHandler : ICommandHandler
                 }
                 else if (destinationUnit == "yd")
                 {
-                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {distance:0.0} {destinationUnit}");
+                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {distance:n2} {destinationUnit}");
                 }
                 else if (destinationUnit == "in")
                 {
@@ -369,7 +369,7 @@ public class CommandHandler : ICommandHandler
                 }
                 else if (destinationUnit == "in")
                 {
-                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {distance:0.0} {destinationUnit}");
+                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {distance:n2} {destinationUnit}");
                 }
                 else if (destinationUnit == "cm")
                 {
@@ -404,11 +404,11 @@ public class CommandHandler : ICommandHandler
                 }
                 else if (destinationUnit == "cm")
                 {
-                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {distance:0.0} {destinationUnit}");
+                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {distance:n2} {destinationUnit}");
                 }
             }
 
-            await command.RespondAsync($"{input} {distance:0.0} {destinationUnit}");
+            await command.RespondAsync($"{input} {distance:n2} {destinationUnit}");
         }
 
         if (command.Data.Name == "weight")
