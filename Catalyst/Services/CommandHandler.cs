@@ -466,87 +466,102 @@ public class CommandHandler : ICommandHandler
         {
             string? sourceUnit = command.Data.Options.ElementAt(1).Value.ToString();
             string? destinationUnit = command.Data.Options.ElementAt(2).Value.ToString();
-            double weight = double.Parse(command.Data.Options.ElementAt(0).Value.ToString(), CultureInfo.InvariantCulture.NumberFormat);
-            string input = $"`{weight} {sourceUnit}:`  ";
+
+#pragma warning disable CS8604 // Possible null reference argument.
+            double inputWeight = double.Parse(command.Data.Options.ElementAt(0).Value.ToString(), CultureInfo.InvariantCulture.NumberFormat);
+#pragma warning restore CS8604 // Possible null reference argument.
+
+            string input = $"`{inputWeight} {sourceUnit}:`  ";
+            UnitsNet.Mass weight;
 
             if (sourceUnit == "kg")
             {
                 if (destinationUnit == "kg")
                 {
-                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {weight:0.0} {destinationUnit}");
+                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {inputWeight:0.0} {destinationUnit}");
                 }
                 else if (destinationUnit == "g")
                 {
-                    weight *= 1000;
+                    weight = Mass.From(inputWeight, UnitsNet.Units.MassUnit.Kilogram).ToUnit(UnitsNet.Units.MassUnit.Gram);
+                    await command.RespondAsync($"{input} {weight}");
                 }
                 else if (destinationUnit == "lb")
                 {
-                    weight *= 2.20462;
+                    weight = Mass.From(inputWeight, UnitsNet.Units.MassUnit.Kilogram).ToUnit(UnitsNet.Units.MassUnit.Pound);
+                    await command.RespondAsync($"{input} {weight}");
                 }
                 else if (destinationUnit == "oz")
                 {
-                    weight *= 35.274;
+                    weight = Mass.From(inputWeight, UnitsNet.Units.MassUnit.Kilogram).ToUnit(UnitsNet.Units.MassUnit.Ounce);
+                    await command.RespondAsync($"{input} {weight}");
                 }
             }
             else if (sourceUnit == "g")
             {
                 if (destinationUnit == "kg")
                 {
-                    weight /= 1000;
+                    weight = Mass.From(inputWeight, UnitsNet.Units.MassUnit.Gram).ToUnit(UnitsNet.Units.MassUnit.Kilogram);
+                    await command.RespondAsync($"{input} {weight}");
                 }
                 else if (destinationUnit == "g")
                 {
-                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {weight:0.0} {destinationUnit}");
+                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {inputWeight:0.0} {destinationUnit}");
                 }
                 else if (destinationUnit == "lb")
                 {
-                    weight *= 0.00220462;
+                    weight = Mass.From(inputWeight, UnitsNet.Units.MassUnit.Gram).ToUnit(UnitsNet.Units.MassUnit.Pound);
+                    await command.RespondAsync($"{input} {weight}");
                 }
                 else if (destinationUnit == "oz")
                 {
-                    weight *= 0.035274;
+                    weight = Mass.From(inputWeight, UnitsNet.Units.MassUnit.Gram).ToUnit(UnitsNet.Units.MassUnit.Ounce);
+                    await command.RespondAsync($"{input} {weight}");
                 }
             }
             else if (sourceUnit == "lb")
             {
                 if (destinationUnit == "kg")
                 {
-                    weight /= 2.20462;
+                    weight = Mass.From(inputWeight, UnitsNet.Units.MassUnit.Pound).ToUnit(UnitsNet.Units.MassUnit.Kilogram);
+                    await command.RespondAsync($"{input} {weight}");
                 }
                 else if (destinationUnit == "g")
                 {
-                    weight *= 453.592;
+                    weight = Mass.From(inputWeight, UnitsNet.Units.MassUnit.Pound).ToUnit(UnitsNet.Units.MassUnit.Gram);
+                    await command.RespondAsync($"{input} {weight}");
                 }
                 else if (destinationUnit == "lb")
                 {
-                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {weight:0.0} {destinationUnit}");
+                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {inputWeight:0.0} {destinationUnit}");
                 }
                 else if (destinationUnit == "oz")
                 {
-                    weight *= 16;
+                    weight = Mass.From(inputWeight, UnitsNet.Units.MassUnit.Pound).ToUnit(UnitsNet.Units.MassUnit.Ounce);
+                    await command.RespondAsync($"{input} {weight}");
                 }
             }
             else if (sourceUnit == "oz")
             {
                 if (destinationUnit == "kg")
                 {
-                    weight /= 35.274;
+                    weight = Mass.From(inputWeight, UnitsNet.Units.MassUnit.Ounce).ToUnit(UnitsNet.Units.MassUnit.Kilogram);
+                    await command.RespondAsync($"{input} {weight}");
                 }
                 else if (destinationUnit == "g")
                 {
-                    weight *= 28.3495;
+                    weight = Mass.From(inputWeight, UnitsNet.Units.MassUnit.Ounce).ToUnit(UnitsNet.Units.MassUnit.Gram);
+                    await command.RespondAsync($"{input} {weight}");
                 }
                 else if (destinationUnit == "lb")
                 {
-                    weight /= 16;
+                    weight = Mass.From(inputWeight, UnitsNet.Units.MassUnit.Ounce).ToUnit(UnitsNet.Units.MassUnit.Pound);
+                    await command.RespondAsync($"{input} {weight}");
                 }
                 else if (destinationUnit == "oz")
                 {
-                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {weight:0.0} {destinationUnit}");
+                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {inputWeight:0.0} {destinationUnit}");
                 }
             }
-
-            await command.RespondAsync($"{input} {weight:0.0} {destinationUnit}");
         }
 
         if (command.Data.Name == "volume")
