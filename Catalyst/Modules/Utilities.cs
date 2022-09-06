@@ -282,23 +282,23 @@ public class Utilities : ModuleBase<ShardedCommandContext>
         await response.ModifyAsync(msg => msg.Content = $"Executing infrastructure health check... please wait.\n\n`CURRENT STATUS:`  Spawning a PowerShell Instance...");
         PowerShell psInstance = PowerShell.Create();
 
-        if (OperatingSystem.IsWindows())
-        {
-            string stDirectory = Directory.GetCurrentDirectory();
-            stDirectory += "\\Redistributables\\SpeedTest\\speedtest.exe";
-            psInstance.AddCommand(stDirectory);
-        }
-        else
-        {
-            psInstance.AddCommand("/app/Redistributables/SpeedTest/speedtest");
-        }
+        //if (OperatingSystem.IsWindows())
+        //{
+        //    string stDirectory = Directory.GetCurrentDirectory();
+        //    stDirectory += "\\Redistributables\\SpeedTest\\speedtest.exe";
+        //    psInstance.AddCommand(stDirectory);
+        //}
+        //else
+        //{
+        //    psInstance.AddCommand("/app/Redistributables/SpeedTest/speedtest");
+        //}
 
-        await response.ModifyAsync(msg => msg.Content = $"Executing infrastructure health check... please wait.\n\n`CURRENT STATUS:`  Executing Speed Test...");
-        await Logger.Log(LogSeverity.Debug, "SpeedTestStarting", $"Launching speedtest... Please Wait.");
-        var psOutput = psInstance.Invoke();
-        psInstance.Dispose();
-        await Logger.Log(LogSeverity.Debug, "SpeedTestResults", $"{psOutput[7]}");
-        await Logger.Log(LogSeverity.Debug, "SpeedTestResults", $"{psOutput[9]}");
+        //await response.ModifyAsync(msg => msg.Content = $"Executing infrastructure health check... please wait.\n\n`CURRENT STATUS:`  Executing Speed Test...");
+        //await Logger.Log(LogSeverity.Debug, "SpeedTestStarting", $"Launching speedtest... Please Wait.");
+        //var psOutput = psInstance.Invoke();
+        //psInstance.Dispose();
+        //await Logger.Log(LogSeverity.Debug, "SpeedTestResults", $"{psOutput[7]}");
+        //await Logger.Log(LogSeverity.Debug, "SpeedTestResults", $"{psOutput[9]}");
 
         await response.ModifyAsync(msg => msg.Content = $"Executing infrastructure health check... please wait.\n\n`CURRENT STATUS:`  Converting retreived data to human-readable format...");
         decimal tempF = Convert.ToDecimal(tempResult[0].Data.ToString()) / 10;
@@ -391,7 +391,7 @@ public class Utilities : ModuleBase<ShardedCommandContext>
             $"`{networkDevices[9, 0]}:`  {networkDevices[9, 2]}  {networkDevices[9, 3]}\n" +
             $"`{networkDevices[10, 0]}:`  {networkDevices[10, 2]}  {networkDevices[10, 3]}\n\n" +
             $"__*Connection Information:*__\n" +
-            $"`Speed Test Results:` {psOutput[11].ToString().Replace("Result URL: ", "")}.png\n");
+            $"`Speed Test Results:` SpeedTest information is currently unavailable.");
         await Logger.Log(LogSeverity.Verbose, $"[{Context.Guild.Name}] ResponseSent", $"Health Report sent to the {Context.Channel.Name} channel.");
     }
     [Command("epo", RunMode = RunMode.Async)]
