@@ -618,6 +618,66 @@ public class Utilities : ModuleBase<ShardedCommandContext>
         }
     }
 
+    [Command("wick", RunMode = RunMode.Async)]
+    public async Task Wick(string subCommand = "")
+    {
+        if (subCommand == "")
+        {
+            await Logger.Log(LogSeverity.Verbose, $"[{Context.Guild.Name}] CommandReceived", $"{Context.User.Username}#{Context.User.DiscriminatorValue} has invoked {Context.Message.Content} from the {Context.Channel.Name} channel.");
+
+            var typingState = Context.Channel.TriggerTypingAsync();
+            string description = $"The server currently uses `Wick Bot` for moderation.\n" +
+                "This Guide will describe the commands that will be needed during an incident.\n\n" +
+                "> `PLEASE NOTE:` for commands that have multiple options\n" +
+                "> (ex. @User#0001 or UserID) `or` will be designated by `|`.\n" +
+                "> \n" +
+                "> `OPTIONAL INPUTS:` are denoted in braces { ex. } and are **not** required.\n" +
+                "> Not including these inputs may have consequences.\n\n" +
+                "See docs included with each command for details.\n" +
+                "`Please click one of the buttons for command details.`\n\n" +
+                "`Close:`  Deletes this message.";
+
+            var embed = new EmbedBuilder
+            {
+                Title = "Wick Command Reference Guide",
+                Description = description,
+                Color = new Color(0x00f7ff),
+                Footer = new EmbedFooterBuilder
+                {
+                    Text = $"Requested by {Context.User.Username}#{Context.User.DiscriminatorValue}",
+                    IconUrl = Context.User.GetAvatarUrl()
+                },
+                Timestamp = DateTime.Now,
+                Author = new EmbedAuthorBuilder
+                {
+                    Name = "The Catalyst",
+                    IconUrl = "https://raw.githubusercontent.com/CodingCatalysts/Catalyst/main/Catalyst/Assets/Animated%20Logo/Bot_catalyst.gif"
+                },
+            };
+
+            var buttons = new ComponentBuilder()
+                .WithButton("Purge", "purge", ButtonStyle.Primary, null, null, false, 0)
+                .WithButton("Mute", "mute", ButtonStyle.Primary, null, null, false, 0)
+                .WithButton("Unmute", "unmute", ButtonStyle.Primary, null, null, false, 0)
+                .WithButton("Kick", "kick", ButtonStyle.Primary, null, null, false, 0)
+                .WithButton("Warning", "warn", ButtonStyle.Primary,null,null,false,1)
+                .WithButton("Ban", "ban", ButtonStyle.Secondary, null, null, false, 1)
+                .WithButton("Unban", "unban", ButtonStyle.Secondary, null, null, false, 1)
+                .WithButton("Lockdown", "lockdown", ButtonStyle.Secondary, null, null, false, 1)
+                .WithButton("Overview", "overview", ButtonStyle.Primary, null, null, false, 2)
+                .WithButton("Slow Mode", "slowmode", ButtonStyle.Primary, null, null, false, 2)
+                .WithButton("Close", "close", ButtonStyle.Danger, null, null, false, 2);
+
+            await Context.Message.ReplyAsync(embed: embed.Build(), components: buttons.Build());
+
+            await Context.Message.DeleteAsync();
+            await Logger.Log(LogSeverity.Verbose, $"[{Context.Guild.Name}] CommandAcknowledged", $"Removed {Context.User.Username}#{Context.User.DiscriminatorValue}'s message.");
+
+            typingState.Dispose();
+        }
+
+    }
+
     [Command("tic", RunMode = RunMode.Async)]
     public async Task Tic()
     {
