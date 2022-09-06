@@ -1103,9 +1103,9 @@ public class CommandHandler : ICommandHandler
             }
         }
     }
-    
-    //public async Task ButtonHandler(SocketMessageComponent component)
-    //{
-        
-    //}
+
+    public async Task ButtonHandler(SocketMessageComponent component)
+    {
+
+    }
 }
