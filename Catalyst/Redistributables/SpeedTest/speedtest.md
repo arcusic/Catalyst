@@ -1,112 +1,152 @@
-# Speedtest
+speedtest(5) - Speedtest CLI by Ookla is the official command line client for testing the speed and performance of your internet connection.
+============
 
-## Name
-  **speedtest** - Speedtest CLI by Ookla is the official command line client for testing the speed and performance of your internet connection.
+## SYNOPSIS
+**speedtest** [**help**] [**-aAbBfhiIpPsv**] [**--ca-certificate=path**] [**--format=**<format-type>]
+[**--interface=interface**] [**--ip=ip_address**] [**--output-header**] [**--precision**=<num_decimal_places>]
+[**--progress**=<yes|no>] [**--selection-details**] [**--server-id**=<id>] [**--servers**] [**--unit**=<unit-of-measure>] [**--version**]
 
-## Version
-  1.1.1
-
-## Synopsis
-```
-    speedtest [-aAbBfhiIpPsv] [--ca-certificate=path] [--format=[=format-type]] [--help] [--interface=interface]
-    [--ip=ip_address] [--output-header] [--precision=num_decimal_places] [--progress=yes|no]
-    [--selection-details] [--server-id=id] [--servers] [--unit=[=unit-of-measure]] [--version]
-```
-
-## Description
+## DESCRIPTION
 **speedtest** is an application that measures the latency, jitter, packet loss, download bandwidth, and
 upload bandwidth of the network connection between the client and a nearby Speedtest
 Server.
 
-## Options
-* **-h, --help**  
+## OPTIONS
+
+* **-h, --help**:
   Print usage information
 
-* **-v**
+* **-v**:
   Logging verbosity, specify multiple times for higher verbosity (e.g. **-vvv**)
 
-* **-V, --version**
+* **-V, --version**:
   Print version number
 
-* **-L, --servers**
+* **-L, --servers**:
   List nearest servers
 
-* **--selection-details**
+* **--selection-details**:
   Show server selection details
 
-* **-s** *id*, **--server-id**=*id*  
+* **-s** *id*, **--server-id**=<id>: 
   Specify a server from the server list using its id
   
-* **-o** *hostname*, **--host**=*hostname*  
+* **-o** *hostname*, **--host**=<hostname>:
   Specify a server from the server list using its hostname
 
-* **-f** *format_type* **--format**=*format_type*  
-  Output format (default = human-readable)
-  Note: Machine readable formats (csv, tsv, json, jsonl, json-pretty) use bytes
-    as the unit of measure with max precision.
-
-  *format_type* values are as follows:
-    * **human-readable**       human readable output
-    * **csv**                  comma separated values
-    * **tsv**                  tab separated values
-    * **json**                 javascript object notation (compact)
-    * **jsonl**                javascript object notation (lines)
-    * **json-pretty**          javascript object notation (pretty)
-
-* **--progress-update-interval**=*interval*
+* **-f** <format_type>, **--format**=<format_type>:
+  Output format (default is <human-readable>). See [OUTPUT FORMATS][] below for details.
+ 
+* **--progress-update-interval**=<interval>:
   Progress update interval (100-1000 milliseconds)
 
-* **--output-header**
+* **--output-header**:
   Show output header for CSV and TSV formats
 
-* **-u*** unit_of_measure***,&nbsp;--unit*** unit_of_measure*
-  Output unit for displaying speeds (Note: this is only applicable
-  for ‘human-readable’ output format and the default unit is Mbps)
+* **-u** <unit_of_measure>, **--unit**=<unit_of_measure>:
+  Output unit for displaying speeds when using the <human-readable>
+  output format. The default unit is Mbps. See [UNITS OF MEASURE][] for
+  more details.
 
-    * **bps**                  bits per second (decimal prefix)
-    * **kbps**                 kilobits per second (decimal prefix)
-    * **Mbps**                 megabits per second (decimal prefix)
-    * **Gbps**                 gigabits per second (decimal prefix)
-    * **kibps**                kilobits per second (binary prefix)
-    * **Mibps**                megabits per second (binary prefix)
-    * **Gibps**                gigabits per second (binary prefix)
-    * **B/s**                  bytes per second
-    * **kB/s**                 kilobytes per second
-    * **MB/s**                 megabytes per second
-    * **GiB/s**                gigabytes per second
-    * **auto-binary-bytes**    automatic in binary bytes
-    * **auto-decimal-bytes**   automatic in decimal bytes
-    * **auto-binary-bytes**    automatic in binary bits
-    * **auto-binary-bytes**    automatic in decimal bits
-
-* **-a**  
-  Shortcut for [**-u auto-decimal-bits**]
+* **-a**:
+  Shortcut for [**-u** <auto-decimal-bits>]
   
-* **-A**  
-  Shortcut for [**-u auto-decimal-bytes**]
+* **-A**:
+  Shortcut for [**-u** <auto-decimal-bytes>]
   
-* **-b**  
-  Shortcut for [**-u auto-binary-bits**]
+* **-b**:
+  Shortcut for [**-u** <auto-binary-bits>]
   
-* **-B**  
-  Shortcut for [**-u auto-binary-bytes**]
+* **-B**:
+  Shortcut for [**-u** <auto-binary-bytes>]
 
-* **-P** *decimal_places* **--precision**=*decimal_places*  
-  Number of decimal_places to use (default = 2, valid = 0-8)
+* **-P** <decimal_places>, **--precision**=<decimal_places>:
+  Number of decimal places to use (default = 2, valid = 0-8). Only applicable to the
+  <human-readable> output format.
 
-* **-p** *yes*|*no* **--progress**=*yes*|*no*  
-  Enable or disable progress bar (default = yes when interactive)
+* **-p** <yes>|<no>, **--progress**=<yes>|<no>:
+  Enable or disable progress bar (default is <yes> when interactive)
 
-* **-I** *interface* **--interface**=*interface*
+* **-I** <interface>, **--interface**=<interface>:
   Attempt to bind to the specified interface when connecting to servers
 
-* **-i** *ip_address* **--ip**=*ip_address*
+* **-i** <ip_address>, **--ip**=<ip_address>:
   Attempt to bind to the specified IP address when connecting to servers
 
-* **--ca-certificate**=*path*
-  Path to CA Certificate bundle, see note below.
+* **--ca-certificate**=<path>:
+  Path to CA Certificate bundle, see [SSL CERTIFICATE LOCATIONS][] below.
 
-## Terms of Use and Privacy Policy Notices
+## OUTPUT FORMATS
+
+These are the available output formats for Speedtest CLI specified with the **-f** or **--format** flags. All machine readable formats 
+(csv, tsv, json, jsonl, json-pretty) use bytes for data sizes, bytes per seconds for speeds and milliseconds for durations. They also always use maximum precision output.
+
+* **human-readable**:
+  human readable output
+* **csv**:
+  comma separated values
+* **tsv**:
+  tab separated values
+* **json**:
+  javascript object notation (compact)
+* **jsonl**:
+  javascript object notation (lines)
+* **json-pretty**:
+  javascript object notation (pretty)
+
+## UNITS OF MEASURE
+
+For the human-readable output format, you can specify the unit of measure to use. The default unit 
+is <Mbps>. The supported units are listed below. 
+
+These units do not apply to machine readable output formats (json, jsonl, csv and tsv).
+
+### Decimal options (multipliers of 1000)
+
+* **bps**:
+  bits per second
+* **kbps**:
+  kilobits per second
+* **Mbps**:
+  megabits per second
+* **Gbps**:
+  gigabits per second
+* **B/s**:
+  bytes per second
+* **kB/s**:
+  kilobytes per second
+* **MB/s**:
+ megabytes per second
+* **GB/s**:
+  gigabytes per second
+ 
+### Binary options (multipliers of 1024)
+* **kibps**:
+  kibibits per second
+* **Mibps**:
+  mebibits per second
+* **Gibps**:
+  gibibits per second
+* **kiB/s**:
+  kibibytes per second
+* **MiB/s**:
+  mebibytes per second
+* **GiB/s**:
+  gibibytes per second
+
+### Auto-scaling options
+Automatic units will scale the prefix depending on the measured speed. 
+
+* **auto-decimal-bits**:
+  automatic in decimal bits
+* **auto-decimal-bytes**:
+  automatic in decimal bytes
+* **auto-binary-bits**:
+  automatic in binary bits
+* **auto-binary-bytes**:
+  automatic in binary bytes
+ 
+## TERMS OF USE AND PRIVACY POLICY NOTICES
 You may only use this Speedtest software and information generated from it for personal, non-commercial use,
 through a command line interface on a personal computer.  Your use of this software is subject to the End User
 License Agreement, Terms of Use and Privacy Policy at these URLs:
@@ -115,7 +155,7 @@ License Agreement, Terms of Use and Privacy Policy at these URLs:
 * [https://www.speedtest.net/about/terms](https://www.speedtest.net/about/terms)
 * [https://www.speedtest.net/about/privacy](https://www.speedtest.net/about/privacy)
 
-## Output
+## OUTPUT
 Upon successful execution, the application will exit with an exit code of 0. The result will include
 latency, jitter, download, upload, packet loss (where available), and a result URL.
 
@@ -142,22 +182,24 @@ shareable result image.
 
 ```
 $ speedtest
-    Speedtest by Ookla
+   Speedtest by Ookla
 
-     Server: Speedtest.net - New York, NY (id = 10390)
-        ISP: Comcast Cable
-    Latency:    57.81 ms   (3.65 ms jitter)
-   Download:    76.82 Mbps (data used: 80.9 MB)
-     Upload:    37.58 Mbps (data used: 65.3 MB)
-Packet Loss:     0.0%
- Result URL: https://www.speedtest.net/result/c/8ae1200c-e639-45e5-8b55-41421a079250
+      Server: SUNET - Stockholm (id: 26852)
+         ISP: Bahnhof AB
+Idle Latency:     5.04 ms   (jitter: 0.04ms, low: 5.01ms, high: 5.07ms)
+    Download:   968.73 Mbps (data used: 117.5 MB)                                                   
+                 12.10 ms   (jitter: 1.71ms, low: 6.71ms, high: 18.82ms)
+      Upload:   942.13 Mbps (data used: 114.8 MB)                                                   
+                  9.94 ms   (jitter: 1.10ms, low: 5.30ms, high: 12.72ms)
+ Packet Loss:     0.0%
+  Result URL: https://www.speedtest.net/result/c/d1c46724-50a3-4a59-87ca-ffc09ea014b2
 ```
 
-## Network Timeout Values
+## NETWORK TIMEOUT VALUES
 By default, network requests set a timeout of **10** seconds. The only exception to this
 is latency testing, which sets a timeout of **15** seconds.
 
-## Fatal Errors
+## FATAL ERRORS
 Upon fatal errors, the application will exit with a non-zero exit code.
 
 **Initialization Fatal Error Examples:**
@@ -180,7 +222,7 @@ Upon fatal errors, the application will exit with a non-zero exit code.
 
 *[error] Server Selection - Failed to find a working test server. (NoServers)*
 
-## SSL Certificate Locations
+## SSL CERTIFICATE LOCATIONS
 By default the following paths are checked for CA certificate bundles on linux machines:
 
     /etc/ssl/certs/ca-certificates.crt
@@ -192,15 +234,23 @@ By default the following paths are checked for CA certificate bundles on linux m
 If the device under test does *not* have one of the above mentioned files, then the canonical and up to date CA certificate bundle provided by the curl project can be manually
 downloaded into a specific location.  This specific location can be provided as a parameter per the following example:
 
-    wget https://curl.haxx.se/ca/cacert.pem
+    wget https://curl.se/ca/cacert.pem
     ./ookla --ca-certificate=./cacert.pem
 
-## Release Notes
+## RELEASE NOTES
 
-### 1.1.1 - 11/15/2021
+### 1.2.0 (2022-07-27)
+* Cleaned up formatting in human-readable output for additional data within parenthesis (now using `label: value` consistently)
+* Compressed result upload data to reduce data usage
+* Added support for measuring responsiveness (latency during load)
+* Added experimental support for multi-server testing
+* Updated third-party dependencies: cURL 7.83.1, mbed TLS 3.1.0, Boost 1.79.0
+* Added stability improvements
+
+### 1.1.1 (2021-11-15)
 * Fixed issue with reported client version in uploaded results
 
-### 1.1.0 - 10/27/2021
+### 1.1.0 (2021-10-27)
 * Use server-side upload measurements
 * Performance enhancement on upload tests for CPU constrained devices
 * Security enhancements
@@ -209,13 +259,13 @@ downloaded into a specific location.  This specific location can be provided as 
 * Fix crash in hostname resolution during test initialization
 * Fix potential buffer overflow
 * Update Boost to 1.77.0
-* Update mbedTLS to 2.27.0
+* Update mbed TLS to 2.27.0
 * Update cURL to 7.78.0
 
-### 1.0.0 - 10/29/2019
+### 1.0.0 (2019-10-29)
 * Initial release
 
-## Copyright Notices for Third-Party Products/Libraries
+## COPYRIGHT NOTICES FOR THIRD-PARTY PRODUCTS/LIBRARIES
 This software incorporates free and open source third-party libraries, including:
 
 * [boost](https://www.boost.org/)
@@ -244,25 +294,25 @@ to recipients of this software: [http://www.apache.org/licenses/LICENSE-2.0](htt
 
     DISCLAIMER
     This file is part of the mingw-w64 runtime package.
-    
-    The mingw-w64 runtime package and its code is distributed in the hope that it 
-    will be useful but WITHOUT ANY WARRANTY.  ALL WARRANTIES, EXPRESSED OR 
-    IMPLIED ARE HEREBY DISCLAIMED.  This includes but is not limited to 
+
+    The mingw-w64 runtime package and its code is distributed in the hope that it
+    will be useful but WITHOUT ANY WARRANTY.  ALL WARRANTIES, EXPRESSED OR
+    IMPLIED ARE HEREBY DISCLAIMED.  This includes but is not limited to
     warranties of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-    
-    
+
+
     Copyright (c) 2002 Todd C. Miller <Todd.Miller@courtesan.com>
-    
+
     Permission to use, copy, modify, and distribute this software for any
     purpose with or without fee is hereby granted, provided that the above
     copyright notice and this permission notice appear in all copies.
-    
+
     Copyright (c) 2000 The NetBSD Foundation, Inc.
     All rights reserved.
-    
+
     This code is derived from software contributed to The NetBSD Foundation
     by Dieter Baron and Thomas Klausner.
-    
+
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions
     are met:
@@ -275,14 +325,14 @@ to recipients of this software: [http://www.apache.org/licenses/LICENSE-2.0](htt
 ### Inclusion of PicoSHA2 is subject to distribution of the software with the following notice:
 
     Copyright (c) 2017 okdshin
-    
+
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
     in the Software without restriction, including without limitation the rights
     to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
     copies of the Software, and to permit persons to whom the Software is
     furnished to do so, subject to the following conditions:
-    
+
     The above copyright notice and this permission notice shall be included in all
     copies or substantial portions of the Software.
 
@@ -300,4 +350,3 @@ to recipients of this software: [http://www.apache.org/licenses/LICENSE-2.0](htt
 
     The above copyright notice and this permission notice shall be
     included in all copies or substantial portions of the Software.
-
