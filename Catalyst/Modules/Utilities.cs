@@ -290,7 +290,6 @@ public class Utilities : ModuleBase<ShardedCommandContext>
         }
         else
         {
-            psInstance.AddCommand("chmod +x /app/Redistributables/SpeedTest/speedtest");
             psInstance.AddCommand("/app/Redistributables/SpeedTest/speedtest");
         }
 
