@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <Title>The Catalyst</Title>
-    <AssemblyVersion>0.2.6.4</AssemblyVersion>
+    <AssemblyVersion>0.2.6.5</AssemblyVersion>
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Discord.Net" />
@@ -31,24 +31,24 @@
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="6.0.1" />
     <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="6.0.1" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="6.0.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.1" />
     <PackageReference Include="Lextm.SharpSnmpLib" Version="12.4.0" />
-    <PackageReference Include="Microsoft.PowerShell.Commands.Diagnostics" Version="7.2.6" />
-    <PackageReference Include="Microsoft.PowerShell.Commands.Management" Version="7.2.6" />
-    <PackageReference Include="Microsoft.PowerShell.Commands.Utility" Version="7.2.6" />
-    <PackageReference Include="Microsoft.PowerShell.ConsoleHost" Version="7.2.6" />
+    <PackageReference Include="Microsoft.PowerShell.Commands.Diagnostics" Version="7.2.7" />
+    <PackageReference Include="Microsoft.PowerShell.Commands.Management" Version="7.2.7" />
+    <PackageReference Include="Microsoft.PowerShell.Commands.Utility" Version="7.2.7" />
+    <PackageReference Include="Microsoft.PowerShell.ConsoleHost" Version="7.2.7" />
     <PackageReference Include="MediatR" Version="11.0.0" />
     <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="11.0.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.9" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.9" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Analyzers" Version="6.0.9" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.9">
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.10" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.10" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Analyzers" Version="6.0.10" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.10">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.PowerShell.Security" Version="7.2.6" />
+    <PackageReference Include="Microsoft.PowerShell.Security" Version="7.2.7" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.17.0" />
-    <PackageReference Include="Microsoft.WSMan.Management" Version="7.2.6" />
+    <PackageReference Include="Microsoft.WSMan.Management" Version="7.2.7" />
     <PackageReference Include="SSH.NET" Version="2020.0.2" />
     <PackageReference Include="UnitsNet" Version="4.145.0" />
   </ItemGroup>
