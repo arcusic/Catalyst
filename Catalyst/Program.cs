@@ -219,6 +219,18 @@ async Task MainAsync()
         .Build();
     //End About Module
 
+    //Start Build Module
+    var hc = new SlashCommandBuilder()
+        .WithName("health")
+        .WithDescription("Check the health of the bot")
+        .Build();
+    
+    var epo = new SlashCommandBuilder()
+        .WithName("emergency_power_off")
+        .WithDescription("Emergency Power Off")
+        .Build();
+    //End Build Module
+
     client.ShardReady += async shard =>
     {
         await shard.CreateGlobalApplicationCommandAsync(about);
