@@ -257,6 +257,12 @@ async Task MainAsync()
         await shard.CreateGlobalApplicationCommandAsync(speedConversion);
         await Logger.Log(LogSeverity.Info, "CMDBuilt", $"Slash Command {speedConversion.Name} is built and ready!");
 
+        await shard.CreateGlobalApplicationCommandAsync(hc);
+        await Logger.Log(LogSeverity.Info, "CMDBuilt", $"Slash Command {hc.Name} is built and ready!");
+
+        await shard.CreateGlobalApplicationCommandAsync(epo);
+        await Logger.Log(LogSeverity.Info, "CMDBuilt", $"Slash Command {epo.Name} is built and ready!");
+
         await Logger.Log(LogSeverity.Info, "ShardReady", $"Shard Number {shard.ShardId} is connected and ready!");
     };
 
