@@ -95,7 +95,7 @@ public class CommandHandler : ICommandHandler
                 var embed = new EmbedBuilder
                 {
                     Title = "Emergency Power Off",
-                    Description = "**Emergency Power Off***\n__**WARNING:**__ This command will `Power Off` the Servers within the Enclosure!",
+                    Description = "__**WARNING:**__ This command will `Power Off` the Servers within the Enclosure!",
                     Color = Color.Red,
                     Footer = new EmbedFooterBuilder
                     {
@@ -1558,14 +1558,14 @@ public class CommandHandler : ICommandHandler
         switch (component.Data.CustomId)
         {
             case "abort":
-                embed.Description = $"***Emergency Power Off***\n" +
-                "__**WARNING:**__ This command will `Shut Down` the Servers within the Enclosure!\n\n" +
-                $"**Execution has been aborted.**";
+                embed.Title = "Emergency Power Off";
+                embed.Description = $"**Execution has been aborted.**";
 
-            await Logger.Log(LogSeverity.Verbose, $"[{component.GuildId}] AbortReceived", $"{component.User.Username}#{component.User.DiscriminatorValue} has aborted from the confirmation message.");
+                await Logger.Log(LogSeverity.Verbose, $"[{component.GuildId}] AbortReceived", $"{component.User.Username}#{component.User.DiscriminatorValue} has aborted from the confirmation message.");
 
-            await component.UpdateAsync(msg => msg.Embed = embed.Build());
-            break;
+                await component.UpdateAsync(msg => msg.Embed = embed.Build());
+                await component.ModifyOriginalResponseAsync(msg => msg.Components = new ComponentBuilder().WithButton("Proceed", "proceed", ButtonStyle.Success, disabled: true).WithButton("Abort", "abort", ButtonStyle.Danger, disabled: true).Build());
+                break;
 
             case "proceed":
 
