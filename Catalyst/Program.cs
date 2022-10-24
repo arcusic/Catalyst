@@ -219,6 +219,18 @@ async Task MainAsync()
         .Build();
     //End About Module
 
+    //Start Build Module
+    var hc = new SlashCommandBuilder()
+        .WithName("health")
+        .WithDescription("Check the health of the bot")
+        .Build();
+    
+    var epo = new SlashCommandBuilder()
+        .WithName("emergency_power_off")
+        .WithDescription("Emergency Power Off")
+        .Build();
+    //End Build Module
+
     client.ShardReady += async shard =>
     {
         await shard.CreateGlobalApplicationCommandAsync(about);
@@ -244,6 +256,12 @@ async Task MainAsync()
 
         await shard.CreateGlobalApplicationCommandAsync(speedConversion);
         await Logger.Log(LogSeverity.Info, "CMDBuilt", $"Slash Command {speedConversion.Name} is built and ready!");
+
+        await shard.CreateGlobalApplicationCommandAsync(hc);
+        await Logger.Log(LogSeverity.Info, "CMDBuilt", $"Slash Command {hc.Name} is built and ready!");
+
+        await shard.CreateGlobalApplicationCommandAsync(epo);
+        await Logger.Log(LogSeverity.Info, "CMDBuilt", $"Slash Command {epo.Name} is built and ready!");
 
         await Logger.Log(LogSeverity.Info, "ShardReady", $"Shard Number {shard.ShardId} is connected and ready!");
     };
