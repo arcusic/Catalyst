@@ -106,7 +106,7 @@ public class CommandHandler : ICommandHandler
                     Author = new EmbedAuthorBuilder
                     {
                         Name = "The Catalyst",
-                        IconUrl = ""
+                        IconUrl = "https://raw.githubusercontent.com/CodingCatalysts/Catalyst/main/Catalyst/Assets/Animated%20Logo/Bot_catalyst.gif"
                     },
                 };
 
@@ -1551,7 +1551,7 @@ public class CommandHandler : ICommandHandler
             Author = new EmbedAuthorBuilder
             {
                 Name = "The Catalyst",
-                IconUrl = ""
+                IconUrl = "https://raw.githubusercontent.com/CodingCatalysts/Catalyst/main/Catalyst/Assets/Animated%20Logo/Bot_catalyst.gif"
             },
         };
 
