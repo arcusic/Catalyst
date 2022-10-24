@@ -115,17 +115,14 @@ public class CommandHandler : ICommandHandler
                     .WithButton("Abort", "abort", ButtonStyle.Danger)
                     .Build();
 
-                if (command.User.Username == "Catalyst" && command.User.DiscriminatorValue == 7894)
-                {
-                    await command.RespondAsync(embed: embed.Build(), components: buttons);
-                }
-                else
-                {
-                    await command.RespondAsync(":no_entry:  ***UNAUTHORIZED***  :no_entry:\n" +
-                    "You have attempted to execute a privledged command without propper permissions.\n\n" +
-                    "__**WARNING:**__  This incident has been logged!\n" +
-                    "*Further attempts to execute a privledged command without authorization may lead to additional action.*");
-                }
+                await command.RespondAsync(embed: embed.Build(), components: buttons);
+            }
+            else
+            {
+                await command.RespondAsync(":no_entry:  ***UNAUTHORIZED***  :no_entry:\n" +
+                "You have attempted to execute a privledged command without propper permissions.\n\n" +
+                "__**WARNING:**__  This incident has been logged!\n" +
+                "*Further attempts to execute a privledged command without authorization may lead to additional action.*");
             }
         }
 
