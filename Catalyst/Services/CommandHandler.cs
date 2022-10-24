@@ -126,7 +126,6 @@ public class CommandHandler : ICommandHandler
                     "__**WARNING:**__  This incident has been logged!\n" +
                     "*Further attempts to execute a privledged command without authorization may lead to additional action.*");
                 }
-                await command.RespondAsync(embed: embed.Build(), components: buttons);
             }
         }
 
@@ -1560,6 +1559,7 @@ public class CommandHandler : ICommandHandler
             case "abort":
                 embed.Title = "Emergency Power Off";
                 embed.Description = $"**Execution has been aborted.**";
+                embed.Color = Color.DarkGrey;
 
                 await Logger.Log(LogSeverity.Verbose, $"[{component.GuildId}] AbortReceived", $"{component.User.Username}#{component.User.DiscriminatorValue} has aborted from the confirmation message.");
 
@@ -1568,14 +1568,15 @@ public class CommandHandler : ICommandHandler
                 break;
 
             case "proceed":
-
                 await Logger.Log(LogSeverity.Verbose, $"[{component.GuildId}] ConfirmationReceived", $"{component.User.Username}#{component.User.DiscriminatorValue} has confirmed from the confirmation message.");
-                embed.Description = "***Emergency Power Off***\n" +
-                    "__**WARNING:**__ This command will `Shut Down` the Servers within the Enclosure!\n\n" +
+                embed.Description = "__**WARNING:**__ This command will `Shut Down` the Servers within the Enclosure!\n\n" +
                     $"**Execution has started.**\n" +
                     $"`STATUS:`  Parsing Required Information...";
+                embed.Title = "Emergency Power Off";
+                embed.Color = Color.Red;
                 await component.UpdateAsync(msg => msg.Embed = embed.Build());
-                
+                await component.ModifyOriginalResponseAsync(msg => msg.Components = new ComponentBuilder().WithButton("Proceed", "proceed", ButtonStyle.Success, disabled: true).WithButton("Abort", "abort", ButtonStyle.Danger, disabled: true).Build());
+
                 var jsonString = await File.ReadAllTextAsync("appsettings.json");
                 var appSettings = JsonDocument.Parse(jsonString)!;
 
@@ -1662,29 +1663,35 @@ public class CommandHandler : ICommandHandler
 
                 using (var sshClient = new SshClient(connectionInfo))
                 {
-                    embed.Description = "***Emergency Power Off***\n" +
-                        "__**WARNING:**__ This command will `Shut Down` the Servers within the Enclosure!\n\n" +
+                    embed.Description = "__**WARNING:**__ This command will `Shut Down` the Servers within the Enclosure!\n\n" +
                         $"**Execution has started.**\n" +
                         $"`STATUS:`  Connecting to FINALIZER...  Server 1/2.";
+                    embed.Title = "Emergency Power Off";
+                    embed.Color = Color.Red;
                     await component.UpdateAsync(msg => msg.Embed = embed.Build());
+                    await component.ModifyOriginalResponseAsync(msg => msg.Components = new ComponentBuilder().WithButton("Proceed", "proceed", ButtonStyle.Success, disabled: true).WithButton("Abort", "abort", ButtonStyle.Danger, disabled: true).Build());
 
                     sshClient.Connect();
                     await Logger.Log(LogSeverity.Debug, "SSHClient", $"Successfully connected to FINALIZER.");
 
-                    embed.Description = "***Emergency Power Off***\n" +
-                        "__**WARNING:**__ This command will `Shut Down` the Servers within the Enclosure!\n\n" +
+                    embed.Description = "__**WARNING:**__ This command will `Shut Down` the Servers within the Enclosure!\n\n" +
                         $"**Execution has started.**\n" +
                         $"`STATUS:`  Connected to FINALIZER.  Executing System Shutdown...  Server 1/2";
+                    embed.Title = "Emergency Power Off";
+                    embed.Color = Color.Red;
                     await component.UpdateAsync(msg => msg.Embed = embed.Build());
+                    await component.ModifyOriginalResponseAsync(msg => msg.Components = new ComponentBuilder().WithButton("Proceed", "proceed", ButtonStyle.Success, disabled: true).WithButton("Abort", "abort", ButtonStyle.Danger, disabled: true).Build());
 
                     var output = sshClient.RunCommand("shutdown /s /f /t 10");
                     await Logger.Log(LogSeverity.Debug, "SSHClient", $"Executing shutdown /s /f /t 10 on FINALIZER.");
 
-                    embed.Description = "***Emergency Power Off***\n" +
-                        "__**WARNING:**__ This command will `Shut Down` the Servers within the Enclosure!\n\n" +
+                    embed.Description = "__**WARNING:**__ This command will `Shut Down` the Servers within the Enclosure!\n\n" +
                         $"**Execution has started.**\n" +
                         $"`STATUS:`  Disconnecting from FINALIZER...  Server 1/2";
+                    embed.Title = "Emergency Power Off";
+                    embed.Color = Color.Red;
                     await component.UpdateAsync(msg => msg.Embed = embed.Build());
+                    await component.ModifyOriginalResponseAsync(msg => msg.Components = new ComponentBuilder().WithButton("Proceed", "proceed", ButtonStyle.Success, disabled: true).WithButton("Abort", "abort", ButtonStyle.Danger, disabled: true).Build());
 
                     sshClient.Disconnect();
                     sshClient.Dispose();
@@ -1695,44 +1702,52 @@ public class CommandHandler : ICommandHandler
 
                 using (var sshClient = new SshClient(connectionInfo))
                 {
-                    embed.Description = "***Emergency Power Off***\n" +
-                        "__**WARNING:**__ This command will `Shut Down` the Servers within the Enclosure!\n\n" +
+                    embed.Description = "__**WARNING:**__ This command will `Shut Down` the Servers within the Enclosure!\n\n" +
                         $"**Execution has started.**\n" +
                         $"`STATUS:`  Connecting to DEVASTATOR...  Server 2/2.";
+                    embed.Title = "Emergency Power Off";
+                    embed.Color = Color.Red;
                     await component.UpdateAsync(msg => msg.Embed = embed.Build());
+                    await component.ModifyOriginalResponseAsync(msg => msg.Components = new ComponentBuilder().WithButton("Proceed", "proceed", ButtonStyle.Success, disabled: true).WithButton("Abort", "abort", ButtonStyle.Danger, disabled: true).Build());
 
                     sshClient.Connect();
                     await Logger.Log(LogSeverity.Debug, "SSHClient", $"Successfully connected to DEVASTATOR.");
 
-                    embed.Description = "***Emergency Power Off***\n" +
-                        "__**WARNING:**__ This command will `Shut Down` the Servers within the Enclosure!\n\n" +
+                    embed.Description = "__**WARNING:**__ This command will `Shut Down` the Servers within the Enclosure!\n\n" +
                         $"**Execution has started.**\n" +
                         $"`STATUS:`  Connected to DEVASTATOR.  Executing System Shutdown...  Server 2/2";
+                    embed.Title = "Emergency Power Off";
+                    embed.Color = Color.Red;
                     await component.UpdateAsync(msg => msg.Embed = embed.Build());
+                    await component.ModifyOriginalResponseAsync(msg => msg.Components = new ComponentBuilder().WithButton("Proceed", "proceed", ButtonStyle.Success, disabled: true).WithButton("Abort", "abort", ButtonStyle.Danger, disabled: true).Build());
 
                     var output = sshClient.RunCommand("shutdown /s /f /t 10");
                     await Logger.Log(LogSeverity.Debug, "SSHClient", $"Executing shutdown /s /f /t 10 on DEVASTATOR.");
 
-                    embed.Description = "***Emergency Power Off***\n" +
-                        "__**WARNING:**__ This command will `Shut Down` the Servers within the Enclosure!\n\n" +
+                    embed.Description = "__**WARNING:**__ This command will `Shut Down` the Servers within the Enclosure!\n\n" +
                         $"**Execution has started.**\n" +
                         $"`STATUS:`  Disconnecting from DEVASTATOR...  Server 2/2";
+                    embed.Title = "Emergency Power Off";
+                    embed.Color = Color.Red;
                     await component.UpdateAsync(msg => msg.Embed = embed.Build());
+                    await component.ModifyOriginalResponseAsync(msg => msg.Components = new ComponentBuilder().WithButton("Proceed", "proceed", ButtonStyle.Success, disabled: true).WithButton("Abort", "abort", ButtonStyle.Danger, disabled: true).Build());
 
                     sshClient.Disconnect();
                     sshClient.Dispose();
                 }
 
-                embed.Description = "***Emergency Power Off***\n" +
-                        "__**WARNING:**__ This command will `Shut Down` the Servers within the Enclosure!\n\n" +
+                embed.Description = "__**WARNING:**__ This command will `Shut Down` the Servers within the Enclosure!\n\n" +
                         $"**Execution has completed.**\n" +
                         $":skull_crossbones:  Goodbye cruel world.  I will remain offline until activated again.  :skull_crossbones: ";
                 await component.UpdateAsync(msg => msg.Embed = embed.Build());
                 
                 await Logger.Log(LogSeverity.Debug, "EPOComplete", $"EPO has completed.");
 
+                embed.Title = "Emergency Power Off";
+                embed.Color = Color.Red;
                 await component.UpdateAsync(msg => msg.Embed = embed.Build());
-            break;
+                await component.ModifyOriginalResponseAsync(msg => msg.Components = new ComponentBuilder().WithButton("Proceed", "proceed", ButtonStyle.Success, disabled: true).WithButton("Abort", "abort", ButtonStyle.Danger, disabled: true).Build());
+                break;
         }
     }
 }
