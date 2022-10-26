@@ -80,6 +80,84 @@ public class CommandHandler : ICommandHandler
 
     public async Task SlashCommandHandler(SocketSlashCommand command)
     {
+        if (command.Data.Name == "tacticore_latest_log")
+        {
+            var jsonString = await File.ReadAllTextAsync("appsettings.json");
+            var appSettings = JsonDocument.Parse(jsonString)!;
+
+            var keyVaultSettings = appSettings.RootElement.GetProperty("KeyVault").EnumerateObject();
+            var snmpSettings = appSettings.RootElement.GetProperty("SNMP").EnumerateObject();
+            var hardwareSettings = appSettings.RootElement.GetProperty("Hardware").EnumerateObject();
+            var powerSettings = appSettings.RootElement.GetProperty("PowerAlert").EnumerateObject();
+            await Logger.Log(LogSeverity.Debug, $"JSONImported", "JSON file has been successfully imported... Processing.");
+
+            string keyVault = keyVaultSettings
+                .Where(onexs => onexs.Name == "KeyVaultName")
+                .Select(onexs => onexs.Value)
+                .FirstOrDefault()
+                .ToString();
+
+            string azureADTennantId = keyVaultSettings
+                .Where(ascended => ascended.Name == "AzureADTennantId")
+                .Select(ascended => ascended.Value)
+                .FirstOrDefault()
+                .ToString();
+
+            string azureADClientId = keyVaultSettings
+                .Where(goblino => goblino.Name == "AzureADClientId")
+                .Select(goblino => goblino.Value)
+                .FirstOrDefault()
+                .ToString();
+
+            string azureADClientSecret = keyVaultSettings
+                .Where(gremlin => gremlin.Name == "AzureADClientSecret")
+                .Select(gremlin => gremlin.Value)
+                .FirstOrDefault()
+                .ToString();
+
+            string powerUserInfo = powerSettings
+                .Where(onexs => onexs.Name == "PowerUser")
+                .Select(onexs => onexs.Value)
+                .FirstOrDefault()
+                .ToString();
+
+            string powerPassInfo = powerSettings
+                .Where(catalyst => catalyst.Name == "PowerPass")
+                .Select(catalyst => catalyst.Value)
+                .FirstOrDefault()
+                .ToString();
+
+            string hwDNS01 = hardwareSettings
+                .Where(kijmix => kijmix.Name == "DNS01")
+                .Select(kijmix => kijmix.Value)
+                .FirstOrDefault()
+                .ToString();
+
+            var secretClient = new SecretClient(new Uri($"https://{keyVault}.vault.azure.net"), new ClientSecretCredential(azureADTennantId, azureADClientId, azureADClientSecret));
+            await Logger.Log(LogSeverity.Debug, "SNMPSecretClientConfigured", $"Configured Azure Key Vault client to connect to {secretClient.VaultUri}.");
+
+            var powerUser = secretClient.GetSecret(powerUserInfo);
+            await Logger.Log(LogSeverity.Debug, "UPSUserObtained", $"Successfully obtained UPS User from Azure Key Vault.");
+
+            var powerPass = secretClient.GetSecret(powerPassInfo);
+            await Logger.Log(LogSeverity.Debug, "UPSPassObtained", $"Successfully obtained UPS Pass from Azure Key Vault.");
+
+            var dns01 = secretClient.GetSecret(hwDNS01);
+            await Logger.Log(LogSeverity.Debug, "DNS01IPObtained", $"Successfully obtained DNS01 IP Address from Azure Key Vault.");
+
+            var connectionInfo = new ConnectionInfo(dns01.Value.Value, powerUser.Value.Value,
+                new PasswordAuthenticationMethod(powerUser.Value.Value, powerPass.Value.Value));
+
+            using var sftpClient = new SftpClient(connectionInfo);
+
+            sftpClient.Connect();
+            Stream latestLog = sftpClient.OpenRead("/D:/Minecraft Server/Java/logs/latest.log");
+
+            await command.RespondWithFileAsync(latestLog, "latest.log", ephemeral: true);
+            sftpClient.Disconnect();
+            sftpClient.Dispose();
+        }
+
         if (command.Data.Name == "emergency_power_off")
         {
             var whiteCheckMark = new Emoji("\u2705");
@@ -115,14 +193,14 @@ public class CommandHandler : ICommandHandler
                     .WithButton("Abort", "abort", ButtonStyle.Danger)
                     .Build();
 
-                await command.RespondAsync(embed: embed.Build(), components: buttons);
+                await command.RespondAsync(embed: embed.Build(), components: buttons, ephemeral: true);
             }
             else
             {
                 await command.RespondAsync(":no_entry:  ***UNAUTHORIZED***  :no_entry:\n" +
                 "You have attempted to execute a privledged command without propper permissions.\n\n" +
                 "__**WARNING:**__  This incident has been logged!\n" +
-                "*Further attempts to execute a privledged command without authorization may lead to additional action.*");
+                "*Further attempts to execute a privledged command without authorization may lead to additional action.*", ephemeral: true);
             }
         }
 
@@ -132,7 +210,7 @@ public class CommandHandler : ICommandHandler
 
             var typingState = command.Channel.EnterTypingState();
 
-            await command.RespondAsync($"Executing infrastructure health check... please wait.\n\n`CURRENT STATUS:`  Preparing for execution...");
+            await command.RespondAsync($"Executing infrastructure health check... please wait.\n\n`CURRENT STATUS:`  Preparing for execution...", ephemeral: true);
             await Logger.Log(LogSeverity.Verbose, $"[{command.GuildId}] ResponseSent", $"'Executing infrastructure health check... please wait.' in the {command.Channel.Name} channel.");
             await command.Channel.TriggerTypingAsync();
 
@@ -535,8 +613,6 @@ public class CommandHandler : ICommandHandler
                 $"> jxckthxripper#1389\n" +
                 $"> 1xs#0001\n" +
                 $"> lovelxrd#7895\n\n" +
-                $"__*Loaded Modules:*__\n" +
-                $"> Utilities Module - v{version}-alpha\n\n" +
                 $"`Built On:` {dateTime} UTC";
 #endif
 #if RELEASE
@@ -554,8 +630,6 @@ public class CommandHandler : ICommandHandler
                 $"> jxckthxripper#1389\n" +
                 $"> 1xs#0001\n" +
                 $"> lovelxrd#7895\n\n" +
-                $"__*Loaded Modules:*__\n" +
-                $"> Utilities Module - v{version}\n\n" +
                 $"`Built On:` {dateTime} UTC";
 #endif
 
@@ -578,7 +652,7 @@ public class CommandHandler : ICommandHandler
                 }
             };
 
-            await command.RespondAsync(embed: embedded.Build());
+            await command.RespondAsync(embed: embedded.Build(), ephemeral: true);
 
             await Logger.Log(LogSeverity.Verbose, $"[{command.GuildId}] ResponseSent", $"Application Version information sent to the {command.Channel.Name} channel.");
         }
@@ -1554,218 +1628,181 @@ public class CommandHandler : ICommandHandler
         switch (component.Data.CustomId)
         {
             case "abort":
-                if (component.User.Username == "Catalyst" && component.User.DiscriminatorValue == 7894)
-                {
-                    embed.Title = "Emergency Power Off";
-                    embed.Description = $"**Execution has been aborted.**";
-                    embed.Color = Color.DarkGrey;
+                await Logger.Log(LogSeverity.Verbose, $"[{component.GuildId}] AbortReceived", $"{component.User.Username}#{component.User.DiscriminatorValue} has aborted from the confirmation message.");
 
-                    await Logger.Log(LogSeverity.Verbose, $"[{component.GuildId}] AbortReceived", $"{component.User.Username}#{component.User.DiscriminatorValue} has aborted from the confirmation message.");
+                embed.Description = $"**Execution has been aborted.**";
+                embed.Color = Color.DarkGrey;
 
-                    await component.UpdateAsync(msg => msg.Embed = embed.Build());
-                    await component.ModifyOriginalResponseAsync(msg => msg.Components = new ComponentBuilder().WithButton("Proceed", "proceed", ButtonStyle.Success, disabled: true).WithButton("Abort", "abort", ButtonStyle.Danger, disabled: true).Build());
-                }
-                else
-                {
-                    await component.User.SendMessageAsync(":no_entry:  ***UNAUTHORIZED***  :no_entry:\n" +
-                    "You have attempted to execute a privledged command without propper permissions.\n\n" +
-                    "__**WARNING:**__  This incident has been logged!\n" +
-                    "*Further attempts to execute a privledged command without authorization may lead to additional action.*");
-                }
+                await component.UpdateAsync(msg => msg.Embed = embed.Build());
+                await component.ModifyOriginalResponseAsync(msg => msg.Components = new ComponentBuilder().WithButton("Proceed", "proceed", ButtonStyle.Success, disabled: true).WithButton("Abort", "abort", ButtonStyle.Danger, disabled: true).Build());
                 
                 break;
 
             case "proceed":
-                if (component.User.Username == "Catalyst" && component.User.DiscriminatorValue == 7894)
+                await Logger.Log(LogSeverity.Verbose, $"[{component.GuildId}] ConfirmationReceived", $"{component.User.Username}#{component.User.DiscriminatorValue} has confirmed from the confirmation message.");
+
+                embed.Description = "__**WARNING:**__ This command will `Shut Down` the Servers within the Enclosure!\n\n" +
+                    $"**Execution has started.**\n" +
+                    $"`STATUS:`  Parsing Required Information...";
+                embed.Color = Color.Blue;
+                await component.UpdateAsync(msg => msg.Embed = embed.Build());
+                await component.ModifyOriginalResponseAsync(msg => msg.Components = new ComponentBuilder().WithButton("Proceed", "proceed", ButtonStyle.Success, disabled: true).WithButton("Abort", "abort", ButtonStyle.Danger, disabled: true).Build());
+
+                var jsonString = await File.ReadAllTextAsync("appsettings.json");
+                var appSettings = JsonDocument.Parse(jsonString)!;
+
+                var keyVaultSettings = appSettings.RootElement.GetProperty("KeyVault").EnumerateObject();
+                var snmpSettings = appSettings.RootElement.GetProperty("SNMP").EnumerateObject();
+                var hardwareSettings = appSettings.RootElement.GetProperty("Hardware").EnumerateObject();
+                var powerSettings = appSettings.RootElement.GetProperty("PowerAlert").EnumerateObject();
+                await Logger.Log(LogSeverity.Debug, $"JSONImported", "JSON file has been successfully imported... Processing.");
+
+                string keyVault = keyVaultSettings
+                    .Where(onexs => onexs.Name == "KeyVaultName")
+                    .Select(onexs => onexs.Value)
+                    .FirstOrDefault()
+                    .ToString();
+
+                string azureADTennantId = keyVaultSettings
+                    .Where(ascended => ascended.Name == "AzureADTennantId")
+                    .Select(ascended => ascended.Value)
+                    .FirstOrDefault()
+                    .ToString();
+
+                string azureADClientId = keyVaultSettings
+                    .Where(goblino => goblino.Name == "AzureADClientId")
+                    .Select(goblino => goblino.Value)
+                    .FirstOrDefault()
+                    .ToString();
+
+                string azureADClientSecret = keyVaultSettings
+                    .Where(gremlin => gremlin.Name == "AzureADClientSecret")
+                    .Select(gremlin => gremlin.Value)
+                    .FirstOrDefault()
+                    .ToString();
+
+                string upsIPSecret = snmpSettings
+                    .Where(jannik => jannik.Name == "UPSIPAddress")
+                    .Select(jannik => jannik.Value)
+                    .FirstOrDefault()
+                    .ToString();
+
+                string powerUserInfo = powerSettings
+                    .Where(onexs => onexs.Name == "PowerUser")
+                    .Select(onexs => onexs.Value)
+                    .FirstOrDefault()
+                    .ToString();
+
+                string powerPassInfo = powerSettings
+                    .Where(catalyst => catalyst.Name == "PowerPass")
+                    .Select(catalyst => catalyst.Value)
+                    .FirstOrDefault()
+                    .ToString();
+
+                string hwDNS01 = hardwareSettings
+                    .Where(kijmix => kijmix.Name == "DNS01")
+                    .Select(kijmix => kijmix.Value)
+                    .FirstOrDefault()
+                    .ToString();
+
+                string hwDNS02 = hardwareSettings
+                    .Where(howly => howly.Name == "DNS02")
+                    .Select(howly => howly.Value)
+                    .FirstOrDefault()
+                    .ToString();
+
+                var secretClient = new SecretClient(new Uri($"https://{keyVault}.vault.azure.net"), new ClientSecretCredential(azureADTennantId, azureADClientId, azureADClientSecret));
+                await Logger.Log(LogSeverity.Debug, "SNMPSecretClientConfigured", $"Configured Azure Key Vault client to connect to {secretClient.VaultUri}.");
+
+                var upsIPAddress = secretClient.GetSecret(upsIPSecret);
+                await Logger.Log(LogSeverity.Debug, "SNMPAddressObtained", $"Successfully obtained SNMP Address from Azure Key Vault.");
+
+                var powerUser = secretClient.GetSecret(powerUserInfo);
+                await Logger.Log(LogSeverity.Debug, "UPSUserObtained", $"Successfully obtained UPS User from Azure Key Vault.");
+
+                var powerPass = secretClient.GetSecret(powerPassInfo);
+                await Logger.Log(LogSeverity.Debug, "UPSPassObtained", $"Successfully obtained UPS Pass from Azure Key Vault.");
+
+                var dns01 = secretClient.GetSecret(hwDNS01);
+                await Logger.Log(LogSeverity.Debug, "DNS01IPObtained", $"Successfully obtained DNS01 IP Address from Azure Key Vault.");
+
+                var dns02 = secretClient.GetSecret(hwDNS02);
+                await Logger.Log(LogSeverity.Debug, "DNS02IPObtained", $"Successfully obtained DNS02 IP Address from Azure Key Vault.");
+
+                var connectionInfo = new ConnectionInfo(dns01.Value.Value, powerUser.Value.Value,
+                    new PasswordAuthenticationMethod(powerUser.Value.Value, powerPass.Value.Value));
+
+                using (var sshClient = new SshClient(connectionInfo))
                 {
-                    await Logger.Log(LogSeverity.Verbose, $"[{component.GuildId}] ConfirmationReceived", $"{component.User.Username}#{component.User.DiscriminatorValue} has confirmed from the confirmation message.");
+                    embed.Color = Color.Gold;
                     embed.Description = "__**WARNING:**__ This command will `Shut Down` the Servers within the Enclosure!\n\n" +
                         $"**Execution has started.**\n" +
-                        $"`STATUS:`  Parsing Required Information...";
-                    embed.Title = "Emergency Power Off";
-                    embed.Color = Color.Red;
-                    await component.UpdateAsync(msg => msg.Embed = embed.Build());
-                    await component.ModifyOriginalResponseAsync(msg => msg.Components = new ComponentBuilder().WithButton("Proceed", "proceed", ButtonStyle.Success, disabled: true).WithButton("Abort", "abort", ButtonStyle.Danger, disabled: true).Build());
+                        $"`STATUS:`  Connecting to FINALIZER...  Server 1/2.";
+                    await component.ModifyOriginalResponseAsync(msg => msg.Embed = embed.Build());
 
-                    var jsonString = await File.ReadAllTextAsync("appsettings.json");
-                    var appSettings = JsonDocument.Parse(jsonString)!;
+                    sshClient.Connect();
+                    await Logger.Log(LogSeverity.Debug, "SSHClient", $"Successfully connected to FINALIZER.");
 
-                    var keyVaultSettings = appSettings.RootElement.GetProperty("KeyVault").EnumerateObject();
-                    var snmpSettings = appSettings.RootElement.GetProperty("SNMP").EnumerateObject();
-                    var hardwareSettings = appSettings.RootElement.GetProperty("Hardware").EnumerateObject();
-                    var powerSettings = appSettings.RootElement.GetProperty("PowerAlert").EnumerateObject();
-                    await Logger.Log(LogSeverity.Debug, $"JSONImported", "JSON file has been successfully imported... Processing.");
-
-                    string keyVault = keyVaultSettings
-                        .Where(onexs => onexs.Name == "KeyVaultName")
-                        .Select(onexs => onexs.Value)
-                        .FirstOrDefault()
-                        .ToString();
-
-                    string azureADTennantId = keyVaultSettings
-                        .Where(ascended => ascended.Name == "AzureADTennantId")
-                        .Select(ascended => ascended.Value)
-                        .FirstOrDefault()
-                        .ToString();
-
-                    string azureADClientId = keyVaultSettings
-                        .Where(goblino => goblino.Name == "AzureADClientId")
-                        .Select(goblino => goblino.Value)
-                        .FirstOrDefault()
-                        .ToString();
-
-                    string azureADClientSecret = keyVaultSettings
-                        .Where(gremlin => gremlin.Name == "AzureADClientSecret")
-                        .Select(gremlin => gremlin.Value)
-                        .FirstOrDefault()
-                        .ToString();
-
-                    string upsIPSecret = snmpSettings
-                        .Where(jannik => jannik.Name == "UPSIPAddress")
-                        .Select(jannik => jannik.Value)
-                        .FirstOrDefault()
-                        .ToString();
-
-                    string powerUserInfo = powerSettings
-                        .Where(onexs => onexs.Name == "PowerUser")
-                        .Select(onexs => onexs.Value)
-                        .FirstOrDefault()
-                        .ToString();
-
-                    string powerPassInfo = powerSettings
-                        .Where(catalyst => catalyst.Name == "PowerPass")
-                        .Select(catalyst => catalyst.Value)
-                        .FirstOrDefault()
-                        .ToString();
-
-                    string hwDNS01 = hardwareSettings
-                        .Where(kijmix => kijmix.Name == "DNS01")
-                        .Select(kijmix => kijmix.Value)
-                        .FirstOrDefault()
-                        .ToString();
-
-                    string hwDNS02 = hardwareSettings
-                        .Where(howly => howly.Name == "DNS02")
-                        .Select(howly => howly.Value)
-                        .FirstOrDefault()
-                        .ToString();
-
-                    var secretClient = new SecretClient(new Uri($"https://{keyVault}.vault.azure.net"), new ClientSecretCredential(azureADTennantId, azureADClientId, azureADClientSecret));
-                    await Logger.Log(LogSeverity.Debug, "SNMPSecretClientConfigured", $"Configured Azure Key Vault client to connect to {secretClient.VaultUri}.");
-
-                    var upsIPAddress = secretClient.GetSecret(upsIPSecret);
-                    await Logger.Log(LogSeverity.Debug, "SNMPAddressObtained", $"Successfully obtained SNMP Address from Azure Key Vault.");
-
-                    var powerUser = secretClient.GetSecret(powerUserInfo);
-                    await Logger.Log(LogSeverity.Debug, "UPSUserObtained", $"Successfully obtained UPS User from Azure Key Vault.");
-
-                    var powerPass = secretClient.GetSecret(powerPassInfo);
-                    await Logger.Log(LogSeverity.Debug, "UPSPassObtained", $"Successfully obtained UPS Pass from Azure Key Vault.");
-
-                    var dns01 = secretClient.GetSecret(hwDNS01);
-                    await Logger.Log(LogSeverity.Debug, "DNS01IPObtained", $"Successfully obtained DNS01 IP Address from Azure Key Vault.");
-
-                    var dns02 = secretClient.GetSecret(hwDNS02);
-                    await Logger.Log(LogSeverity.Debug, "DNS02IPObtained", $"Successfully obtained DNS02 IP Address from Azure Key Vault.");
-
-                    var connectionInfo = new ConnectionInfo(dns01.Value.Value, powerUser.Value.Value,
-                        new PasswordAuthenticationMethod(powerUser.Value.Value, powerPass.Value.Value));
-
-                    using (var sshClient = new SshClient(connectionInfo))
-                    {
-                        embed.Description = "__**WARNING:**__ This command will `Shut Down` the Servers within the Enclosure!\n\n" +
-                            $"**Execution has started.**\n" +
-                            $"`STATUS:`  Connecting to FINALIZER...  Server 1/2.";
-                        embed.Title = "Emergency Power Off";
-                        embed.Color = Color.Red;
-                        await component.UpdateAsync(msg => msg.Embed = embed.Build());
-                        await component.ModifyOriginalResponseAsync(msg => msg.Components = new ComponentBuilder().WithButton("Proceed", "proceed", ButtonStyle.Success, disabled: true).WithButton("Abort", "abort", ButtonStyle.Danger, disabled: true).Build());
-
-                        sshClient.Connect();
-                        await Logger.Log(LogSeverity.Debug, "SSHClient", $"Successfully connected to FINALIZER.");
-
-                        embed.Description = "__**WARNING:**__ This command will `Shut Down` the Servers within the Enclosure!\n\n" +
-                            $"**Execution has started.**\n" +
-                            $"`STATUS:`  Connected to FINALIZER.  Executing System Shutdown...  Server 1/2";
-                        embed.Title = "Emergency Power Off";
-                        embed.Color = Color.Red;
-                        await component.UpdateAsync(msg => msg.Embed = embed.Build());
-                        await component.ModifyOriginalResponseAsync(msg => msg.Components = new ComponentBuilder().WithButton("Proceed", "proceed", ButtonStyle.Success, disabled: true).WithButton("Abort", "abort", ButtonStyle.Danger, disabled: true).Build());
-
-                        var output = sshClient.RunCommand("shutdown /s /f /t 10");
-                        await Logger.Log(LogSeverity.Debug, "SSHClient", $"Executing shutdown /s /f /t 10 on FINALIZER.");
-
-                        embed.Description = "__**WARNING:**__ This command will `Shut Down` the Servers within the Enclosure!\n\n" +
-                            $"**Execution has started.**\n" +
-                            $"`STATUS:`  Disconnecting from FINALIZER...  Server 1/2";
-                        embed.Title = "Emergency Power Off";
-                        embed.Color = Color.Red;
-                        await component.UpdateAsync(msg => msg.Embed = embed.Build());
-                        await component.ModifyOriginalResponseAsync(msg => msg.Components = new ComponentBuilder().WithButton("Proceed", "proceed", ButtonStyle.Success, disabled: true).WithButton("Abort", "abort", ButtonStyle.Danger, disabled: true).Build());
-
-                        sshClient.Disconnect();
-                        sshClient.Dispose();
-                    }
-
-                    connectionInfo = new ConnectionInfo(dns02.Value.Value, powerUser.Value.Value,
-                        new PasswordAuthenticationMethod(powerUser.Value.Value, powerPass.Value.Value));
-
-                    using (var sshClient = new SshClient(connectionInfo))
-                    {
-                        embed.Description = "__**WARNING:**__ This command will `Shut Down` the Servers within the Enclosure!\n\n" +
-                            $"**Execution has started.**\n" +
-                            $"`STATUS:`  Connecting to DEVASTATOR...  Server 2/2.";
-                        embed.Title = "Emergency Power Off";
-                        embed.Color = Color.Red;
-                        await component.UpdateAsync(msg => msg.Embed = embed.Build());
-                        await component.ModifyOriginalResponseAsync(msg => msg.Components = new ComponentBuilder().WithButton("Proceed", "proceed", ButtonStyle.Success, disabled: true).WithButton("Abort", "abort", ButtonStyle.Danger, disabled: true).Build());
-
-                        sshClient.Connect();
-                        await Logger.Log(LogSeverity.Debug, "SSHClient", $"Successfully connected to DEVASTATOR.");
-
-                        embed.Description = "__**WARNING:**__ This command will `Shut Down` the Servers within the Enclosure!\n\n" +
-                            $"**Execution has started.**\n" +
-                            $"`STATUS:`  Connected to DEVASTATOR.  Executing System Shutdown...  Server 2/2";
-                        embed.Title = "Emergency Power Off";
-                        embed.Color = Color.Red;
-                        await component.UpdateAsync(msg => msg.Embed = embed.Build());
-                        await component.ModifyOriginalResponseAsync(msg => msg.Components = new ComponentBuilder().WithButton("Proceed", "proceed", ButtonStyle.Success, disabled: true).WithButton("Abort", "abort", ButtonStyle.Danger, disabled: true).Build());
-
-                        var output = sshClient.RunCommand("shutdown /s /f /t 10");
-                        await Logger.Log(LogSeverity.Debug, "SSHClient", $"Executing shutdown /s /f /t 10 on DEVASTATOR.");
-
-                        embed.Description = "__**WARNING:**__ This command will `Shut Down` the Servers within the Enclosure!\n\n" +
-                            $"**Execution has started.**\n" +
-                            $"`STATUS:`  Disconnecting from DEVASTATOR...  Server 2/2";
-                        embed.Title = "Emergency Power Off";
-                        embed.Color = Color.Red;
-                        await component.UpdateAsync(msg => msg.Embed = embed.Build());
-                        await component.ModifyOriginalResponseAsync(msg => msg.Components = new ComponentBuilder().WithButton("Proceed", "proceed", ButtonStyle.Success, disabled: true).WithButton("Abort", "abort", ButtonStyle.Danger, disabled: true).Build());
-
-                        sshClient.Disconnect();
-                        sshClient.Dispose();
-                    }
-
+                    embed.Color = Color.Orange;
                     embed.Description = "__**WARNING:**__ This command will `Shut Down` the Servers within the Enclosure!\n\n" +
-                            $"**Execution has completed.**\n" +
-                            $":skull_crossbones:  Goodbye cruel world.  I will remain offline until activated again.  :skull_crossbones: ";
-                    await component.UpdateAsync(msg => msg.Embed = embed.Build());
-                
-                    await Logger.Log(LogSeverity.Debug, "EPOComplete", $"EPO has completed.");
+                        $"**Execution has started.**\n" +
+                        $"`STATUS:`  Connected to FINALIZER.  Executing System Shutdown...  Server 1/2";
+                    await component.ModifyOriginalResponseAsync(msg => msg.Embed = embed.Build());
 
-                    embed.Title = "Emergency Power Off";
-                    embed.Color = Color.Red;
-                    await component.UpdateAsync(msg => msg.Embed = embed.Build());
-                    await component.ModifyOriginalResponseAsync(msg => msg.Components = new ComponentBuilder().WithButton("Proceed", "proceed", ButtonStyle.Success, disabled: true).WithButton("Abort", "abort", ButtonStyle.Danger, disabled: true).Build());
+                    var output = sshClient.RunCommand("shutdown /s /f /t 10");
+                    await Logger.Log(LogSeverity.Debug, "SSHClient", $"Executing shutdown /s /f /t 10 on FINALIZER.");
+
+                    embed.Color = Color.Purple;
+                    embed.Description = "__**WARNING:**__ This command will `Shut Down` the Servers within the Enclosure!\n\n" +
+                        $"**Execution has started.**\n" +
+                        $"`STATUS:`  Disconnecting from FINALIZER...  Server 1/2";
+                    await component.ModifyOriginalResponseAsync(msg => msg.Embed = embed.Build());
+
+                    sshClient.Disconnect();
+                    sshClient.Dispose();
                 }
-                else
+
+                connectionInfo = new ConnectionInfo(dns02.Value.Value, powerUser.Value.Value,
+                    new PasswordAuthenticationMethod(powerUser.Value.Value, powerPass.Value.Value));
+
+                using (var sshClient = new SshClient(connectionInfo))
                 {
-                    await component.User.SendMessageAsync(":no_entry:  ***UNAUTHORIZED***  :no_entry:\n" +
-                    "You have attempted to execute a privledged command without propper permissions.\n\n" +
-                    "__**WARNING:**__  This incident has been logged!\n" +
-                    "*Further attempts to execute a privledged command without authorization may lead to additional action.*");
+                    embed.Color = Color.Gold;
+                    embed.Description = "__**WARNING:**__ This command will `Shut Down` the Servers within the Enclosure!\n\n" +
+                        $"**Execution has started.**\n" +
+                        $"`STATUS:`  Connecting to DEVASTATOR...  Server 2/2.";
+                    await component.ModifyOriginalResponseAsync(msg => msg.Embed = embed.Build());
+
+                    sshClient.Connect();
+                    await Logger.Log(LogSeverity.Debug, "SSHClient", $"Successfully connected to DEVASTATOR.");
+
+                    embed.Color = Color.Orange;
+                    embed.Description = "__**WARNING:**__ This command will `Shut Down` the Servers within the Enclosure!\n\n" +
+                        $"**Execution has started.**\n" +
+                        $"`STATUS:`  Connected to DEVASTATOR.  Executing System Shutdown...  Server 2/2";
+                    await component.ModifyOriginalResponseAsync(msg => msg.Embed = embed.Build());
+
+                    var output = sshClient.RunCommand("shutdown /s /f /t 10");
+                    await Logger.Log(LogSeverity.Debug, "SSHClient", $"Executing shutdown /s /f /t 10 on DEVASTATOR.");
+
+                    embed.Color = Color.Purple;
+                    embed.Description = "__**WARNING:**__ This command will `Shut Down` the Servers within the Enclosure!\n\n" +
+                        $"**Execution has started.**\n" +
+                        $"`STATUS:`  Disconnecting from DEVASTATOR...  Server 2/2";
+                    await component.ModifyOriginalResponseAsync(msg => msg.Embed = embed.Build());
+
+                    sshClient.Disconnect();
+                    sshClient.Dispose();
                 }
-                break;
+
+                embed.Color = Color.Red;
+                embed.Description = "__**WARNING:**__ This command will `Shut Down` the Servers within the Enclosure!\n\n" +
+                        $"**Execution has completed.**\n" +
+                        $":skull_crossbones:  Goodbye cruel world.  I will remain offline until activated again.  :skull_crossbones: ";
+                await component.ModifyOriginalResponseAsync(msg => msg.Embed = embed.Build());
+
+                await Logger.Log(LogSeverity.Debug, "EPOComplete", $"EPO has completed.");
+            break;
         }
     }
 }
