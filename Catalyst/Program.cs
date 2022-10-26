@@ -219,7 +219,7 @@ async Task MainAsync()
         .Build();
     //End About Module
 
-    //Start Build Module
+    //Start Utility Module
     var hc = new SlashCommandBuilder()
         .WithName("health")
         .WithDescription("Check the health of the bot")
@@ -229,7 +229,12 @@ async Task MainAsync()
         .WithName("emergency_power_off")
         .WithDescription("Emergency Power Off")
         .Build();
-    //End Build Module
+
+    var tacticore_latest_log = new SlashCommandBuilder()
+        .WithName("tacticore_latest_log")
+        .WithDescription("Get the latest logs from TacticoreMC")
+        .Build();
+    //End Utility Module
 
     client.ShardReady += async shard =>
     {
@@ -262,6 +267,9 @@ async Task MainAsync()
 
         await shard.CreateGlobalApplicationCommandAsync(epo);
         await Logger.Log(LogSeverity.Info, "CMDBuilt", $"Slash Command {epo.Name} is built and ready!");
+
+        await shard.CreateGlobalApplicationCommandAsync(tacticore_latest_log);
+        await Logger.Log(LogSeverity.Info, "CMDBuilt", $"Slash Command {tacticore_latest_log.Name} is built and ready!");
 
         await Logger.Log(LogSeverity.Info, "ShardReady", $"Shard Number {shard.ShardId} is connected and ready!");
     };
