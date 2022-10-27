@@ -118,7 +118,7 @@ public class CommandHandler : ICommandHandler
                     .ToString();
 
                 string powerUserInfo = powerSettings
-                    .Where(onexs => onexs.Name == "PowerUser")
+                    .Where(onexs => onexs.Name == "MinecraftUser")
                     .Select(onexs => onexs.Value)
                     .FirstOrDefault()
                     .ToString();
@@ -130,7 +130,7 @@ public class CommandHandler : ICommandHandler
                     .ToString();
 
                 string hwDNS01 = hardwareSettings
-                    .Where(kijmix => kijmix.Name == "DNS01")
+                    .Where(kijmix => kijmix.Name == "MinecraftHost")
                     .Select(kijmix => kijmix.Value)
                     .FirstOrDefault()
                     .ToString();
@@ -153,7 +153,7 @@ public class CommandHandler : ICommandHandler
                 using var sftpClient = new SftpClient(connectionInfo);
 
                 sftpClient.Connect();
-                Stream latestLog = sftpClient.OpenRead("/D:/Minecraft Server/Java/logs/latest.log");
+                Stream latestLog = sftpClient.OpenRead("/opt/mscs/worlds/tacticore/logs/latest.log");
 
                 await command.RespondWithFileAsync(latestLog, "latest.log", ephemeral: true);
                 sftpClient.Disconnect();
