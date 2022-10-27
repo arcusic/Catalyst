@@ -82,6 +82,7 @@ public class CommandHandler : ICommandHandler
     {
         if (command.Data.Name == "tacticore_latest_log")
         {
+            await command.DeferAsync();
             var jsonString = await File.ReadAllTextAsync("appsettings.json");
             var appSettings = JsonDocument.Parse(jsonString)!;
 
