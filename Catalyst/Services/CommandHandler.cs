@@ -86,77 +86,78 @@ public class CommandHandler : ICommandHandler
             var jsonString = await File.ReadAllTextAsync("appsettings.json");
             var appSettings = JsonDocument.Parse(jsonString)!;
 
-            var keyVaultSettings = appSettings.RootElement.GetProperty("KeyVault").EnumerateObject();
-            var snmpSettings = appSettings.RootElement.GetProperty("SNMP").EnumerateObject();
-            var hardwareSettings = appSettings.RootElement.GetProperty("Hardware").EnumerateObject();
-            var powerSettings = appSettings.RootElement.GetProperty("PowerAlert").EnumerateObject();
-            await Logger.Log(LogSeverity.Debug, $"JSONImported", "JSON file has been successfully imported... Processing.");
+                var keyVaultSettings = appSettings.RootElement.GetProperty("KeyVault").EnumerateObject();
+                var snmpSettings = appSettings.RootElement.GetProperty("SNMP").EnumerateObject();
+                var hardwareSettings = appSettings.RootElement.GetProperty("Hardware").EnumerateObject();
+                var powerSettings = appSettings.RootElement.GetProperty("PowerAlert").EnumerateObject();
+                await Logger.Log(LogSeverity.Debug, $"JSONImported", "JSON file has been successfully imported... Processing.");
 
-            string keyVault = keyVaultSettings
-                .Where(onexs => onexs.Name == "KeyVaultName")
-                .Select(onexs => onexs.Value)
-                .FirstOrDefault()
-                .ToString();
+                string keyVault = keyVaultSettings
+                    .Where(onexs => onexs.Name == "KeyVaultName")
+                    .Select(onexs => onexs.Value)
+                    .FirstOrDefault()
+                    .ToString();
 
-            string azureADTennantId = keyVaultSettings
-                .Where(ascended => ascended.Name == "AzureADTennantId")
-                .Select(ascended => ascended.Value)
-                .FirstOrDefault()
-                .ToString();
+                string azureADTennantId = keyVaultSettings
+                    .Where(ascended => ascended.Name == "AzureADTennantId")
+                    .Select(ascended => ascended.Value)
+                    .FirstOrDefault()
+                    .ToString();
 
-            string azureADClientId = keyVaultSettings
-                .Where(goblino => goblino.Name == "AzureADClientId")
-                .Select(goblino => goblino.Value)
-                .FirstOrDefault()
-                .ToString();
+                string azureADClientId = keyVaultSettings
+                    .Where(goblino => goblino.Name == "AzureADClientId")
+                    .Select(goblino => goblino.Value)
+                    .FirstOrDefault()
+                    .ToString();
 
-            string azureADClientSecret = keyVaultSettings
-                .Where(gremlin => gremlin.Name == "AzureADClientSecret")
-                .Select(gremlin => gremlin.Value)
-                .FirstOrDefault()
-                .ToString();
+                string azureADClientSecret = keyVaultSettings
+                    .Where(gremlin => gremlin.Name == "AzureADClientSecret")
+                    .Select(gremlin => gremlin.Value)
+                    .FirstOrDefault()
+                    .ToString();
 
-            string powerUserInfo = powerSettings
-                .Where(onexs => onexs.Name == "PowerUser")
-                .Select(onexs => onexs.Value)
-                .FirstOrDefault()
-                .ToString();
+                string powerUserInfo = powerSettings
+                    .Where(onexs => onexs.Name == "MinecraftUser")
+                    .Select(onexs => onexs.Value)
+                    .FirstOrDefault()
+                    .ToString();
 
-            string powerPassInfo = powerSettings
-                .Where(catalyst => catalyst.Name == "PowerPass")
-                .Select(catalyst => catalyst.Value)
-                .FirstOrDefault()
-                .ToString();
+                string powerPassInfo = powerSettings
+                    .Where(catalyst => catalyst.Name == "PowerPass")
+                    .Select(catalyst => catalyst.Value)
+                    .FirstOrDefault()
+                    .ToString();
 
-            string hwDNS01 = hardwareSettings
-                .Where(kijmix => kijmix.Name == "DNS01")
-                .Select(kijmix => kijmix.Value)
-                .FirstOrDefault()
-                .ToString();
+                string hwDNS01 = hardwareSettings
+                    .Where(kijmix => kijmix.Name == "MinecraftHost")
+                    .Select(kijmix => kijmix.Value)
+                    .FirstOrDefault()
+                    .ToString();
 
-            var secretClient = new SecretClient(new Uri($"https://{keyVault}.vault.azure.net"), new ClientSecretCredential(azureADTennantId, azureADClientId, azureADClientSecret));
-            await Logger.Log(LogSeverity.Debug, "SNMPSecretClientConfigured", $"Configured Azure Key Vault client to connect to {secretClient.VaultUri}.");
+                var secretClient = new SecretClient(new Uri($"https://{keyVault}.vault.azure.net"), new ClientSecretCredential(azureADTennantId, azureADClientId, azureADClientSecret));
+                await Logger.Log(LogSeverity.Debug, "SNMPSecretClientConfigured", $"Configured Azure Key Vault client to connect to {secretClient.VaultUri}.");
 
-            var powerUser = secretClient.GetSecret(powerUserInfo);
-            await Logger.Log(LogSeverity.Debug, "UPSUserObtained", $"Successfully obtained UPS User from Azure Key Vault.");
+                var powerUser = secretClient.GetSecret(powerUserInfo);
+                await Logger.Log(LogSeverity.Debug, "UPSUserObtained", $"Successfully obtained UPS User from Azure Key Vault.");
 
-            var powerPass = secretClient.GetSecret(powerPassInfo);
-            await Logger.Log(LogSeverity.Debug, "UPSPassObtained", $"Successfully obtained UPS Pass from Azure Key Vault.");
+                var powerPass = secretClient.GetSecret(powerPassInfo);
+                await Logger.Log(LogSeverity.Debug, "UPSPassObtained", $"Successfully obtained UPS Pass from Azure Key Vault.");
 
-            var dns01 = secretClient.GetSecret(hwDNS01);
-            await Logger.Log(LogSeverity.Debug, "DNS01IPObtained", $"Successfully obtained DNS01 IP Address from Azure Key Vault.");
+                var dns01 = secretClient.GetSecret(hwDNS01);
+                await Logger.Log(LogSeverity.Debug, "DNS01IPObtained", $"Successfully obtained DNS01 IP Address from Azure Key Vault.");
 
-            var connectionInfo = new ConnectionInfo(dns01.Value.Value, powerUser.Value.Value,
-                new PasswordAuthenticationMethod(powerUser.Value.Value, powerPass.Value.Value));
+                var connectionInfo = new ConnectionInfo(dns01.Value.Value, powerUser.Value.Value,
+                    new PasswordAuthenticationMethod(powerUser.Value.Value, powerPass.Value.Value));
 
-            using var sftpClient = new SftpClient(connectionInfo);
+                using var sftpClient = new SftpClient(connectionInfo);
 
-            sftpClient.Connect();
-            Stream latestLog = sftpClient.OpenRead("/D:/Minecraft Server/Java/logs/latest.log");
+                sftpClient.Connect();
+                Stream latestLog = sftpClient.OpenRead("/opt/mscs/worlds/tacticore/logs/latest.log");
 
-            await command.RespondWithFileAsync(latestLog, "latest.log", ephemeral: true);
-            sftpClient.Disconnect();
-            sftpClient.Dispose();
+                await command.RespondWithFileAsync(latestLog, "latest.log", ephemeral: true);
+                sftpClient.Disconnect();
+                sftpClient.Dispose();
+            }
         }
 
         if (command.Data.Name == "emergency_power_off")
@@ -167,7 +168,7 @@ public class CommandHandler : ICommandHandler
 
             await Logger.Log(LogSeverity.Verbose, $"[{command.GuildId}] CommandReceived", $"{command.User.Username}#{command.User.DiscriminatorValue} has invoked {command.CommandName} from the {command.Channel.Name} channel.");
 
-            if (command.User.Username == "Catalyst" && command.User.DiscriminatorValue == 7894)
+            if (command.User.Id == 162600879948562432)
             {
                 await command.Channel.TriggerTypingAsync();
 
