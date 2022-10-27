@@ -157,7 +157,6 @@ public class CommandHandler : ICommandHandler
                 await command.RespondWithFileAsync(latestLog, "latest.log", ephemeral: true);
                 sftpClient.Disconnect();
                 sftpClient.Dispose();
-            }
         }
 
         if (command.Data.Name == "emergency_power_off")
