@@ -82,10 +82,9 @@ public class CommandHandler : ICommandHandler
     {
         if (command.Data.Name == "tacticore_latest_log")
         {
-            if (command.User.Id == 162600879948562432 || command.User.Id == 135696547722559488)
-            {
-                var jsonString = await File.ReadAllTextAsync("appsettings.json");
-                var appSettings = JsonDocument.Parse(jsonString)!;
+            await command.DeferAsync();
+            var jsonString = await File.ReadAllTextAsync("appsettings.json");
+            var appSettings = JsonDocument.Parse(jsonString)!;
 
                 var keyVaultSettings = appSettings.RootElement.GetProperty("KeyVault").EnumerateObject();
                 var snmpSettings = appSettings.RootElement.GetProperty("SNMP").EnumerateObject();
@@ -158,7 +157,6 @@ public class CommandHandler : ICommandHandler
                 await command.RespondWithFileAsync(latestLog, "latest.log", ephemeral: true);
                 sftpClient.Disconnect();
                 sftpClient.Dispose();
-            }
         }
 
         if (command.Data.Name == "emergency_power_off")
