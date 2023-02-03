@@ -82,7 +82,7 @@ public class CommandHandler : ICommandHandler
     {
         if (command.Data.Name == "tacticore_latest_log")
         {
-            if (command.User.Id == 162600879948562432 || command.User.Id == 135696547722559488)
+            if (command.User.Id == 162600879948562432 || command.User.Id == 135696547722559488 || command.User.Id == 213308514385395712)
             {
                 var jsonString = await File.ReadAllTextAsync("appsettings.json");
                 var appSettings = JsonDocument.Parse(jsonString)!;
