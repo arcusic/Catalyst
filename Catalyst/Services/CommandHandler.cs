@@ -153,7 +153,7 @@ public class CommandHandler : ICommandHandler
                 using var sftpClient = new SftpClient(connectionInfo);
 
                 sftpClient.Connect();
-                Stream latestLog = sftpClient.OpenRead("/opt/mscs/worlds/tacticore/logs/latest.log");
+                Stream latestLog = sftpClient.OpenRead("/opt/mscs/worlds/tacticraft/logs/latest.log");
 
                 await command.RespondWithFileAsync(latestLog, "latest.log", ephemeral: true);
                 sftpClient.Disconnect();
