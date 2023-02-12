@@ -238,6 +238,11 @@ async Task MainAsync()
     var tacticraft_whitelist = new SlashCommandBuilder()
         .WithName("tacticraft_whitelist")
         .WithDescription("Whitelist Account for Tacticraft")
+        .AddOption(new SlashCommandOptionBuilder()
+            .WithName("minecraft_username")
+            .WithDescription("Minecraft Username")
+            .WithRequired(true)
+            .WithType(ApplicationCommandOptionType.String))
         .Build();
     //End Utility Module
 
