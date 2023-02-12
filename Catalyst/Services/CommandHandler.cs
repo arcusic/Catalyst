@@ -80,7 +80,7 @@ public class CommandHandler : ICommandHandler
 
     public async Task SlashCommandHandler(SocketSlashCommand command)
     {
-        if (command.Data.Name == "tacticore_latest_log")
+        if (command.Data.Name == "tacticraft_latest_log")
         {
             if (command.User.Id == 162600879948562432 || command.User.Id == 135696547722559488 || command.User.Id == 213308514385395712)
             {
