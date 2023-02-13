@@ -230,9 +230,19 @@ async Task MainAsync()
         .WithDescription("Emergency Power Off")
         .Build();
 
-    var tacticore_latest_log = new SlashCommandBuilder()
-        .WithName("tacticore_latest_log")
-        .WithDescription("Get the latest logs from TacticoreMC")
+    var tacticraft_latest_log = new SlashCommandBuilder()
+        .WithName("tacticraft_latest_log")
+        .WithDescription("Get the latest logs from Tacticraft")
+        .Build();
+
+    var tacticraft_whitelist = new SlashCommandBuilder()
+        .WithName("tacticraft_whitelist")
+        .WithDescription("Whitelist Account for Tacticraft")
+        .AddOption(new SlashCommandOptionBuilder()
+            .WithName("minecraft_username")
+            .WithDescription("Minecraft Username")
+            .WithRequired(true)
+            .WithType(ApplicationCommandOptionType.String))
         .Build();
     //End Utility Module
 
@@ -268,8 +278,11 @@ async Task MainAsync()
         await shard.CreateGlobalApplicationCommandAsync(epo);
         await Logger.Log(LogSeverity.Info, "CMDBuilt", $"Slash Command {epo.Name} is built and ready!");
 
-        await shard.CreateGlobalApplicationCommandAsync(tacticore_latest_log);
-        await Logger.Log(LogSeverity.Info, "CMDBuilt", $"Slash Command {tacticore_latest_log.Name} is built and ready!");
+        await shard.CreateGlobalApplicationCommandAsync(tacticraft_latest_log);
+        await Logger.Log(LogSeverity.Info, "CMDBuilt", $"Slash Command {tacticraft_latest_log.Name} is built and ready!");
+
+        await shard.CreateGlobalApplicationCommandAsync(tacticraft_whitelist);
+        await Logger.Log(LogSeverity.Info, "CMDBuilt", $"Slash Command {tacticraft_whitelist.Name} is built and ready!");
 
         await Logger.Log(LogSeverity.Info, "ShardReady", $"Shard Number {shard.ShardId} is connected and ready!");
     };
