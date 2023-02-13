@@ -1817,6 +1817,10 @@ public class CommandHandler : ICommandHandler
                             $"You can connect to Tacticraft by using `tacticraft.app` as the Server Address.\n" +
                             $"A world map is available at https://tacticraft.app";
                         await component.ModifyOriginalResponseAsync(msg => msg.Embed = embed.Build());
+
+                        var channel = _client.GetChannel(996886356934533260) as IMessageChannel;
+                        await channel.SendMessageAsync($"I have added {component.User.Username}#{component.User.DiscriminatorValue} - `MC Username: {mcUsersplit[1]}` to the Tacticraft Whitelist.\n\n" +
+                            $"Command Output:\n```{output.Result}```");
                     }
                 }
 
