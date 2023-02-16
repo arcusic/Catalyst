@@ -17,6 +17,8 @@ using System.Text.Json;
 using System.Text;
 using Renci.SshNet;
 using Azure;
+using System.Linq;
+using Lextm.SharpSnmpLib.Security;
 
 namespace Catalyst.Services;
 
@@ -1697,130 +1699,159 @@ public class CommandHandler : ICommandHandler
 
                 if (component.GuildId == 994625404243546292)
                 {
-                    embed.Description = "__**WARNING:**__ Server Logs on Tacticraft are monitored.\n\n" +
-                    "Griefing is not tolerated on Tacticraft and will result in your access to the server being revoked.\n\n" +
-                    "By clicking `I Agree` below, you are acknowledging and agreeing to this policy.\n\n" +
-                    $"**Execution has started.**\n" +
-                    $"`STATUS:`  Parsing Required Information...";
-                    embed.Color = Color.Blue;
-                    await component.UpdateAsync(msg => msg.Embed = embed.Build());
-                    await component.ModifyOriginalResponseAsync(msg => msg.Components = new ComponentBuilder().WithButton("Proceed", "proceed", ButtonStyle.Success, disabled: true).WithButton("Abort", "abort", ButtonStyle.Danger, disabled: true).Build());
-
-                    var jsonStringmc = await File.ReadAllTextAsync("appsettings.json");
-                    var appSettingsmc = JsonDocument.Parse(jsonStringmc)!;
-
-                    var keyVaultSettingsmc = appSettingsmc.RootElement.GetProperty("KeyVault").EnumerateObject();
-                    var snmpSettingsmc = appSettingsmc.RootElement.GetProperty("SNMP").EnumerateObject();
-                    var hardwareSettingsmc = appSettingsmc.RootElement.GetProperty("Hardware").EnumerateObject();
-                    var powerSettingsmc = appSettingsmc.RootElement.GetProperty("PowerAlert").EnumerateObject();
-                    await Logger.Log(LogSeverity.Debug, $"JSONImported", "JSON file has been successfully imported... Processing.");
-
-                    string keyVaultmc = keyVaultSettingsmc
-                        .Where(onexs => onexs.Name == "KeyVaultName")
-                        .Select(onexs => onexs.Value)
-                        .FirstOrDefault()
-                        .ToString();
-
-                    string azureADTennantIdmc = keyVaultSettingsmc
-                        .Where(ascended => ascended.Name == "AzureADTennantId")
-                        .Select(ascended => ascended.Value)
-                        .FirstOrDefault()
-                        .ToString();
-
-                    string azureADClientIdmc = keyVaultSettingsmc
-                        .Where(goblino => goblino.Name == "AzureADClientId")
-                        .Select(goblino => goblino.Value)
-                        .FirstOrDefault()
-                        .ToString();
-
-                    string azureADClientSecretmc = keyVaultSettingsmc
-                        .Where(gremlin => gremlin.Name == "AzureADClientSecret")
-                        .Select(gremlin => gremlin.Value)
-                        .FirstOrDefault()
-                        .ToString();
-
-                    string powerUserInfomc = powerSettingsmc
-                        .Where(onexs => onexs.Name == "MinecraftUser")
-                        .Select(onexs => onexs.Value)
-                        .FirstOrDefault()
-                        .ToString();
-
-                    string powerPassInfomc = powerSettingsmc
-                        .Where(catalyst => catalyst.Name == "PowerPass")
-                        .Select(catalyst => catalyst.Value)
-                        .FirstOrDefault()
-                        .ToString();
-
-                    string hwDNS01mc = hardwareSettingsmc
-                        .Where(kijmix => kijmix.Name == "MinecraftHost")
-                        .Select(kijmix => kijmix.Value)
-                        .FirstOrDefault()
-                        .ToString();
-
-                    var secretClientmc = new SecretClient(new Uri($"https://{keyVaultmc}.vault.azure.net"), new ClientSecretCredential(azureADTennantIdmc, azureADClientIdmc, azureADClientSecretmc));
-                    await Logger.Log(LogSeverity.Debug, "SNMPSecretClientConfigured", $"Configured Azure Key Vault client to connect to {secretClientmc.VaultUri}.");
-
-                    var powerUsermc = secretClientmc.GetSecret(powerUserInfomc);
-                    await Logger.Log(LogSeverity.Debug, "UPSUserObtained", $"Successfully obtained UPS User from Azure Key Vault.");
-
-                    var powerPassmc = secretClientmc.GetSecret(powerPassInfomc);
-                    await Logger.Log(LogSeverity.Debug, "UPSPassObtained", $"Successfully obtained UPS Pass from Azure Key Vault.");
-
-                    var dns01mc = secretClientmc.GetSecret(hwDNS01mc);
-                    await Logger.Log(LogSeverity.Debug, "DNS01IPObtained", $"Successfully obtained DNS01 IP Address from Azure Key Vault.");
-
+                    var guild = _client.GetGuild(994625404243546292);
+                    var role = guild.GetRole(1075576019152547942);
+                    var user = _client.GetUser(component.User.Id);
+                    var channel = _client.GetChannel(996886356934533260) as IMessageChannel;
                     string[] mcUsersplit = mcUser.Split(" - ");
 
-                    var connectionInfomc = new ConnectionInfo(dns01mc.Value.Value, powerUsermc.Value.Value,
-                        new PasswordAuthenticationMethod(powerUsermc.Value.Value, powerPassmc.Value.Value));
+                    var roleMember = role.Members.Where(rm => rm.Id == user.Id).FirstOrDefault();
 
-                    using (var sshClient = new SshClient(connectionInfomc))
+                    if (roleMember == null)
                     {
-                        embed.Color = Color.Gold;
+                        embed.Description = "__**WARNING:**__ Server Logs on Tacticraft are monitored.\n\n" +
+                        "Griefing is not tolerated on Tacticraft and will result in your access to the server being revoked.\n\n" +
+                        "By clicking `I Agree` below, you are acknowledging and agreeing to this policy.\n\n" +
+                        $"**Execution has started.**\n" +
+                        $"`STATUS:`  Parsing Required Information...";
+                        embed.Color = Color.Blue;
+                        await component.UpdateAsync(msg => msg.Embed = embed.Build());
+                        await component.ModifyOriginalResponseAsync(msg => msg.Components = new ComponentBuilder().WithButton("Proceed", "proceed", ButtonStyle.Success, disabled: true).WithButton("Abort", "abort", ButtonStyle.Danger, disabled: true).Build());
+
+                        var jsonStringmc = await File.ReadAllTextAsync("appsettings.json");
+                        var appSettingsmc = JsonDocument.Parse(jsonStringmc)!;
+
+                        var keyVaultSettingsmc = appSettingsmc.RootElement.GetProperty("KeyVault").EnumerateObject();
+                        var snmpSettingsmc = appSettingsmc.RootElement.GetProperty("SNMP").EnumerateObject();
+                        var hardwareSettingsmc = appSettingsmc.RootElement.GetProperty("Hardware").EnumerateObject();
+                        var powerSettingsmc = appSettingsmc.RootElement.GetProperty("PowerAlert").EnumerateObject();
+                        await Logger.Log(LogSeverity.Debug, $"JSONImported", "JSON file has been successfully imported... Processing.");
+
+                        string keyVaultmc = keyVaultSettingsmc
+                            .Where(onexs => onexs.Name == "KeyVaultName")
+                            .Select(onexs => onexs.Value)
+                            .FirstOrDefault()
+                            .ToString();
+
+                        string azureADTennantIdmc = keyVaultSettingsmc
+                            .Where(ascended => ascended.Name == "AzureADTennantId")
+                            .Select(ascended => ascended.Value)
+                            .FirstOrDefault()
+                            .ToString();
+
+                        string azureADClientIdmc = keyVaultSettingsmc
+                            .Where(goblino => goblino.Name == "AzureADClientId")
+                            .Select(goblino => goblino.Value)
+                            .FirstOrDefault()
+                            .ToString();
+
+                        string azureADClientSecretmc = keyVaultSettingsmc
+                            .Where(gremlin => gremlin.Name == "AzureADClientSecret")
+                            .Select(gremlin => gremlin.Value)
+                            .FirstOrDefault()
+                            .ToString();
+
+                        string powerUserInfomc = powerSettingsmc
+                            .Where(onexs => onexs.Name == "MinecraftUser")
+                            .Select(onexs => onexs.Value)
+                            .FirstOrDefault()
+                            .ToString();
+
+                        string powerPassInfomc = powerSettingsmc
+                            .Where(catalyst => catalyst.Name == "PowerPass")
+                            .Select(catalyst => catalyst.Value)
+                            .FirstOrDefault()
+                            .ToString();
+
+                        string hwDNS01mc = hardwareSettingsmc
+                            .Where(kijmix => kijmix.Name == "MinecraftHost")
+                            .Select(kijmix => kijmix.Value)
+                            .FirstOrDefault()
+                            .ToString();
+
+                        var secretClientmc = new SecretClient(new Uri($"https://{keyVaultmc}.vault.azure.net"), new ClientSecretCredential(azureADTennantIdmc, azureADClientIdmc, azureADClientSecretmc));
+                        await Logger.Log(LogSeverity.Debug, "SNMPSecretClientConfigured", $"Configured Azure Key Vault client to connect to {secretClientmc.VaultUri}.");
+
+                        var powerUsermc = secretClientmc.GetSecret(powerUserInfomc);
+                        await Logger.Log(LogSeverity.Debug, "UPSUserObtained", $"Successfully obtained UPS User from Azure Key Vault.");
+
+                        var powerPassmc = secretClientmc.GetSecret(powerPassInfomc);
+                        await Logger.Log(LogSeverity.Debug, "UPSPassObtained", $"Successfully obtained UPS Pass from Azure Key Vault.");
+
+                        var dns01mc = secretClientmc.GetSecret(hwDNS01mc);
+                        await Logger.Log(LogSeverity.Debug, "DNS01IPObtained", $"Successfully obtained DNS01 IP Address from Azure Key Vault.");
+
+                        var connectionInfomc = new ConnectionInfo(dns01mc.Value.Value, powerUsermc.Value.Value,
+                            new PasswordAuthenticationMethod(powerUsermc.Value.Value, powerPassmc.Value.Value));
+
+                        using (var sshClient = new SshClient(connectionInfomc))
+                        {
+                            embed.Color = Color.Gold;
+                            embed.Description = "__**WARNING:**__ Server Logs on Tacticraft are monitored.\n\n" +
+                                "Griefing is not tolerated on Tacticraft and will result in your access to the server being revoked.\n\n" +
+                                "By clicking `I Agree` below, you are acknowledging and agreeing to this policy.\n\n" +
+                                $"**Execution has started.**\n" +
+                                $"`STATUS:`  Connecting to TACTICRAFT...";
+                            await component.ModifyOriginalResponseAsync(msg => msg.Embed = embed.Build());
+
+                            sshClient.Connect();
+                            await Logger.Log(LogSeverity.Debug, "SSHClient", $"Successfully connected to FINALIZER.");
+
+                            embed.Color = Color.Orange;
+                            embed.Description = "__**WARNING:**__ Server Logs on Tacticraft are monitored.\n\n" +
+                                "Griefing is not tolerated on Tacticraft and will result in your access to the server being revoked.\n\n" +
+                                "By clicking `I Agree` below, you are acknowledging and agreeing to this policy.\n\n" +
+                                $"**Execution has started.**\n" +
+                                $"`STATUS:`  Connected to TACTICRAFT.  Whitelisting in progress...";
+                            await component.ModifyOriginalResponseAsync(msg => msg.Embed = embed.Build());
+
+                            var output = sshClient.RunCommand($"mscs send tacticraft whitelist add {mcUsersplit[1]}");
+                            await Logger.Log(LogSeverity.Debug, "SSHClient", $"mscs send tacticraft whitelist add {mcUsersplit[1]} on JUMPBOX.");
+
+                            embed.Color = Color.Purple;
+                            embed.Description = "__**WARNING:**__ Server Logs on Tacticraft are monitored.\n\n" +
+                                "Griefing is not tolerated on Tacticraft and will result in your access to the server being revoked.\n\n" +
+                                "By clicking `I Agree` below, you are acknowledging and agreeing to this policy.\n\n" +
+                                $"**Execution has started.**\n" +
+                                $"`STATUS:`  Disconnecting from TACTICRAFT...";
+                            await component.ModifyOriginalResponseAsync(msg => msg.Embed = embed.Build());
+
+                            sshClient.Disconnect();
+                            sshClient.Dispose();
+
+                            var roleAddition = component.User as IGuildUser;
+                            var roleAdded = guild.GetRole(1075576019152547942) as IRole;
+
+                            await roleAddition.AddRoleAsync(roleAdded);
+
+                            embed.Color = Color.Green;
+                            embed.Description = "__**WARNING:**__ Server Logs on Tacticraft are monitored.\n\n" +
+                                "Griefing is not tolerated on Tacticraft and will result in your access to the server being revoked.\n\n" +
+                                "By clicking `I Agree` below, you are acknowledging and agreeing to this policy.\n\n" +
+                                $"**Execution has completed.**\n\n" +
+                                $"You can connect to Tacticraft by using `tacticraft.app` as the Server Address.\n" +
+                                $"A world map is available at https://tacticraft.app";
+                            await component.ModifyOriginalResponseAsync(msg => msg.Embed = embed.Build());
+
+                            await channel.SendMessageAsync($"`{component.User.Username}#{component.User.DiscriminatorValue}` has witelisted a Minecraft Account.\n" +
+                                $"`MC Username: {mcUsersplit[1]}`\n\n" +
+                                $"Command Output:\n```{output.Result}```");
+                        }
+                    }
+                    else
+                    {
                         embed.Description = "__**WARNING:**__ Server Logs on Tacticraft are monitored.\n\n" +
                             "Griefing is not tolerated on Tacticraft and will result in your access to the server being revoked.\n\n" +
                             "By clicking `I Agree` below, you are acknowledging and agreeing to this policy.\n\n" +
-                            $"**Execution has started.**\n" +
-                            $"`STATUS:`  Connecting to TACTICRAFT...";
-                        await component.ModifyOriginalResponseAsync(msg => msg.Embed = embed.Build());
+                            $"**EXECUTION HAS FAILED:**\n**ERROR 503 (UNAUTHORIZED)**\n\n" +
+                            $"You have already whitelisted A Minecraft Account.\nCommand execution has been blocked.  This incident has been logged.";
+                        embed.Color = Color.Red;
+                        await component.UpdateAsync(niteghxst => niteghxst.Embed = embed.Build());
+                        await component.ModifyOriginalResponseAsync(msg => msg.Components = new ComponentBuilder().WithButton("Proceed", "proceed", ButtonStyle.Success, disabled: true).WithButton("Abort", "abort", ButtonStyle.Danger, disabled: true).Build());
 
-                        sshClient.Connect();
-                        await Logger.Log(LogSeverity.Debug, "SSHClient", $"Successfully connected to FINALIZER.");
-
-                        embed.Color = Color.Orange;
-                        embed.Description = "__**WARNING:**__ Server Logs on Tacticraft are monitored.\n\n" +
-                            "Griefing is not tolerated on Tacticraft and will result in your access to the server being revoked.\n\n" +
-                            "By clicking `I Agree` below, you are acknowledging and agreeing to this policy.\n\n" +
-                            $"**Execution has started.**\n" +
-                            $"`STATUS:`  Connected to TACTICRAFT.  Whitelisting in progress...";
-                        await component.ModifyOriginalResponseAsync(msg => msg.Embed = embed.Build());
-
-                        var output = sshClient.RunCommand($"mscs send tacticraft whitelist add {mcUsersplit[1]}");
-                        await Logger.Log(LogSeverity.Debug, "SSHClient", $"mscs send tacticraft whitelist add {mcUsersplit[1]} on JUMPBOX.");
-
-                        embed.Color = Color.Purple;
-                        embed.Description = "__**WARNING:**__ Server Logs on Tacticraft are monitored.\n\n" +
-                            "Griefing is not tolerated on Tacticraft and will result in your access to the server being revoked.\n\n" +
-                            "By clicking `I Agree` below, you are acknowledging and agreeing to this policy.\n\n" +
-                            $"**Execution has started.**\n" +
-                            $"`STATUS:`  Disconnecting from TACTICRAFT...";
-                        await component.ModifyOriginalResponseAsync(msg => msg.Embed = embed.Build());
-
-                        sshClient.Disconnect();
-                        sshClient.Dispose();
-
-                        embed.Color = Color.Green;
-                        embed.Description = "__**WARNING:**__ Server Logs on Tacticraft are monitored.\n\n" +
-                            "Griefing is not tolerated on Tacticraft and will result in your access to the server being revoked.\n\n" +
-                            "By clicking `I Agree` below, you are acknowledging and agreeing to this policy.\n\n" +
-                            $"**Execution has completed.**\n\n" +
-                            $"You can connect to Tacticraft by using `tacticraft.app` as the Server Address.\n" +
-                            $"A world map is available at https://tacticraft.app";
-                        await component.ModifyOriginalResponseAsync(msg => msg.Embed = embed.Build());
-
-                        var channel = _client.GetChannel(996886356934533260) as IMessageChannel;
-                        await channel.SendMessageAsync($"I have added {component.User.Username}#{component.User.DiscriminatorValue} - `MC Username: {mcUsersplit[1]}` to the Tacticraft Whitelist.\n\n" +
-                            $"Command Output:\n```{output.Result}```");
+                        await channel.SendMessageAsync($"`{component.User.Username}#{component.User.DiscriminatorValue}` has attempted to whitelist a second Minecraft Account.\n" +
+                            $"`MC Username:` {mcUsersplit[1]}\n" +
+                            $"`Command Execution has been blocked.`");
                     }
                 }
 
