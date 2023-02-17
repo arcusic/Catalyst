@@ -1758,7 +1758,7 @@ public class CommandHandler : ICommandHandler
                             .ToString();
 
                         string powerPassInfomc = powerSettingsmc
-                            .Where(catalyst => catalyst.Name == "PowerPass")
+                            .Where(catalyst => catalyst.Name == "MinecraftPass")
                             .Select(catalyst => catalyst.Value)
                             .FirstOrDefault()
                             .ToString();
