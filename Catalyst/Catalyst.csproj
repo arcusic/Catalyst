@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <Title>The Catalyst</Title>
-    <AssemblyVersion>0.5.2</AssemblyVersion>
+    <AssemblyVersion>0.5.4</AssemblyVersion>
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Discord.Net" />
