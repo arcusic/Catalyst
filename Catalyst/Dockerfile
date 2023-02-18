@@ -8,6 +8,8 @@ WORKDIR /app
 RUN mkdir ~/.config/
 RUN mkdir ~/.config/ookla/
 RUN echo '{"Settings": {"LicenseAccepted": "604ec27f828456331ebf441826292c49276bd3c1bee1a2f65a6452f505c4061c"}}' > ~/.config/ookla/speedtest-cli.json
+RUN apt-get update
+RUN apt-get -y upgrade
 
 FROM mcr.microsoft.com/dotnet/sdk:latest AS build
 WORKDIR /src
