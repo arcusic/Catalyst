@@ -9,6 +9,9 @@ using Catalyst.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
+using System.Net;
+using System.Security.Policy;
+using System.Text.Json;
 
 // Initialize Local Configuration File
 var config = new ConfigurationBuilder()
@@ -321,6 +324,30 @@ async Task MainAsync()
     await client.SetGameAsync($"v{version}");
     await client.SetStatusAsync(UserStatus.Online);
 #endif
+
+    var jsonString = await File.ReadAllTextAsync("appsettings.json");
+    var appSettings = JsonDocument.Parse(jsonString)!;
+
+    var heartbeatSettings = appSettings.RootElement.GetProperty("KeyVault").EnumerateObject();
+    await Logger.Log(LogSeverity.Debug, $"JSONImported", "JSON file has been successfully imported... Processing.");
+
+    string heartbeat = heartbeatSettings
+        .Where(onexs => onexs.Name == "Heartbeat")
+        .Select(onexs => onexs.Value)
+        .FirstOrDefault()
+        .ToString();
+
+    var url = secretClient.GetSecret(heartbeat);
+
+    await Logger.Log(LogSeverity.Debug, "UPSUserObtained", $"Successfully obtained UPS User from Azure Key Vault.");
+
+    var timer = new PeriodicTimer(TimeSpan.FromMinutes(1));
+
+    while (await timer.WaitForNextTickAsync())
+    {
+        using var wb = new WebClient();
+        var response = wb.DownloadString(url.Value.Value);
+    }
     
     // Wait infinitely so your bot actually stays connected.
     await Task.Delay(Timeout.Infinite);
