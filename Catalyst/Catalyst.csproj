@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <Title>The Catalyst</Title>
-    <AssemblyVersion>0.5.5</AssemblyVersion>
+    <AssemblyVersion>0.5.6</AssemblyVersion>
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Discord.Net" />
@@ -32,11 +32,11 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="7.0.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
     <PackageReference Include="Lextm.SharpSnmpLib" Version="12.5.1" />
-    <PackageReference Include="Microsoft.PowerShell.Commands.Diagnostics" Version="7.3.2" />
-    <PackageReference Include="Microsoft.PowerShell.Commands.Management" Version="7.3.2" />
-    <PackageReference Include="Microsoft.PowerShell.Commands.Utility" Version="7.3.2" />
-    <PackageReference Include="Microsoft.PowerShell.ConsoleHost" Version="7.3.2" />
-    <PackageReference Include="MediatR" Version="12.0.0" />
+    <PackageReference Include="Microsoft.PowerShell.Commands.Diagnostics" Version="7.3.3" />
+    <PackageReference Include="Microsoft.PowerShell.Commands.Management" Version="7.3.3" />
+    <PackageReference Include="Microsoft.PowerShell.Commands.Utility" Version="7.3.3" />
+    <PackageReference Include="Microsoft.PowerShell.ConsoleHost" Version="7.3.3" />
+    <PackageReference Include="MediatR" Version="12.0.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.3" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.3" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Analyzers" Version="7.0.3" />
@@ -44,11 +44,11 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.PowerShell.Security" Version="7.3.2" />
+    <PackageReference Include="Microsoft.PowerShell.Security" Version="7.3.3" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.17.0" />
-    <PackageReference Include="Microsoft.WSMan.Management" Version="7.3.2" />
+    <PackageReference Include="Microsoft.WSMan.Management" Version="7.3.3" />
     <PackageReference Include="SSH.NET" Version="2020.0.2" />
-    <PackageReference Include="UnitsNet" Version="5.3.0" />
+    <PackageReference Include="UnitsNet" Version="5.5.0" />
   </ItemGroup>
   <ItemGroup>
     <None Update="appsettings.json">
