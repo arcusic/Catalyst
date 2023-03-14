@@ -16,9 +16,6 @@ using System.Net;
 using System.Text.Json;
 using System.Text;
 using Renci.SshNet;
-using Azure;
-using System.Linq;
-using Lextm.SharpSnmpLib.Security;
 
 namespace Catalyst.Services;
 
