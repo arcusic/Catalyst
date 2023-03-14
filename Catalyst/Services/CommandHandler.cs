@@ -1846,7 +1846,7 @@ public class CommandHandler : ICommandHandler
                             $"**EXECUTION HAS FAILED:**\n**ERROR 503 (UNAUTHORIZED)**\n\n" +
                             $"You have already whitelisted A Minecraft Account.\nCommand execution has been blocked.  This incident has been logged.";
                         embed.Color = Color.Red;
-                        await component.UpdateAsync(niteghxst => niteghxst.Embed = embed.Build());
+                        await component.UpdateAsync(vampire => vampire.Embed = embed.Build());
                         await component.ModifyOriginalResponseAsync(msg => msg.Components = new ComponentBuilder().WithButton("Proceed", "proceed", ButtonStyle.Success, disabled: true).WithButton("Abort", "abort", ButtonStyle.Danger, disabled: true).Build());
 
                         await channel.SendMessageAsync($"`{component.User.Username}#{component.User.DiscriminatorValue}` has attempted to whitelist a second Minecraft Account.\n" +
