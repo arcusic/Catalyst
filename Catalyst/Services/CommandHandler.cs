@@ -1826,59 +1826,57 @@ public class CommandHandler : ICommandHandler
                         var connectionInfomc = new ConnectionInfo(dns01mc.Value.Value, powerUsermc.Value.Value,
                             new PasswordAuthenticationMethod(powerUsermc.Value.Value, powerPassmc.Value.Value));
 
-                        using (var sshClient = new SshClient(connectionInfomc))
-                        {
-                            embed.Color = Color.Gold;
-                            embed.Description = "__**WARNING:**__ Server Logs on Tacticraft are monitored.\n\n" +
-                                "Griefing is not tolerated on Tacticraft and will result in your access to the server being revoked.\n\n" +
-                                "By clicking `I Agree` below, you are acknowledging and agreeing to this policy.\n\n" +
-                                $"**Execution has started.**\n" +
-                                $"`STATUS:`  Connecting to TACTICRAFT...";
-                            await component.ModifyOriginalResponseAsync(msg => msg.Embed = embed.Build());
+                        using var sshClient = new SshClient(connectionInfomc);
+                        embed.Color = Color.Gold;
+                        embed.Description = "__**WARNING:**__ Server Logs on Tacticraft are monitored.\n\n" +
+                            "Griefing is not tolerated on Tacticraft and will result in your access to the server being revoked.\n\n" +
+                            "By clicking `I Agree` below, you are acknowledging and agreeing to this policy.\n\n" +
+                            $"**Execution has started.**\n" +
+                            $"`STATUS:`  Connecting to TACTICRAFT...";
+                        await component.ModifyOriginalResponseAsync(msg => msg.Embed = embed.Build());
 
-                            sshClient.Connect();
-                            await Logger.Log(LogSeverity.Debug, "SSHClient", $"Successfully connected to FINALIZER.");
+                        sshClient.Connect();
+                        await Logger.Log(LogSeverity.Debug, "SSHClient", $"Successfully connected to FINALIZER.");
 
-                            embed.Color = Color.Orange;
-                            embed.Description = "__**WARNING:**__ Server Logs on Tacticraft are monitored.\n\n" +
-                                "Griefing is not tolerated on Tacticraft and will result in your access to the server being revoked.\n\n" +
-                                "By clicking `I Agree` below, you are acknowledging and agreeing to this policy.\n\n" +
-                                $"**Execution has started.**\n" +
-                                $"`STATUS:`  Connected to TACTICRAFT.  Whitelisting in progress...";
-                            await component.ModifyOriginalResponseAsync(msg => msg.Embed = embed.Build());
+                        embed.Color = Color.Orange;
+                        embed.Description = "__**WARNING:**__ Server Logs on Tacticraft are monitored.\n\n" +
+                            "Griefing is not tolerated on Tacticraft and will result in your access to the server being revoked.\n\n" +
+                            "By clicking `I Agree` below, you are acknowledging and agreeing to this policy.\n\n" +
+                            $"**Execution has started.**\n" +
+                            $"`STATUS:`  Connected to TACTICRAFT.  Whitelisting in progress...";
+                        await component.ModifyOriginalResponseAsync(msg => msg.Embed = embed.Build());
 
-                            var output = sshClient.RunCommand($"mscs send tacticraft whitelist add {mcUsersplit[1]}");
-                            await Logger.Log(LogSeverity.Debug, "SSHClient", $"mscs send tacticraft whitelist add {mcUsersplit[1]} on JUMPBOX.");
+                        var output = sshClient.RunCommand($"mscs send tacticraft whitelist add {mcUsersplit[1]}");
+                        await Logger.Log(LogSeverity.Debug, "SSHClient", $"mscs send tacticraft whitelist add {mcUsersplit[1]} on JUMPBOX.");
 
-                            embed.Color = Color.Purple;
-                            embed.Description = "__**WARNING:**__ Server Logs on Tacticraft are monitored.\n\n" +
-                                "Griefing is not tolerated on Tacticraft and will result in your access to the server being revoked.\n\n" +
-                                "By clicking `I Agree` below, you are acknowledging and agreeing to this policy.\n\n" +
-                                $"**Execution has started.**\n" +
-                                $"`STATUS:`  Disconnecting from TACTICRAFT...";
-                            await component.ModifyOriginalResponseAsync(msg => msg.Embed = embed.Build());
+                        embed.Color = Color.Purple;
+                        embed.Description = "__**WARNING:**__ Server Logs on Tacticraft are monitored.\n\n" +
+                            "Griefing is not tolerated on Tacticraft and will result in your access to the server being revoked.\n\n" +
+                            "By clicking `I Agree` below, you are acknowledging and agreeing to this policy.\n\n" +
+                            $"**Execution has started.**\n" +
+                            $"`STATUS:`  Disconnecting from TACTICRAFT...";
+                        await component.ModifyOriginalResponseAsync(msg => msg.Embed = embed.Build());
 
-                            sshClient.Disconnect();
-                            sshClient.Dispose();
+                        sshClient.Disconnect();
+                        sshClient.Dispose();
 
-                            var roleAddition = component.User as IGuildUser;
-                            var roleAdded = guild.GetRole(1075576019152547942) as IRole;
+                        var roleAddition = component.User as IGuildUser;
+                        var roleAdded = guild.GetRole(1075576019152547942) as IRole;
 
-                            await roleAddition.AddRoleAsync(roleAdded);
+                        await roleAddition.AddRoleAsync(roleAdded);
 
-                            embed.Color = Color.Green;
-                            embed.Description = "__**WARNING:**__ Server Logs on Tacticraft are monitored.\n\n" +
-                                "Griefing is not tolerated on Tacticraft and will result in your access to the server being revoked.\n\n" +
-                                "By clicking `I Agree` below, you are acknowledging and agreeing to this policy.\n\n" +
-                                $"**Execution has completed.**\n\n" +
-                                $"You can connect to Tacticraft by using `tacticraft.app` as the Server Address.\n" +
-                                $"A world map is available at https://tacticraft.app";
-                            await component.ModifyOriginalResponseAsync(msg => msg.Embed = embed.Build());
+                        embed.Color = Color.Green;
+                        embed.Description = "__**WARNING:**__ Server Logs on Tacticraft are monitored.\n\n" +
+                            "Griefing is not tolerated on Tacticraft and will result in your access to the server being revoked.\n\n" +
+                            "By clicking `I Agree` below, you are acknowledging and agreeing to this policy.\n\n" +
+                            $"**Execution has completed.**\n\n" +
+                            $"You can connect to Tacticraft by using `tacticraft.app` as the Server Address.\n" +
+                            $"A world map is available at https://tacticraft.app";
+                        await component.ModifyOriginalResponseAsync(msg => msg.Embed = embed.Build());
 
-                            await channel.SendMessageAsync($"`{component.User.Username}#{component.User.DiscriminatorValue}` has witelisted a Minecraft Account.\n" +
-                                $"`MC Username: {mcUsersplit[1]}`\n\n" +
-                                $"Command Output:\n```{output.Result}```");
-                        }
+                        await channel.SendMessageAsync($"`{component.User.Username}#{component.User.DiscriminatorValue}` has witelisted a Minecraft Account.\n" +
+                            $"`MC Username: {mcUsersplit[1]}`\n\n" +
+                            $"Command Output:\n```{output.Result}```");
                     }
                     else
                     {
