@@ -79,6 +79,51 @@ public class CommandHandler : ICommandHandler
 
     public async Task SlashCommandHandler(SocketSlashCommand command)
     {
+        if (command.Data.Name == "post_role_message")
+        {
+            var whiteCheckMark = new Emoji("\u2705");
+            var redX = new Emoji("\u274C");
+            var denied = new Emoji("\uD83D\uDEAB");
+
+            await Logger.Log(LogSeverity.Verbose, $"[{command.GuildId}] CommandReceived", $"{command.User.Username}#{command.User.DiscriminatorValue} has invoked {command.CommandName} from the {command.Channel.Name} channel.");
+
+            if (command.Channel.Id == 996886356934533260)
+            {
+                await command.Channel.TriggerTypingAsync();
+
+                var embed = new EmbedBuilder
+                {
+                    Title = "Review Updated Roles",
+                    Description = "__**WARNING:**__ This command will `replace` the current message in #roles.  This cannot be undone.",
+                    Color = Color.Red,
+                    Footer = new EmbedFooterBuilder
+                    {
+                        Text = $"Requested by {command.User.Username}#{command.User.DiscriminatorValue}",
+                        IconUrl = command.User.GetAvatarUrl()
+                    },
+                    Timestamp = DateTime.Now,
+                    Author = new EmbedAuthorBuilder
+                    {
+                        Name = "The Catalyst",
+                        IconUrl = "https://raw.githubusercontent.com/CodingCatalysts/Catalyst/main/Catalyst/Assets/Animated%20Logo/Bot_catalyst.gif"
+                    },
+                };
+
+                var buttons = new ComponentBuilder()
+                    .WithButton("Proceed", "role_proceed", ButtonStyle.Success)
+                    .WithButton("Abort", "role_abort", ButtonStyle.Danger)
+                    .Build();
+
+                await command.RespondAsync(embed: embed.Build(), components: buttons, ephemeral: true);
+            }
+            else
+            {
+                await command.RespondAsync(":no_entry:  ***UNAUTHORIZED***  :no_entry:\n" +
+                "You have attempted to execute a privledged command without propper permissions.\n\n" +
+                "__**WARNING:**__  This incident has been logged!\n" +
+                "*Further attempts to execute a privledged command without authorization may lead to additional action.*", ephemeral: true);
+            }
+        }
         if (command.Data.Name == "tacticraft_whitelist")
         {
             var whiteCheckMark = new Emoji("\u2705");
