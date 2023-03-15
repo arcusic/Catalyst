@@ -50,11 +50,6 @@ public class CommandHandler : ICommandHandler
                 await context.Channel.SendMessageAsync($"error: {result}");
             }
         };
-        
-        foreach (var module in _commands.Modules)
-        {
-            await Logger.Log(LogSeverity.Info, $"{nameof(CommandHandler)} | Commands", $"Module '{module.Name}' initialized.");
-        }
     }
     
     private async Task HandleCommandAsync(SocketMessage arg)
@@ -68,13 +63,13 @@ public class CommandHandler : ICommandHandler
             return;
 
         // Create a Command Context.
-        //var context = new ShardedCommandContext(_client, msg);
+        var context = new ShardedCommandContext(_client, msg);
         
-        //var markPos = 0;
-        //if (msg.HasCharPrefix('.', ref markPos) || msg.HasCharPrefix('?', ref markPos))
-        //{
-        //    _ = await _commands.ExecuteAsync(context, markPos, Bootstrapper.ServiceProvider);
-        //}
+        var markPos = 0;
+        if (msg.HasCharPrefix('.', ref markPos) || msg.HasCharPrefix('?', ref markPos))
+        {
+            _ = await _commands.ExecuteAsync(context, markPos, Bootstrapper.ServiceProvider);
+        }
     }
 
     public static async Task SlashCommandHandler(SocketSlashCommand command)
