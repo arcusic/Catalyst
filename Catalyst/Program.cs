@@ -345,8 +345,9 @@ async Task MainAsync()
 
     while (await timer.WaitForNextTickAsync())
     {
-        using var wb = new WebClient();
-        var response = wb.DownloadString(url.Value.Value);
+        using var wb = new HttpClient();
+        using HttpResponseMessage response = await wb.GetAsync(url.Value.Value);
+        response.EnsureSuccessStatusCode();
     }
     
     // Wait infinitely so your bot actually stays connected.
