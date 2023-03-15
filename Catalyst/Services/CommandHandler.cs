@@ -77,7 +77,7 @@ public class CommandHandler : ICommandHandler
         }
     }
 
-    public async Task SlashCommandHandler(SocketSlashCommand command)
+    public static async Task SlashCommandHandler(SocketSlashCommand command)
     {
         if (command.Data.Name == "post_role_message")
         {
