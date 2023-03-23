@@ -12,6 +12,7 @@ on:
     tags: [ 'v*.*.*' ]
   pull_request:
     branches: [ "main" ]
+    tags: [ 'v*.*.*' ]
 
 env:
   # github.repository as <account>/<repo>
