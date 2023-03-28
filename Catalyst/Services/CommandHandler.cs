@@ -715,11 +715,10 @@ public class CommandHandler : ICommandHandler
                 $"`64 Bit Process:`  {procEmote}\n" +
                 $"`.NET Version:`  {Environment.Version}\n\n" +
                 $"__*Created By:*__\n" +
-                $"> Catalyst#7894\n" +
-                $"> Tactical050#9264\n" +
-                $"> jxckthxripper#1389\n" +
-                $"> 1xs#0001\n" +
-                $"> lovelxrd#7895\n\n" +
+                $"> Catalyst#7894\n\n" +
+                $"__*Contributors:*__\n" +
+                $"> Tactical050#9264 (Logo)\n" +
+                $"> jxckthxripper#1389 (Animated Logo)\n" +
                 $"`Built On:` {dateTime} UTC";
 #endif
 
