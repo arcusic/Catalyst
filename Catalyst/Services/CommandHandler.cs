@@ -16,6 +16,7 @@ using System.Net;
 using System.Text.Json;
 using System.Text;
 using Renci.SshNet;
+using Microsoft.Extensions.Configuration;
 
 namespace Catalyst.Services;
 
@@ -72,8 +73,16 @@ public class CommandHandler : ICommandHandler
         }
     }
 
-    public static async Task SlashCommandHandler(SocketSlashCommand command)
+    public async Task SlashCommandHandler(SocketSlashCommand command)
     {
+        var config = new ConfigurationBuilder()
+            .AddJsonFile("appsettings.json")
+            .AddEnvironmentVariables()
+            .Build();
+
+        var secretClient = new SecretClient(new Uri($"https://{config.GetRequiredSection("KeyVault")["KeyVaultName"]}.vault.azure.net"), new ClientSecretCredential(config.GetRequiredSection("KeyVault")["AzureADTennantId"], config.GetRequiredSection("KeyVault")["AzureADClientId"], config.GetRequiredSection("KeyVault")["AzureADClientSecret"]));
+        await Logger.Log(LogSeverity.Debug, "SecretClientConfigured", $"Configured Azure Key Vault client to connect to {secretClient.VaultUri}.");
+
         if (command.Data.Name == "post_role_message")
         {
             var whiteCheckMark = new Emoji("\u2705");
@@ -170,7 +179,12 @@ public class CommandHandler : ICommandHandler
 
         if (command.Data.Name == "tacticraft_latest_log")
         {
-            if (command.User.Id == 162600879948562432 || command.User.Id == 135696547722559488 || command.User.Id == 213308514385395712)
+            var guild = _client.GetGuild(994625404243546292);
+            var role = guild.GetRole(1090505454435708938);
+            var user = _client.GetUser(command.User.Id);
+            var roleMember = role.Members.Where(rm => rm.Id == user.Id).FirstOrDefault();
+
+            if (roleMember != null)
             {
                 var jsonString = await File.ReadAllTextAsync("appsettings.json");
                 var appSettings = JsonDocument.Parse(jsonString)!;
@@ -223,9 +237,6 @@ public class CommandHandler : ICommandHandler
                     .FirstOrDefault()
                     .ToString();
 
-                var secretClient = new SecretClient(new Uri($"https://{keyVault}.vault.azure.net"), new ClientSecretCredential(azureADTennantId, azureADClientId, azureADClientSecret));
-                await Logger.Log(LogSeverity.Debug, "SNMPSecretClientConfigured", $"Configured Azure Key Vault client to connect to {secretClient.VaultUri}.");
-
                 var powerUser = secretClient.GetSecret(powerUserInfo);
                 await Logger.Log(LogSeverity.Debug, "UPSUserObtained", $"Successfully obtained UPS User from Azure Key Vault.");
 
@@ -246,6 +257,13 @@ public class CommandHandler : ICommandHandler
                 await command.RespondWithFileAsync(latestLog, "latest.log", ephemeral: true);
                 sftpClient.Disconnect();
                 sftpClient.Dispose();
+            }
+            else
+            {
+                await command.RespondAsync(":no_entry:  ***UNAUTHORIZED***  :no_entry:\n" +
+                "You have attempted to execute a privledged command without propper permissions.\n\n" +
+                "__**WARNING:**__  This incident has been logged!\n" +
+                "*Further attempts to execute a privledged command without authorization may lead to additional action.*", ephemeral: true);
             }
         }
 
@@ -425,8 +443,6 @@ public class CommandHandler : ICommandHandler
             await Logger.Log(LogSeverity.Debug, $"JSONParsed", "JSON file has been successfully parsed.");
 
             await command.ModifyOriginalResponseAsync(msg => msg.Content = $"Executing infrastructure health check... please wait.\n\n`CURRENT STATUS:`  Retreiving Secrets from Azure KeyVault...");
-            var secretClient = new SecretClient(new Uri($"https://{keyVault}.vault.azure.net"), new ClientSecretCredential(azureADTennantId, azureADClientId, azureADClientSecret));
-            await Logger.Log(LogSeverity.Debug, "SNMPSecretClientConfigured", $"Configured Azure Key Vault client to connect to {secretClient.VaultUri}.");
 
             var upsIPAddress = secretClient.GetSecret(upsIPSecret);
             await Logger.Log(LogSeverity.Debug, "SNMPAddressObtained", $"Successfully obtained SNMP Address from Azure Key Vault.");
