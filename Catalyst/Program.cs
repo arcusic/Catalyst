@@ -238,10 +238,10 @@ async Task MainAsync()
     //End About Module
 
     //Start Utility Module
-    SlashCommandBuilder hc = new();
-    hc.WithName("status").WithDescription("The Catalyst Status");
-    globalApplicationCommandProperties.Add(hc.Build());
-    await Logger.Log(LogSeverity.Info, "CMDProvisioned", $"Slash Command {hc.Name} provisioned to Global Commands.");
+    SlashCommandBuilder status = new();
+    status.WithName("status").WithDescription("The Catalyst Status");
+    globalApplicationCommandProperties.Add(status.Build());
+    await Logger.Log(LogSeverity.Info, "CMDProvisioned", $"Slash Command {status.Name} provisioned to Global Commands.");
 
     SlashCommandBuilder epo = new();
     epo.WithName("emergency_power_off").WithDescription("Emergency Power Off");
