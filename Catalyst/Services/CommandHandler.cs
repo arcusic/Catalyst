@@ -701,8 +701,8 @@ public class CommandHandler : ICommandHandler
                 $"__*Created By:*__\n" +
                 $"> Catalyst#7894\n\n" +
                 $"__*Contributors:*__\n" +
-                $"> Tactical050#9264\n" +
-                $"> jxckthxripper#1389\n" +
+                $"> Tactical050#9264 (Logo)\n" +
+                $"> jxckthxripper#1389 (Animated Logo)\n\n" +
                 $"`Built On:` {dateTime} UTC";
 #endif
 #if RELEASE
@@ -718,7 +718,7 @@ public class CommandHandler : ICommandHandler
                 $"> Catalyst#7894\n\n" +
                 $"__*Contributors:*__\n" +
                 $"> Tactical050#9264 (Logo)\n" +
-                $"> jxckthxripper#1389 (Animated Logo)\n" +
+                $"> jxckthxripper#1389 (Animated Logo)\n\n" +
                 $"`Built On:` {dateTime} UTC";
 #endif
 
