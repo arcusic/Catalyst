@@ -30,7 +30,7 @@ var client = new DiscordShardedClient(new DiscordSocketConfig
 {
     LogLevel = LogSeverity.Debug,
     MessageCacheSize = 1000,
-    TotalShards = 1,
+    TotalShards = null,
     GatewayIntents = GatewayIntents.All,
     AlwaysDownloadUsers = true,
     DefaultRetryMode = RetryMode.AlwaysRetry
@@ -266,12 +266,12 @@ async Task MainAsync()
         var tactical = shard.GetGuild(994625404243546292);
 
         await Logger.Log(LogSeverity.Info, "GLOBAL_BLD", $"Processing Global Application Commands...");
-        await shard.BulkOverwriteGlobalApplicationCommandsAsync(globalApplicationCommandProperties.ToArray());
+        await shard.BulkOverwriteGlobalApplicationCommandsAsync(globalApplicationCommandProperties_reset.ToArray());
         await Logger.Log(LogSeverity.Info, "GLOBAL_BLD", $"Completed Global Application Commands.");
 
         await Logger.Log(LogSeverity.Info, "GUILD_BLD", $"Processing Guild Application Commands...");
         await Logger.Log(LogSeverity.Info, "GUILD_BLD", $"Processing Tactical Commands...");
-        await tactical.BulkOverwriteApplicationCommandAsync(tacticalApplicationCommandProperties.ToArray());
+        await tactical.BulkOverwriteApplicationCommandAsync(tacticalApplicationCommandProperties_reset.ToArray());
         await Logger.Log(LogSeverity.Info, "GUILD_BLD", $"Completed Tactical Commands.");
         await Logger.Log(LogSeverity.Info, "GUILD_BLD", $"Completed Guild Application Commands.");
 
