@@ -313,7 +313,7 @@ public class CommandHandler : ICommandHandler
             }
         }
 
-        if (command.Data.Name == "health")
+        if (command.Data.Name == "status")
         {
             await Logger.Log(LogSeverity.Verbose, $"[{command.GuildId}] CommandReceived", $"{command.User.Username}#{command.User.DiscriminatorValue} has invoked {command.CommandName} from the {command.Channel.Name} channel.");
 
