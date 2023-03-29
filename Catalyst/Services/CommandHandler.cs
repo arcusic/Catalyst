@@ -16,9 +16,7 @@ using System.Net;
 using System.Text.Json;
 using System.Text;
 using Renci.SshNet;
-using Azure;
-using System.Linq;
-using Lextm.SharpSnmpLib.Security;
+using Microsoft.Extensions.Configuration;
 
 namespace Catalyst.Services;
 
@@ -53,11 +51,6 @@ public class CommandHandler : ICommandHandler
                 await context.Channel.SendMessageAsync($"error: {result}");
             }
         };
-        
-        foreach (var module in _commands.Modules)
-        {
-            await Logger.Log(LogSeverity.Info, $"{nameof(CommandHandler)} | Commands", $"Module '{module.Name}' initialized.");
-        }
     }
     
     private async Task HandleCommandAsync(SocketMessage arg)
@@ -76,12 +69,65 @@ public class CommandHandler : ICommandHandler
         var markPos = 0;
         if (msg.HasCharPrefix('.', ref markPos) || msg.HasCharPrefix('?', ref markPos))
         {
-            var result = await _commands.ExecuteAsync(context, markPos, Bootstrapper.ServiceProvider);
+            _ = await _commands.ExecuteAsync(context, markPos, Bootstrapper.ServiceProvider);
         }
     }
 
     public async Task SlashCommandHandler(SocketSlashCommand command)
     {
+        var config = new ConfigurationBuilder()
+            .AddJsonFile("appsettings.json")
+            .AddEnvironmentVariables()
+            .Build();
+
+        var secretClient = new SecretClient(new Uri($"https://{config.GetRequiredSection("KeyVault")["KeyVaultName"]}.vault.azure.net"), new ClientSecretCredential(config.GetRequiredSection("KeyVault")["AzureADTennantId"], config.GetRequiredSection("KeyVault")["AzureADClientId"], config.GetRequiredSection("KeyVault")["AzureADClientSecret"]));
+        await Logger.Log(LogSeverity.Debug, "SecretClientConfigured", $"Configured Azure Key Vault client to connect to {secretClient.VaultUri}.");
+
+        if (command.Data.Name == "post_role_message")
+        {
+            var whiteCheckMark = new Emoji("\u2705");
+            var redX = new Emoji("\u274C");
+            var denied = new Emoji("\uD83D\uDEAB");
+
+            await Logger.Log(LogSeverity.Verbose, $"[{command.GuildId}] CommandReceived", $"{command.User.Username}#{command.User.DiscriminatorValue} has invoked {command.CommandName} from the {command.Channel.Name} channel.");
+
+            if (command.Channel.Id == 996886356934533260)
+            {
+                await command.Channel.TriggerTypingAsync();
+
+                var embed = new EmbedBuilder
+                {
+                    Title = "Review Updated Roles",
+                    Description = "__**WARNING:**__ This command will `replace` the current message in #roles.  This cannot be undone.",
+                    Color = Color.Red,
+                    Footer = new EmbedFooterBuilder
+                    {
+                        Text = $"Requested by {command.User.Username}#{command.User.DiscriminatorValue}",
+                        IconUrl = command.User.GetAvatarUrl()
+                    },
+                    Timestamp = DateTime.Now,
+                    Author = new EmbedAuthorBuilder
+                    {
+                        Name = "The Catalyst",
+                        IconUrl = "https://raw.githubusercontent.com/CodingCatalysts/Catalyst/main/Catalyst/Assets/Animated%20Logo/Bot_catalyst.gif"
+                    },
+                };
+
+                var buttons = new ComponentBuilder()
+                    .WithButton("Proceed", "role_proceed", ButtonStyle.Success)
+                    .WithButton("Abort", "role_abort", ButtonStyle.Danger)
+                    .Build();
+
+                await command.RespondAsync(embed: embed.Build(), components: buttons, ephemeral: true);
+            }
+            else
+            {
+                await command.RespondAsync(":no_entry:  ***UNAUTHORIZED***  :no_entry:\n" +
+                "You have attempted to execute a privledged command without propper permissions.\n\n" +
+                "__**WARNING:**__  This incident has been logged!\n" +
+                "*Further attempts to execute a privledged command without authorization may lead to additional action.*", ephemeral: true);
+            }
+        }
         if (command.Data.Name == "tacticraft_whitelist")
         {
             var whiteCheckMark = new Emoji("\u2705");
@@ -133,7 +179,12 @@ public class CommandHandler : ICommandHandler
 
         if (command.Data.Name == "tacticraft_latest_log")
         {
-            if (command.User.Id == 162600879948562432 || command.User.Id == 135696547722559488 || command.User.Id == 213308514385395712)
+            var guild = _client.GetGuild(994625404243546292);
+            var role = guild.GetRole(1090505454435708938);
+            var user = _client.GetUser(command.User.Id);
+            var roleMember = role.Members.Where(rm => rm.Id == user.Id).FirstOrDefault();
+
+            if (roleMember != null)
             {
                 var jsonString = await File.ReadAllTextAsync("appsettings.json");
                 var appSettings = JsonDocument.Parse(jsonString)!;
@@ -186,9 +237,6 @@ public class CommandHandler : ICommandHandler
                     .FirstOrDefault()
                     .ToString();
 
-                var secretClient = new SecretClient(new Uri($"https://{keyVault}.vault.azure.net"), new ClientSecretCredential(azureADTennantId, azureADClientId, azureADClientSecret));
-                await Logger.Log(LogSeverity.Debug, "SNMPSecretClientConfigured", $"Configured Azure Key Vault client to connect to {secretClient.VaultUri}.");
-
                 var powerUser = secretClient.GetSecret(powerUserInfo);
                 await Logger.Log(LogSeverity.Debug, "UPSUserObtained", $"Successfully obtained UPS User from Azure Key Vault.");
 
@@ -209,6 +257,13 @@ public class CommandHandler : ICommandHandler
                 await command.RespondWithFileAsync(latestLog, "latest.log", ephemeral: true);
                 sftpClient.Disconnect();
                 sftpClient.Dispose();
+            }
+            else
+            {
+                await command.RespondAsync(":no_entry:  ***UNAUTHORIZED***  :no_entry:\n" +
+                "You have attempted to execute a privledged command without propper permissions.\n\n" +
+                "__**WARNING:**__  This incident has been logged!\n" +
+                "*Further attempts to execute a privledged command without authorization may lead to additional action.*", ephemeral: true);
             }
         }
 
@@ -388,8 +443,6 @@ public class CommandHandler : ICommandHandler
             await Logger.Log(LogSeverity.Debug, $"JSONParsed", "JSON file has been successfully parsed.");
 
             await command.ModifyOriginalResponseAsync(msg => msg.Content = $"Executing infrastructure health check... please wait.\n\n`CURRENT STATUS:`  Retreiving Secrets from Azure KeyVault...");
-            var secretClient = new SecretClient(new Uri($"https://{keyVault}.vault.azure.net"), new ClientSecretCredential(azureADTennantId, azureADClientId, azureADClientSecret));
-            await Logger.Log(LogSeverity.Debug, "SNMPSecretClientConfigured", $"Configured Azure Key Vault client to connect to {secretClient.VaultUri}.");
 
             var upsIPAddress = secretClient.GetSecret(upsIPSecret);
             await Logger.Log(LogSeverity.Debug, "SNMPAddressObtained", $"Successfully obtained SNMP Address from Azure Key Vault.");
@@ -662,11 +715,10 @@ public class CommandHandler : ICommandHandler
                 $"`64 Bit Process:`  {procEmote}\n" +
                 $"`.NET Version:`  {Environment.Version}\n\n" +
                 $"__*Created By:*__\n" +
-                $"> Catalyst#7894\n" +
-                $"> Tactical050#9264\n" +
-                $"> jxckthxripper#1389\n" +
-                $"> 1xs#0001\n" +
-                $"> lovelxrd#7895\n\n" +
+                $"> Catalyst#7894\n\n" +
+                $"__*Contributors:*__\n" +
+                $"> Tactical050#9264 (Logo)\n" +
+                $"> jxckthxripper#1389 (Animated Logo)\n\n" +
                 $"`Built On:` {dateTime} UTC";
 #endif
 #if RELEASE
@@ -679,11 +731,10 @@ public class CommandHandler : ICommandHandler
                 $"`64 Bit Process:`  {procEmote}\n" +
                 $"`.NET Version:`  {Environment.Version}\n\n" +
                 $"__*Created By:*__\n" +
-                $"> Catalyst#7894\n" +
-                $"> Tactical050#9264\n" +
-                $"> jxckthxripper#1389\n" +
-                $"> 1xs#0001\n" +
-                $"> lovelxrd#7895\n\n" +
+                $"> Catalyst#7894\n\n" +
+                $"__*Contributors:*__\n" +
+                $"> Tactical050#9264 (Logo)\n" +
+                $"> jxckthxripper#1389 (Animated Logo)\n\n" +
                 $"`Built On:` {dateTime} UTC";
 #endif
 
@@ -723,938 +774,942 @@ public class CommandHandler : ICommandHandler
                 "This command is under active development and is not yet available.");
         }
 
-        if (command.Data.Name == "temperature")
+        if (command.Data.Name == "conversion")
         {
-            string? unit = command.Data.Options.Last().Value.ToString();
+            var cmd = command.Data.Options.First().Name;
+            if (cmd == "temperature")
+            {
+                string? unit = command.Data.Options.First().Options.Last().Value.ToString();
 
 #pragma warning disable CS8604 // Possible null reference argument.
-            double inputTemp = double.Parse(command.Data.Options.First().Value.ToString(), CultureInfo.InvariantCulture.NumberFormat);
+                double inputTemp = double.Parse(command.Data.Options.First().Options.First().Value.ToString(), CultureInfo.InvariantCulture.NumberFormat);
 #pragma warning restore CS8604 // Possible null reference argument.
 
-            string input = $"`{inputTemp}°{unit}:`  ";
-            UnitsNet.Temperature temp;
+                string input = $"`{inputTemp}°{unit}:`  ";
+                UnitsNet.Temperature temp;
 
-            if (unit == "C")
-            {
-                temp = Temperature.From(inputTemp, UnitsNet.Units.TemperatureUnit.DegreeCelsius).ToUnit(UnitsNet.Units.TemperatureUnit.DegreeFahrenheit);
+                if (unit == "C")
+                {
+                    temp = Temperature.From(inputTemp, UnitsNet.Units.TemperatureUnit.DegreeCelsius).ToUnit(UnitsNet.Units.TemperatureUnit.DegreeFahrenheit);
+                }
+                else
+                {
+                    temp = Temperature.From(inputTemp, UnitsNet.Units.TemperatureUnit.DegreeFahrenheit).ToUnit(UnitsNet.Units.TemperatureUnit.DegreeCelsius);
+                }
+                await command.RespondAsync($"{input} {temp}");
             }
-            else
-            {
-                temp = Temperature.From(inputTemp, UnitsNet.Units.TemperatureUnit.DegreeFahrenheit).ToUnit(UnitsNet.Units.TemperatureUnit.DegreeCelsius);
-            }
-            await command.RespondAsync($"{input} {temp}");
-        }
 
-        if (command.Data.Name == "distance")
-        {
-            string? sourceUnit = command.Data.Options.ElementAt(1).Value.ToString();
-            string? destinationUnit = command.Data.Options.ElementAt(2).Value.ToString();
+            if (cmd == "distance")
+            {
+                string? sourceUnit = command.Data.Options.First().Options.ElementAt(1).Value.ToString();
+                string? destinationUnit = command.Data.Options.First().Options.ElementAt(2).Value.ToString();
 
 #pragma warning disable CS8604 // Possible null reference argument.
-            double inputDistance = double.Parse(command.Data.Options.ElementAt(0).Value.ToString(), CultureInfo.InvariantCulture.NumberFormat);
+                double inputDistance = double.Parse(command.Data.Options.First().Options.ElementAt(0).Value.ToString(), CultureInfo.InvariantCulture.NumberFormat);
 #pragma warning restore CS8604 // Possible null reference argument.
 
-            string input = $"`{inputDistance} {sourceUnit}:`  ";
-            UnitsNet.Length distance;
+                string input = $"`{inputDistance} {sourceUnit}:`  ";
+                UnitsNet.Length distance;
 
-            if (sourceUnit == "m")
-            {
-                if (destinationUnit == "m")
+                if (sourceUnit == "m")
                 {
-                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {inputDistance:n2} {destinationUnit}");
+                    if (destinationUnit == "m")
+                    {
+                        await command.RespondAsync($"Seriously... convert it yourself...\n{input} {inputDistance:n2} {destinationUnit}");
+                    }
+                    else if (destinationUnit == "km")
+                    {
+                        distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Meter).ToUnit(UnitsNet.Units.LengthUnit.Kilometer);
+                        await command.RespondAsync($"{input} {distance}");
+                    }
+                    else if (destinationUnit == "mi")
+                    {
+                        distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Meter).ToUnit(UnitsNet.Units.LengthUnit.Mile);
+                        await command.RespondAsync($"{input} {distance}");
+                    }
+                    else if (destinationUnit == "ft")
+                    {
+                        distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Meter).ToUnit(UnitsNet.Units.LengthUnit.Foot);
+                        await command.RespondAsync($"{input} {distance}");
+                    }
+                    else if (destinationUnit == "yd")
+                    {
+                        distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Meter).ToUnit(UnitsNet.Units.LengthUnit.Yard);
+                        await command.RespondAsync($"{input} {distance}");
+                    }
+                    else if (destinationUnit == "in")
+                    {
+                        distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Meter).ToUnit(UnitsNet.Units.LengthUnit.Inch);
+                        await command.RespondAsync($"{input} {distance}");
+                    }
+                    else if (destinationUnit == "cm")
+                    {
+                        distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Meter).ToUnit(UnitsNet.Units.LengthUnit.Centimeter);
+                        await command.RespondAsync($"{input} {distance}");
+                    }
                 }
-                else if (destinationUnit == "km")
+                else if (sourceUnit == "km")
                 {
-                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Meter).ToUnit(UnitsNet.Units.LengthUnit.Kilometer);
-                    await command.RespondAsync($"{input} {distance}");
+                    if (destinationUnit == "m")
+                    {
+                        distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Kilometer).ToUnit(UnitsNet.Units.LengthUnit.Meter);
+                        await command.RespondAsync($"{input} {distance}");
+                    }
+                    else if (destinationUnit == "km")
+                    {
+                        await command.RespondAsync($"Seriously... convert it yourself...\n{input} {inputDistance:n2} {destinationUnit}");
+                    }
+                    else if (destinationUnit == "mi")
+                    {
+                        distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Kilometer).ToUnit(UnitsNet.Units.LengthUnit.Mile);
+                        await command.RespondAsync($"{input} {distance}");
+                    }
+                    else if (destinationUnit == "ft")
+                    {
+                        distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Kilometer).ToUnit(UnitsNet.Units.LengthUnit.Foot);
+                        await command.RespondAsync($"{input} {distance}");
+                    }
+                    else if (destinationUnit == "yd")
+                    {
+                        distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Kilometer).ToUnit(UnitsNet.Units.LengthUnit.Yard);
+                        await command.RespondAsync($"{input} {distance}");
+                    }
+                    else if (destinationUnit == "in")
+                    {
+                        distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Kilometer).ToUnit(UnitsNet.Units.LengthUnit.Inch);
+                        await command.RespondAsync($"{input} {distance}");
+                    }
+                    else if (destinationUnit == "cm")
+                    {
+                        distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Kilometer).ToUnit(UnitsNet.Units.LengthUnit.Centimeter);
+                        await command.RespondAsync($"{input} {distance}");
+                    }
                 }
-                else if (destinationUnit == "mi")
+                else if (sourceUnit == "mi")
                 {
-                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Meter).ToUnit(UnitsNet.Units.LengthUnit.Mile);
-                    await command.RespondAsync($"{input} {distance}");
+                    if (destinationUnit == "m")
+                    {
+                        distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Mile).ToUnit(UnitsNet.Units.LengthUnit.Meter);
+                        await command.RespondAsync($"{input} {distance}");
+                    }
+                    else if (destinationUnit == "km")
+                    {
+                        distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Mile).ToUnit(UnitsNet.Units.LengthUnit.Kilometer);
+                        await command.RespondAsync($"{input} {distance}");
+                    }
+                    else if (destinationUnit == "mi")
+                    {
+                        await command.RespondAsync($"Seriously... convert it yourself...\n{input} {inputDistance:n2} {destinationUnit}");
+                    }
+                    else if (destinationUnit == "ft")
+                    {
+                        distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Mile).ToUnit(UnitsNet.Units.LengthUnit.Foot);
+                        await command.RespondAsync($"{input} {distance}");
+                    }
+                    else if (destinationUnit == "yd")
+                    {
+                        distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Mile).ToUnit(UnitsNet.Units.LengthUnit.Yard);
+                        await command.RespondAsync($"{input} {distance}");
+                    }
+                    else if (destinationUnit == "in")
+                    {
+                        distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Mile).ToUnit(UnitsNet.Units.LengthUnit.Inch);
+                        await command.RespondAsync($"{input} {distance}");
+                    }
+                    else if (destinationUnit == "cm")
+                    {
+                        distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Mile).ToUnit(UnitsNet.Units.LengthUnit.Centimeter);
+                        await command.RespondAsync($"{input} {distance}");
+                    }
                 }
-                else if (destinationUnit == "ft")
+                else if (sourceUnit == "ft")
                 {
-                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Meter).ToUnit(UnitsNet.Units.LengthUnit.Foot);
-                    await command.RespondAsync($"{input} {distance}");
+                    if (destinationUnit == "m")
+                    {
+                        distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Foot).ToUnit(UnitsNet.Units.LengthUnit.Meter);
+                        await command.RespondAsync($"{input} {distance}");
+                    }
+                    else if (destinationUnit == "km")
+                    {
+                        distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Foot).ToUnit(UnitsNet.Units.LengthUnit.Kilometer);
+                        await command.RespondAsync($"{input} {distance}");
+                    }
+                    else if (destinationUnit == "mi")
+                    {
+                        distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Foot).ToUnit(UnitsNet.Units.LengthUnit.Mile);
+                        await command.RespondAsync($"{input} {distance}");
+                    }
+                    else if (destinationUnit == "ft")
+                    {
+                        await command.RespondAsync($"Seriously... convert it yourself...\n{input} {inputDistance:n2} {destinationUnit}");
+                    }
+                    else if (destinationUnit == "yd")
+                    {
+                        distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Foot).ToUnit(UnitsNet.Units.LengthUnit.Yard);
+                        await command.RespondAsync($"{input} {distance}");
+                    }
+                    else if (destinationUnit == "in")
+                    {
+                        distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Foot).ToUnit(UnitsNet.Units.LengthUnit.Inch);
+                        await command.RespondAsync($"{input} {distance}");
+                    }
+                    else if (destinationUnit == "cm")
+                    {
+                        distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Foot).ToUnit(UnitsNet.Units.LengthUnit.Centimeter);
+                        await command.RespondAsync($"{input} {distance}");
+                    }
                 }
-                else if (destinationUnit == "yd")
+                else if (sourceUnit == "yd")
                 {
-                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Meter).ToUnit(UnitsNet.Units.LengthUnit.Yard);
-                    await command.RespondAsync($"{input} {distance}");
+                    if (destinationUnit == "m")
+                    {
+                        distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Yard).ToUnit(UnitsNet.Units.LengthUnit.Meter);
+                        await command.RespondAsync($"{input} {distance}");
+                    }
+                    else if (destinationUnit == "km")
+                    {
+                        distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Yard).ToUnit(UnitsNet.Units.LengthUnit.Kilometer);
+                        await command.RespondAsync($"{input} {distance}");
+                    }
+                    else if (destinationUnit == "mi")
+                    {
+                        distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Yard).ToUnit(UnitsNet.Units.LengthUnit.Mile);
+                        await command.RespondAsync($"{input} {distance}");
+                    }
+                    else if (destinationUnit == "ft")
+                    {
+                        distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Yard).ToUnit(UnitsNet.Units.LengthUnit.Foot);
+                        await command.RespondAsync($"{input} {distance}");
+                    }
+                    else if (destinationUnit == "yd")
+                    {
+                        await command.RespondAsync($"Seriously... convert it yourself...\n{input} {inputDistance:n2} {destinationUnit}");
+                    }
+                    else if (destinationUnit == "in")
+                    {
+                        distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Yard).ToUnit(UnitsNet.Units.LengthUnit.Inch);
+                        await command.RespondAsync($"{input} {distance}");
+                    }
+                    else if (destinationUnit == "cm")
+                    {
+                        distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Yard).ToUnit(UnitsNet.Units.LengthUnit.Centimeter);
+                        await command.RespondAsync($"{input} {distance}");
+                    }
                 }
-                else if (destinationUnit == "in")
+                else if (sourceUnit == "in")
                 {
-                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Meter).ToUnit(UnitsNet.Units.LengthUnit.Inch);
-                    await command.RespondAsync($"{input} {distance}");
+                    if (destinationUnit == "m")
+                    {
+                        distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Inch).ToUnit(UnitsNet.Units.LengthUnit.Meter);
+                        await command.RespondAsync($"{input} {distance}");
+                    }
+                    else if (destinationUnit == "km")
+                    {
+                        distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Inch).ToUnit(UnitsNet.Units.LengthUnit.Kilometer);
+                        await command.RespondAsync($"{input} {distance}");
+                    }
+                    else if (destinationUnit == "mi")
+                    {
+                        distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Inch).ToUnit(UnitsNet.Units.LengthUnit.Mile);
+                        await command.RespondAsync($"{input} {distance}");
+                    }
+                    else if (destinationUnit == "ft")
+                    {
+                        distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Inch).ToUnit(UnitsNet.Units.LengthUnit.Foot);
+                        await command.RespondAsync($"{input} {distance}");
+                    }
+                    else if (destinationUnit == "yd")
+                    {
+                        distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Inch).ToUnit(UnitsNet.Units.LengthUnit.Yard);
+                        await command.RespondAsync($"{input} {distance}");
+                    }
+                    else if (destinationUnit == "in")
+                    {
+                        await command.RespondAsync($"Seriously... convert it yourself...\n{input} {inputDistance:n2} {destinationUnit}");
+                    }
+                    else if (destinationUnit == "cm")
+                    {
+                        distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Inch).ToUnit(UnitsNet.Units.LengthUnit.Centimeter);
+                        await command.RespondAsync($"{input} {distance}");
+                    }
                 }
-                else if (destinationUnit == "cm")
+                else if (sourceUnit == "cm")
                 {
-                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Meter).ToUnit(UnitsNet.Units.LengthUnit.Centimeter);
-                    await command.RespondAsync($"{input} {distance}");
+                    if (destinationUnit == "m")
+                    {
+                        distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Centimeter).ToUnit(UnitsNet.Units.LengthUnit.Meter);
+                        await command.RespondAsync($"{input} {distance}");
+                    }
+                    else if (destinationUnit == "km")
+                    {
+                        distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Centimeter).ToUnit(UnitsNet.Units.LengthUnit.Kilometer);
+                        await command.RespondAsync($"{input} {distance}");
+                    }
+                    else if (destinationUnit == "mi")
+                    {
+                        distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Centimeter).ToUnit(UnitsNet.Units.LengthUnit.Mile);
+                        await command.RespondAsync($"{input} {distance}");
+                    }
+                    else if (destinationUnit == "ft")
+                    {
+                        distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Centimeter).ToUnit(UnitsNet.Units.LengthUnit.Foot);
+                        await command.RespondAsync($"{input} {distance}");
+                    }
+                    else if (destinationUnit == "yd")
+                    {
+                        distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Centimeter).ToUnit(UnitsNet.Units.LengthUnit.Yard);
+                        await command.RespondAsync($"{input} {distance}");
+                    }
+                    else if (destinationUnit == "in")
+                    {
+                        distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Centimeter).ToUnit(UnitsNet.Units.LengthUnit.Inch);
+                        await command.RespondAsync($"{input} {distance}");
+                    }
+                    else if (destinationUnit == "cm")
+                    {
+                        await command.RespondAsync($"Seriously... convert it yourself...\n{input} {inputDistance:n2} {destinationUnit}");
+                    }
                 }
             }
-            else if (sourceUnit == "km")
-            {
-                if (destinationUnit == "m")
-                {
-                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Kilometer).ToUnit(UnitsNet.Units.LengthUnit.Meter);
-                    await command.RespondAsync($"{input} {distance}");
-                }
-                else if (destinationUnit == "km")
-                {
-                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {inputDistance:n2} {destinationUnit}");
-                }
-                else if (destinationUnit == "mi")
-                {
-                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Kilometer).ToUnit(UnitsNet.Units.LengthUnit.Mile);
-                    await command.RespondAsync($"{input} {distance}");
-                }
-                else if (destinationUnit == "ft")
-                {
-                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Kilometer).ToUnit(UnitsNet.Units.LengthUnit.Foot);
-                    await command.RespondAsync($"{input} {distance}");
-                }
-                else if (destinationUnit == "yd")
-                {
-                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Kilometer).ToUnit(UnitsNet.Units.LengthUnit.Yard);
-                    await command.RespondAsync($"{input} {distance}");
-                }
-                else if (destinationUnit == "in")
-                {
-                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Kilometer).ToUnit(UnitsNet.Units.LengthUnit.Inch);
-                    await command.RespondAsync($"{input} {distance}");
-                }
-                else if (destinationUnit == "cm")
-                {
-                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Kilometer).ToUnit(UnitsNet.Units.LengthUnit.Centimeter);
-                    await command.RespondAsync($"{input} {distance}");
-                }
-            }
-            else if (sourceUnit == "mi")
-            {
-                if (destinationUnit == "m")
-                {
-                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Mile).ToUnit(UnitsNet.Units.LengthUnit.Meter);
-                    await command.RespondAsync($"{input} {distance}");
-                }
-                else if (destinationUnit == "km")
-                {
-                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Mile).ToUnit(UnitsNet.Units.LengthUnit.Kilometer);
-                    await command.RespondAsync($"{input} {distance}");
-                }
-                else if (destinationUnit == "mi")
-                {
-                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {inputDistance:n2} {destinationUnit}");
-                }
-                else if (destinationUnit == "ft")
-                {
-                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Mile).ToUnit(UnitsNet.Units.LengthUnit.Foot);
-                    await command.RespondAsync($"{input} {distance}");
-                }
-                else if (destinationUnit == "yd")
-                {
-                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Mile).ToUnit(UnitsNet.Units.LengthUnit.Yard);
-                    await command.RespondAsync($"{input} {distance}");
-                }
-                else if (destinationUnit == "in")
-                {
-                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Mile).ToUnit(UnitsNet.Units.LengthUnit.Inch);
-                    await command.RespondAsync($"{input} {distance}");
-                }
-                else if (destinationUnit == "cm")
-                {
-                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Mile).ToUnit(UnitsNet.Units.LengthUnit.Centimeter);
-                    await command.RespondAsync($"{input} {distance}");
-                }
-            }
-            else if (sourceUnit == "ft")
-            {
-                if (destinationUnit == "m")
-                {
-                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Foot).ToUnit(UnitsNet.Units.LengthUnit.Meter);
-                    await command.RespondAsync($"{input} {distance}");
-                }
-                else if (destinationUnit == "km")
-                {
-                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Foot).ToUnit(UnitsNet.Units.LengthUnit.Kilometer);
-                    await command.RespondAsync($"{input} {distance}");
-                }
-                else if (destinationUnit == "mi")
-                {
-                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Foot).ToUnit(UnitsNet.Units.LengthUnit.Mile);
-                    await command.RespondAsync($"{input} {distance}");
-                }
-                else if (destinationUnit == "ft")
-                {
-                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {inputDistance:n2} {destinationUnit}");
-                }
-                else if (destinationUnit == "yd")
-                {
-                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Foot).ToUnit(UnitsNet.Units.LengthUnit.Yard);
-                    await command.RespondAsync($"{input} {distance}");
-                }
-                else if (destinationUnit == "in")
-                {
-                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Foot).ToUnit(UnitsNet.Units.LengthUnit.Inch);
-                    await command.RespondAsync($"{input} {distance}");
-                }
-                else if (destinationUnit == "cm")
-                {
-                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Foot).ToUnit(UnitsNet.Units.LengthUnit.Centimeter);
-                    await command.RespondAsync($"{input} {distance}");
-                }
-            }
-            else if (sourceUnit == "yd")
-            {
-                if (destinationUnit == "m")
-                {
-                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Yard).ToUnit(UnitsNet.Units.LengthUnit.Meter);
-                    await command.RespondAsync($"{input} {distance}");
-                }
-                else if (destinationUnit == "km")
-                {
-                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Yard).ToUnit(UnitsNet.Units.LengthUnit.Kilometer);
-                    await command.RespondAsync($"{input} {distance}");
-                }
-                else if (destinationUnit == "mi")
-                {
-                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Yard).ToUnit(UnitsNet.Units.LengthUnit.Mile);
-                    await command.RespondAsync($"{input} {distance}");
-                }
-                else if (destinationUnit == "ft")
-                {
-                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Yard).ToUnit(UnitsNet.Units.LengthUnit.Foot);
-                    await command.RespondAsync($"{input} {distance}");
-                }
-                else if (destinationUnit == "yd")
-                {
-                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {inputDistance:n2} {destinationUnit}");
-                }
-                else if (destinationUnit == "in")
-                {
-                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Yard).ToUnit(UnitsNet.Units.LengthUnit.Inch);
-                    await command.RespondAsync($"{input} {distance}");
-                }
-                else if (destinationUnit == "cm")
-                {
-                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Yard).ToUnit(UnitsNet.Units.LengthUnit.Centimeter);
-                    await command.RespondAsync($"{input} {distance}");
-                }
-            }
-            else if (sourceUnit == "in")
-            {
-                if (destinationUnit == "m")
-                {
-                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Inch).ToUnit(UnitsNet.Units.LengthUnit.Meter);
-                    await command.RespondAsync($"{input} {distance}");
-                }
-                else if (destinationUnit == "km")
-                {
-                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Inch).ToUnit(UnitsNet.Units.LengthUnit.Kilometer);
-                    await command.RespondAsync($"{input} {distance}");
-                }
-                else if (destinationUnit == "mi")
-                {
-                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Inch).ToUnit(UnitsNet.Units.LengthUnit.Mile);
-                    await command.RespondAsync($"{input} {distance}");
-                }
-                else if (destinationUnit == "ft")
-                {
-                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Inch).ToUnit(UnitsNet.Units.LengthUnit.Foot);
-                    await command.RespondAsync($"{input} {distance}");
-                }
-                else if (destinationUnit == "yd")
-                {
-                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Inch).ToUnit(UnitsNet.Units.LengthUnit.Yard);
-                    await command.RespondAsync($"{input} {distance}");
-                }
-                else if (destinationUnit == "in")
-                {
-                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {inputDistance:n2} {destinationUnit}");
-                }
-                else if (destinationUnit == "cm")
-                {
-                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Inch).ToUnit(UnitsNet.Units.LengthUnit.Centimeter);
-                    await command.RespondAsync($"{input} {distance}");
-                }
-            }
-            else if (sourceUnit == "cm")
-            {
-                if (destinationUnit == "m")
-                {
-                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Centimeter).ToUnit(UnitsNet.Units.LengthUnit.Meter);
-                    await command.RespondAsync($"{input} {distance}");
-                }
-                else if (destinationUnit == "km")
-                {
-                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Centimeter).ToUnit(UnitsNet.Units.LengthUnit.Kilometer);
-                    await command.RespondAsync($"{input} {distance}");
-                }
-                else if (destinationUnit == "mi")
-                {
-                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Centimeter).ToUnit(UnitsNet.Units.LengthUnit.Mile);
-                    await command.RespondAsync($"{input} {distance}");
-                }
-                else if (destinationUnit == "ft")
-                {
-                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Centimeter).ToUnit(UnitsNet.Units.LengthUnit.Foot);
-                    await command.RespondAsync($"{input} {distance}");
-                }
-                else if (destinationUnit == "yd")
-                {
-                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Centimeter).ToUnit(UnitsNet.Units.LengthUnit.Yard);
-                    await command.RespondAsync($"{input} {distance}");
-                }
-                else if (destinationUnit == "in")
-                {
-                    distance = Length.From(inputDistance, UnitsNet.Units.LengthUnit.Centimeter).ToUnit(UnitsNet.Units.LengthUnit.Inch);
-                    await command.RespondAsync($"{input} {distance}");
-                }
-                else if (destinationUnit == "cm")
-                {
-                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {inputDistance:n2} {destinationUnit}");
-                }
-            }
-        }
 
-        if (command.Data.Name == "weight")
-        {
-            string? sourceUnit = command.Data.Options.ElementAt(1).Value.ToString();
-            string? destinationUnit = command.Data.Options.ElementAt(2).Value.ToString();
+            if (cmd == "weight")
+            {
+                string? sourceUnit = command.Data.Options.First().Options.ElementAt(1).Value.ToString();
+                string? destinationUnit = command.Data.Options.First().Options.ElementAt(2).Value.ToString();
 
 #pragma warning disable CS8604 // Possible null reference argument.
-            double inputWeight = double.Parse(command.Data.Options.ElementAt(0).Value.ToString(), CultureInfo.InvariantCulture.NumberFormat);
+                double inputWeight = double.Parse(command.Data.Options.First().Options.ElementAt(0).Value.ToString(), CultureInfo.InvariantCulture.NumberFormat);
 #pragma warning restore CS8604 // Possible null reference argument.
 
-            string input = $"`{inputWeight} {sourceUnit}:`  ";
-            UnitsNet.Mass weight;
+                string input = $"`{inputWeight} {sourceUnit}:`  ";
+                UnitsNet.Mass weight;
 
-            if (sourceUnit == "kg")
-            {
-                if (destinationUnit == "kg")
+                if (sourceUnit == "kg")
                 {
-                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {inputWeight:0.0} {destinationUnit}");
+                    if (destinationUnit == "kg")
+                    {
+                        await command.RespondAsync($"Seriously... convert it yourself...\n{input} {inputWeight:0.0} {destinationUnit}");
+                    }
+                    else if (destinationUnit == "g")
+                    {
+                        weight = Mass.From(inputWeight, UnitsNet.Units.MassUnit.Kilogram).ToUnit(UnitsNet.Units.MassUnit.Gram);
+                        await command.RespondAsync($"{input} {weight}");
+                    }
+                    else if (destinationUnit == "lb")
+                    {
+                        weight = Mass.From(inputWeight, UnitsNet.Units.MassUnit.Kilogram).ToUnit(UnitsNet.Units.MassUnit.Pound);
+                        await command.RespondAsync($"{input} {weight}");
+                    }
+                    else if (destinationUnit == "oz")
+                    {
+                        weight = Mass.From(inputWeight, UnitsNet.Units.MassUnit.Kilogram).ToUnit(UnitsNet.Units.MassUnit.Ounce);
+                        await command.RespondAsync($"{input} {weight}");
+                    }
                 }
-                else if (destinationUnit == "g")
+                else if (sourceUnit == "g")
                 {
-                    weight = Mass.From(inputWeight, UnitsNet.Units.MassUnit.Kilogram).ToUnit(UnitsNet.Units.MassUnit.Gram);
-                    await command.RespondAsync($"{input} {weight}");
+                    if (destinationUnit == "kg")
+                    {
+                        weight = Mass.From(inputWeight, UnitsNet.Units.MassUnit.Gram).ToUnit(UnitsNet.Units.MassUnit.Kilogram);
+                        await command.RespondAsync($"{input} {weight}");
+                    }
+                    else if (destinationUnit == "g")
+                    {
+                        await command.RespondAsync($"Seriously... convert it yourself...\n{input} {inputWeight:0.0} {destinationUnit}");
+                    }
+                    else if (destinationUnit == "lb")
+                    {
+                        weight = Mass.From(inputWeight, UnitsNet.Units.MassUnit.Gram).ToUnit(UnitsNet.Units.MassUnit.Pound);
+                        await command.RespondAsync($"{input} {weight}");
+                    }
+                    else if (destinationUnit == "oz")
+                    {
+                        weight = Mass.From(inputWeight, UnitsNet.Units.MassUnit.Gram).ToUnit(UnitsNet.Units.MassUnit.Ounce);
+                        await command.RespondAsync($"{input} {weight}");
+                    }
                 }
-                else if (destinationUnit == "lb")
+                else if (sourceUnit == "lb")
                 {
-                    weight = Mass.From(inputWeight, UnitsNet.Units.MassUnit.Kilogram).ToUnit(UnitsNet.Units.MassUnit.Pound);
-                    await command.RespondAsync($"{input} {weight}");
+                    if (destinationUnit == "kg")
+                    {
+                        weight = Mass.From(inputWeight, UnitsNet.Units.MassUnit.Pound).ToUnit(UnitsNet.Units.MassUnit.Kilogram);
+                        await command.RespondAsync($"{input} {weight}");
+                    }
+                    else if (destinationUnit == "g")
+                    {
+                        weight = Mass.From(inputWeight, UnitsNet.Units.MassUnit.Pound).ToUnit(UnitsNet.Units.MassUnit.Gram);
+                        await command.RespondAsync($"{input} {weight}");
+                    }
+                    else if (destinationUnit == "lb")
+                    {
+                        await command.RespondAsync($"Seriously... convert it yourself...\n{input} {inputWeight:0.0} {destinationUnit}");
+                    }
+                    else if (destinationUnit == "oz")
+                    {
+                        weight = Mass.From(inputWeight, UnitsNet.Units.MassUnit.Pound).ToUnit(UnitsNet.Units.MassUnit.Ounce);
+                        await command.RespondAsync($"{input} {weight}");
+                    }
                 }
-                else if (destinationUnit == "oz")
+                else if (sourceUnit == "oz")
                 {
-                    weight = Mass.From(inputWeight, UnitsNet.Units.MassUnit.Kilogram).ToUnit(UnitsNet.Units.MassUnit.Ounce);
-                    await command.RespondAsync($"{input} {weight}");
+                    if (destinationUnit == "kg")
+                    {
+                        weight = Mass.From(inputWeight, UnitsNet.Units.MassUnit.Ounce).ToUnit(UnitsNet.Units.MassUnit.Kilogram);
+                        await command.RespondAsync($"{input} {weight}");
+                    }
+                    else if (destinationUnit == "g")
+                    {
+                        weight = Mass.From(inputWeight, UnitsNet.Units.MassUnit.Ounce).ToUnit(UnitsNet.Units.MassUnit.Gram);
+                        await command.RespondAsync($"{input} {weight}");
+                    }
+                    else if (destinationUnit == "lb")
+                    {
+                        weight = Mass.From(inputWeight, UnitsNet.Units.MassUnit.Ounce).ToUnit(UnitsNet.Units.MassUnit.Pound);
+                        await command.RespondAsync($"{input} {weight}");
+                    }
+                    else if (destinationUnit == "oz")
+                    {
+                        await command.RespondAsync($"Seriously... convert it yourself...\n{input} {inputWeight:0.0} {destinationUnit}");
+                    }
                 }
             }
-            else if (sourceUnit == "g")
-            {
-                if (destinationUnit == "kg")
-                {
-                    weight = Mass.From(inputWeight, UnitsNet.Units.MassUnit.Gram).ToUnit(UnitsNet.Units.MassUnit.Kilogram);
-                    await command.RespondAsync($"{input} {weight}");
-                }
-                else if (destinationUnit == "g")
-                {
-                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {inputWeight:0.0} {destinationUnit}");
-                }
-                else if (destinationUnit == "lb")
-                {
-                    weight = Mass.From(inputWeight, UnitsNet.Units.MassUnit.Gram).ToUnit(UnitsNet.Units.MassUnit.Pound);
-                    await command.RespondAsync($"{input} {weight}");
-                }
-                else if (destinationUnit == "oz")
-                {
-                    weight = Mass.From(inputWeight, UnitsNet.Units.MassUnit.Gram).ToUnit(UnitsNet.Units.MassUnit.Ounce);
-                    await command.RespondAsync($"{input} {weight}");
-                }
-            }
-            else if (sourceUnit == "lb")
-            {
-                if (destinationUnit == "kg")
-                {
-                    weight = Mass.From(inputWeight, UnitsNet.Units.MassUnit.Pound).ToUnit(UnitsNet.Units.MassUnit.Kilogram);
-                    await command.RespondAsync($"{input} {weight}");
-                }
-                else if (destinationUnit == "g")
-                {
-                    weight = Mass.From(inputWeight, UnitsNet.Units.MassUnit.Pound).ToUnit(UnitsNet.Units.MassUnit.Gram);
-                    await command.RespondAsync($"{input} {weight}");
-                }
-                else if (destinationUnit == "lb")
-                {
-                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {inputWeight:0.0} {destinationUnit}");
-                }
-                else if (destinationUnit == "oz")
-                {
-                    weight = Mass.From(inputWeight, UnitsNet.Units.MassUnit.Pound).ToUnit(UnitsNet.Units.MassUnit.Ounce);
-                    await command.RespondAsync($"{input} {weight}");
-                }
-            }
-            else if (sourceUnit == "oz")
-            {
-                if (destinationUnit == "kg")
-                {
-                    weight = Mass.From(inputWeight, UnitsNet.Units.MassUnit.Ounce).ToUnit(UnitsNet.Units.MassUnit.Kilogram);
-                    await command.RespondAsync($"{input} {weight}");
-                }
-                else if (destinationUnit == "g")
-                {
-                    weight = Mass.From(inputWeight, UnitsNet.Units.MassUnit.Ounce).ToUnit(UnitsNet.Units.MassUnit.Gram);
-                    await command.RespondAsync($"{input} {weight}");
-                }
-                else if (destinationUnit == "lb")
-                {
-                    weight = Mass.From(inputWeight, UnitsNet.Units.MassUnit.Ounce).ToUnit(UnitsNet.Units.MassUnit.Pound);
-                    await command.RespondAsync($"{input} {weight}");
-                }
-                else if (destinationUnit == "oz")
-                {
-                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {inputWeight:0.0} {destinationUnit}");
-                }
-            }
-        }
 
-        if (command.Data.Name == "volume")
-        {
-            string? sourceUnit = command.Data.Options.ElementAt(1).Value.ToString();
-            string? destinationUnit = command.Data.Options.ElementAt(2).Value.ToString();
+            if (cmd == "volume")
+            {
+                string? sourceUnit = command.Data.Options.First().Options.ElementAt(1).Value.ToString();
+                string? destinationUnit = command.Data.Options.First().Options.ElementAt(2).Value.ToString();
 
 #pragma warning disable CS8604 // Possible null reference argument.
-            double inputVolume = double.Parse(command.Data.Options.ElementAt(0).Value.ToString(), CultureInfo.InvariantCulture.NumberFormat);
+                double inputVolume = double.Parse(command.Data.Options.First().Options.ElementAt(0).Value.ToString(), CultureInfo.InvariantCulture.NumberFormat);
 #pragma warning restore CS8604 // Possible null reference argument.
 
-            string input = $"`{inputVolume} {sourceUnit}:`  ";
-            UnitsNet.Volume volume;
+                string input = $"`{inputVolume} {sourceUnit}:`  ";
+                UnitsNet.Volume volume;
 
-            if (sourceUnit == "L")
-            {
-                if (destinationUnit == "L")
+                if (sourceUnit == "L")
                 {
-                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {inputVolume:0.0} {destinationUnit}");
+                    if (destinationUnit == "L")
+                    {
+                        await command.RespondAsync($"Seriously... convert it yourself...\n{input} {inputVolume:0.0} {destinationUnit}");
+                    }
+                    else if (destinationUnit == "mL")
+                    {
+                        volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.Liter).ToUnit(UnitsNet.Units.VolumeUnit.Milliliter);
+                        await command.RespondAsync($"{input} {volume}");
+                    }
+                    else if (destinationUnit == "gal")
+                    {
+                        volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.Liter).ToUnit(UnitsNet.Units.VolumeUnit.UsGallon);
+                        await command.RespondAsync($"{input} {volume}");
+                    }
+                    else if (destinationUnit == "qt")
+                    {
+                        volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.Liter).ToUnit(UnitsNet.Units.VolumeUnit.UsQuart);
+                        await command.RespondAsync($"{input} {volume}");
+                    }
+                    else if (destinationUnit == "pt")
+                    {
+                        volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.Liter).ToUnit(UnitsNet.Units.VolumeUnit.UsPint);
+                        await command.RespondAsync($"{input} {volume}");
+                    }
+                    else if (destinationUnit == "cup")
+                    {
+                        volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.Liter).ToUnit(UnitsNet.Units.VolumeUnit.UsCustomaryCup);
+                        await command.RespondAsync($"{input} {volume}");
+                    }
+                    else if (destinationUnit == "fl oz")
+                    {
+                        volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.Liter).ToUnit(UnitsNet.Units.VolumeUnit.UsOunce);
+                        await command.RespondAsync($"{input} {volume}");
+                    }
+                    else if (destinationUnit == "tbsp")
+                    {
+                        volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.Liter).ToUnit(UnitsNet.Units.VolumeUnit.UsTablespoon);
+                        await command.RespondAsync($"{input} {volume}");
+                    }
+                    else if (destinationUnit == "tsp")
+                    {
+                        volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.Liter).ToUnit(UnitsNet.Units.VolumeUnit.UsTeaspoon);
+                        await command.RespondAsync($"{input} {volume}");
+                    }
                 }
-                else if (destinationUnit == "mL")
+                else if (sourceUnit == "mL")
                 {
-                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.Liter).ToUnit(UnitsNet.Units.VolumeUnit.Milliliter);
-                    await command.RespondAsync($"{input} {volume}");
+                    if (destinationUnit == "L")
+                    {
+                        volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.Milliliter).ToUnit(UnitsNet.Units.VolumeUnit.Liter);
+                        await command.RespondAsync($"{input} {volume}");
+                    }
+                    else if (destinationUnit == "mL")
+                    {
+                        await command.RespondAsync($"Seriously... convert it yourself...\n{input} {inputVolume:0.0} {destinationUnit}");
+                    }
+                    else if (destinationUnit == "gal")
+                    {
+                        volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.Milliliter).ToUnit(UnitsNet.Units.VolumeUnit.UsGallon);
+                        await command.RespondAsync($"{input} {volume}");
+                    }
+                    else if (destinationUnit == "qt")
+                    {
+                        volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.Milliliter).ToUnit(UnitsNet.Units.VolumeUnit.UsQuart);
+                        await command.RespondAsync($"{input} {volume}");
+                    }
+                    else if (destinationUnit == "pt")
+                    {
+                        volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.Milliliter).ToUnit(UnitsNet.Units.VolumeUnit.UsPint);
+                        await command.RespondAsync($"{input} {volume}");
+                    }
+                    else if (destinationUnit == "cup")
+                    {
+                        volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.Milliliter).ToUnit(UnitsNet.Units.VolumeUnit.UsCustomaryCup);
+                        await command.RespondAsync($"{input} {volume}");
+                    }
+                    else if (destinationUnit == "fl oz")
+                    {
+                        volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.Milliliter).ToUnit(UnitsNet.Units.VolumeUnit.UsOunce);
+                        await command.RespondAsync($"{input} {volume}");
+                    }
+                    else if (destinationUnit == "tbsp")
+                    {
+                        volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.Milliliter).ToUnit(UnitsNet.Units.VolumeUnit.UsTablespoon);
+                        await command.RespondAsync($"{input} {volume}");
+                    }
+                    else if (destinationUnit == "tsp")
+                    {
+                        volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.Milliliter).ToUnit(UnitsNet.Units.VolumeUnit.UsTeaspoon);
+                        await command.RespondAsync($"{input} {volume}");
+                    }
                 }
-                else if (destinationUnit == "gal")
+                else if (sourceUnit == "gal")
                 {
-                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.Liter).ToUnit(UnitsNet.Units.VolumeUnit.UsGallon);
-                    await command.RespondAsync($"{input} {volume}");
+                    if (destinationUnit == "L")
+                    {
+                        volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsGallon).ToUnit(UnitsNet.Units.VolumeUnit.Liter);
+                        await command.RespondAsync($"{input} {volume}");
+                    }
+                    else if (destinationUnit == "mL")
+                    {
+                        volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsGallon).ToUnit(UnitsNet.Units.VolumeUnit.Milliliter);
+                        await command.RespondAsync($"{input} {volume}");
+                    }
+                    else if (destinationUnit == "gal")
+                    {
+                        await command.RespondAsync($"Seriously... convert it yourself...\n{input} {inputVolume:0.0} {destinationUnit}");
+                    }
+                    else if (destinationUnit == "qt")
+                    {
+                        volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsGallon).ToUnit(UnitsNet.Units.VolumeUnit.UsQuart);
+                        await command.RespondAsync($"{input} {volume}");
+                    }
+                    else if (destinationUnit == "pt")
+                    {
+                        volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsGallon).ToUnit(UnitsNet.Units.VolumeUnit.UsPint);
+                        await command.RespondAsync($"{input} {volume}");
+                    }
+                    else if (destinationUnit == "cup")
+                    {
+                        volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsGallon).ToUnit(UnitsNet.Units.VolumeUnit.UsCustomaryCup);
+                        await command.RespondAsync($"{input} {volume}");
+                    }
+                    else if (destinationUnit == "fl oz")
+                    {
+                        volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsGallon).ToUnit(UnitsNet.Units.VolumeUnit.UsOunce);
+                        await command.RespondAsync($"{input} {volume}");
+                    }
+                    else if (destinationUnit == "tbsp")
+                    {
+                        volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsGallon).ToUnit(UnitsNet.Units.VolumeUnit.UsTablespoon);
+                        await command.RespondAsync($"{input} {volume}");
+                    }
+                    else if (destinationUnit == "tsp")
+                    {
+                        volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsGallon).ToUnit(UnitsNet.Units.VolumeUnit.UsTeaspoon);
+                        await command.RespondAsync($"{input} {volume}");
+                    }
                 }
-                else if (destinationUnit == "qt")
+                else if (sourceUnit == "qt")
                 {
-                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.Liter).ToUnit(UnitsNet.Units.VolumeUnit.UsQuart);
-                    await command.RespondAsync($"{input} {volume}");
+                    if (destinationUnit == "L")
+                    {
+                        volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsQuart).ToUnit(UnitsNet.Units.VolumeUnit.Liter);
+                        await command.RespondAsync($"{input} {volume}");
+                    }
+                    else if (destinationUnit == "mL")
+                    {
+                        volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsQuart).ToUnit(UnitsNet.Units.VolumeUnit.Milliliter);
+                        await command.RespondAsync($"{input} {volume}");
+                    }
+                    else if (destinationUnit == "gal")
+                    {
+                        volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsQuart).ToUnit(UnitsNet.Units.VolumeUnit.UsGallon);
+                        await command.RespondAsync($"{input} {volume}");
+                    }
+                    else if (destinationUnit == "qt")
+                    {
+                        await command.RespondAsync($"Seriously... convert it yourself...\n{input} {inputVolume:0.0} {destinationUnit}");
+                    }
+                    else if (destinationUnit == "pt")
+                    {
+                        volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsQuart).ToUnit(UnitsNet.Units.VolumeUnit.UsPint);
+                        await command.RespondAsync($"{input} {volume}");
+                    }
+                    else if (destinationUnit == "cup")
+                    {
+                        volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsQuart).ToUnit(UnitsNet.Units.VolumeUnit.UsCustomaryCup);
+                        await command.RespondAsync($"{input} {volume}");
+                    }
+                    else if (destinationUnit == "fl oz")
+                    {
+                        volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsQuart).ToUnit(UnitsNet.Units.VolumeUnit.UsOunce);
+                        await command.RespondAsync($"{input} {volume}");
+                    }
+                    else if (destinationUnit == "tbsp")
+                    {
+                        volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsQuart).ToUnit(UnitsNet.Units.VolumeUnit.UsTablespoon);
+                        await command.RespondAsync($"{input} {volume}");
+                    }
+                    else if (destinationUnit == "tsp")
+                    {
+                        volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsQuart).ToUnit(UnitsNet.Units.VolumeUnit.UsTeaspoon);
+                        await command.RespondAsync($"{input} {volume}");
+                    }
                 }
-                else if (destinationUnit == "pt")
+                else if (sourceUnit == "pt")
                 {
-                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.Liter).ToUnit(UnitsNet.Units.VolumeUnit.UsPint);
-                    await command.RespondAsync($"{input} {volume}");
+                    if (destinationUnit == "L")
+                    {
+                        volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsPint).ToUnit(UnitsNet.Units.VolumeUnit.Liter);
+                        await command.RespondAsync($"{input} {volume}");
+                    }
+                    else if (destinationUnit == "mL")
+                    {
+                        volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsPint).ToUnit(UnitsNet.Units.VolumeUnit.Milliliter);
+                        await command.RespondAsync($"{input} {volume}");
+                    }
+                    else if (destinationUnit == "gal")
+                    {
+                        volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsPint).ToUnit(UnitsNet.Units.VolumeUnit.UsGallon);
+                        await command.RespondAsync($"{input} {volume}");
+                    }
+                    else if (destinationUnit == "qt")
+                    {
+                        volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsPint).ToUnit(UnitsNet.Units.VolumeUnit.UsQuart);
+                        await command.RespondAsync($"{input} {volume}");
+                    }
+                    else if (destinationUnit == "pt")
+                    {
+                        await command.RespondAsync($"Seriously... convert it yourself...\n{input} {inputVolume:0.0} {destinationUnit}");
+                    }
+                    else if (destinationUnit == "cup")
+                    {
+                        volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsPint).ToUnit(UnitsNet.Units.VolumeUnit.UsCustomaryCup);
+                        await command.RespondAsync($"{input} {volume}");
+                    }
+                    else if (destinationUnit == "fl oz")
+                    {
+                        volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsPint).ToUnit(UnitsNet.Units.VolumeUnit.UsOunce);
+                        await command.RespondAsync($"{input} {volume}");
+                    }
+                    else if (destinationUnit == "tbsp")
+                    {
+                        volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsPint).ToUnit(UnitsNet.Units.VolumeUnit.UsTablespoon);
+                        await command.RespondAsync($"{input} {volume}");
+                    }
+                    else if (destinationUnit == "tsp")
+                    {
+                        volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsPint).ToUnit(UnitsNet.Units.VolumeUnit.UsTeaspoon);
+                        await command.RespondAsync($"{input} {volume}");
+                    }
                 }
-                else if (destinationUnit == "cup")
+                else if (sourceUnit == "cup")
                 {
-                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.Liter).ToUnit(UnitsNet.Units.VolumeUnit.UsCustomaryCup);
-                    await command.RespondAsync($"{input} {volume}");
+                    if (destinationUnit == "L")
+                    {
+                        volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsCustomaryCup).ToUnit(UnitsNet.Units.VolumeUnit.Liter);
+                        await command.RespondAsync($"{input} {volume}");
+                    }
+                    else if (destinationUnit == "mL")
+                    {
+                        volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsCustomaryCup).ToUnit(UnitsNet.Units.VolumeUnit.Milliliter);
+                        await command.RespondAsync($"{input} {volume}");
+                    }
+                    else if (destinationUnit == "gal")
+                    {
+                        volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsCustomaryCup).ToUnit(UnitsNet.Units.VolumeUnit.UsGallon);
+                        await command.RespondAsync($"{input} {volume}");
+                    }
+                    else if (destinationUnit == "qt")
+                    {
+                        volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsCustomaryCup).ToUnit(UnitsNet.Units.VolumeUnit.UsQuart);
+                        await command.RespondAsync($"{input} {volume}");
+                    }
+                    else if (destinationUnit == "pt")
+                    {
+                        volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsCustomaryCup).ToUnit(UnitsNet.Units.VolumeUnit.UsPint);
+                        await command.RespondAsync($"{input} {volume}");
+                    }
+                    else if (destinationUnit == "cup")
+                    {
+                        await command.RespondAsync($"Seriously... convert it yourself...\n{input} {inputVolume:0.0} {destinationUnit}");
+                    }
+                    else if (destinationUnit == "fl oz")
+                    {
+                        volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsCustomaryCup).ToUnit(UnitsNet.Units.VolumeUnit.UsOunce);
+                        await command.RespondAsync($"{input} {volume}");
+                    }
+                    else if (destinationUnit == "tbsp")
+                    {
+                        volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsCustomaryCup).ToUnit(UnitsNet.Units.VolumeUnit.UsTablespoon);
+                        await command.RespondAsync($"{input} {volume}");
+                    }
+                    else if (destinationUnit == "tsp")
+                    {
+                        volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsCustomaryCup).ToUnit(UnitsNet.Units.VolumeUnit.UsTeaspoon);
+                        await command.RespondAsync($"{input} {volume}");
+                    }
                 }
-                else if (destinationUnit == "fl oz")
+                else if (sourceUnit == "fl oz")
                 {
-                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.Liter).ToUnit(UnitsNet.Units.VolumeUnit.UsOunce);
-                    await command.RespondAsync($"{input} {volume}");
+                    if (destinationUnit == "L")
+                    {
+                        volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsOunce).ToUnit(UnitsNet.Units.VolumeUnit.Liter);
+                        await command.RespondAsync($"{input} {volume}");
+                    }
+                    else if (destinationUnit == "mL")
+                    {
+                        volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsOunce).ToUnit(UnitsNet.Units.VolumeUnit.Milliliter);
+                        await command.RespondAsync($"{input} {volume}");
+                    }
+                    else if (destinationUnit == "gal")
+                    {
+                        volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsOunce).ToUnit(UnitsNet.Units.VolumeUnit.UsGallon);
+                        await command.RespondAsync($"{input} {volume}");
+                    }
+                    else if (destinationUnit == "qt")
+                    {
+                        volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsOunce).ToUnit(UnitsNet.Units.VolumeUnit.UsQuart);
+                        await command.RespondAsync($"{input} {volume}");
+                    }
+                    else if (destinationUnit == "pt")
+                    {
+                        volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsOunce).ToUnit(UnitsNet.Units.VolumeUnit.UsPint);
+                        await command.RespondAsync($"{input} {volume}");
+                    }
+                    else if (destinationUnit == "cup")
+                    {
+                        volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsOunce).ToUnit(UnitsNet.Units.VolumeUnit.UsCustomaryCup);
+                        await command.RespondAsync($"{input} {volume}");
+                    }
+                    else if (destinationUnit == "fl oz")
+                    {
+                        await command.RespondAsync($"Seriously... convert it yourself...\n{input} {inputVolume:0.0} {destinationUnit}");
+                    }
+                    else if (destinationUnit == "tbsp")
+                    {
+                        volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsOunce).ToUnit(UnitsNet.Units.VolumeUnit.UsTablespoon);
+                        await command.RespondAsync($"{input} {volume}");
+                    }
+                    else if (destinationUnit == "tsp")
+                    {
+                        volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsOunce).ToUnit(UnitsNet.Units.VolumeUnit.UsTeaspoon);
+                        await command.RespondAsync($"{input} {volume}");
+                    }
                 }
-                else if (destinationUnit == "tbsp")
+                else if (sourceUnit == "tbsp")
                 {
-                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.Liter).ToUnit(UnitsNet.Units.VolumeUnit.UsTablespoon);
-                    await command.RespondAsync($"{input} {volume}");
+                    if (destinationUnit == "L")
+                    {
+                        volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsTablespoon).ToUnit(UnitsNet.Units.VolumeUnit.Liter);
+                        await command.RespondAsync($"{input} {volume}");
+                    }
+                    else if (destinationUnit == "mL")
+                    {
+                        volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsTablespoon).ToUnit(UnitsNet.Units.VolumeUnit.Milliliter);
+                        await command.RespondAsync($"{input} {volume}");
+                    }
+                    else if (destinationUnit == "gal")
+                    {
+                        volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsTablespoon).ToUnit(UnitsNet.Units.VolumeUnit.UsGallon);
+                        await command.RespondAsync($"{input} {volume}");
+                    }
+                    else if (destinationUnit == "qt")
+                    {
+                        volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsTablespoon).ToUnit(UnitsNet.Units.VolumeUnit.UsQuart);
+                        await command.RespondAsync($"{input} {volume}");
+                    }
+                    else if (destinationUnit == "pt")
+                    {
+                        volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsTablespoon).ToUnit(UnitsNet.Units.VolumeUnit.UsPint);
+                        await command.RespondAsync($"{input} {volume}");
+                    }
+                    else if (destinationUnit == "cup")
+                    {
+                        volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsTablespoon).ToUnit(UnitsNet.Units.VolumeUnit.UsCustomaryCup);
+                        await command.RespondAsync($"{input} {volume}");
+                    }
+                    else if (destinationUnit == "fl oz")
+                    {
+                        volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsTablespoon).ToUnit(UnitsNet.Units.VolumeUnit.UsOunce);
+                        await command.RespondAsync($"{input} {volume}");
+                    }
+                    else if (destinationUnit == "tbsp")
+                    {
+                        await command.RespondAsync($"Seriously... convert it yourself...\n{input} {inputVolume:0.0} {destinationUnit}");
+                    }
+                    else if (destinationUnit == "tsp")
+                    {
+                        volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsTablespoon).ToUnit(UnitsNet.Units.VolumeUnit.UsTeaspoon);
+                        await command.RespondAsync($"{input} {volume}");
+                    }
                 }
-                else if (destinationUnit == "tsp")
+                else if (sourceUnit == "tsp")
                 {
-                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.Liter).ToUnit(UnitsNet.Units.VolumeUnit.UsTeaspoon);
-                    await command.RespondAsync($"{input} {volume}");
+                    if (destinationUnit == "L")
+                    {
+                        volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsTeaspoon).ToUnit(UnitsNet.Units.VolumeUnit.Liter);
+                        await command.RespondAsync($"{input} {volume}");
+                    }
+                    else if (destinationUnit == "mL")
+                    {
+                        volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsTeaspoon).ToUnit(UnitsNet.Units.VolumeUnit.Milliliter);
+                        await command.RespondAsync($"{input} {volume}");
+                    }
+                    else if (destinationUnit == "gal")
+                    {
+                        volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsTeaspoon).ToUnit(UnitsNet.Units.VolumeUnit.UsGallon);
+                        await command.RespondAsync($"{input} {volume}");
+                    }
+                    else if (destinationUnit == "qt")
+                    {
+                        volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsTeaspoon).ToUnit(UnitsNet.Units.VolumeUnit.UsQuart);
+                        await command.RespondAsync($"{input} {volume}");
+                    }
+                    else if (destinationUnit == "pt")
+                    {
+                        volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsTeaspoon).ToUnit(UnitsNet.Units.VolumeUnit.UsPint);
+                        await command.RespondAsync($"{input} {volume}");
+                    }
+                    else if (destinationUnit == "cup")
+                    {
+                        volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsTeaspoon).ToUnit(UnitsNet.Units.VolumeUnit.UsCustomaryCup);
+                        await command.RespondAsync($"{input} {volume}");
+                    }
+                    else if (destinationUnit == "fl oz")
+                    {
+                        volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsTeaspoon).ToUnit(UnitsNet.Units.VolumeUnit.UsOunce);
+                        await command.RespondAsync($"{input} {volume}");
+                    }
+                    else if (destinationUnit == "tbsp")
+                    {
+                        volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsTeaspoon).ToUnit(UnitsNet.Units.VolumeUnit.UsTablespoon);
+                        await command.RespondAsync($"{input} {volume}");
+                    }
+                    else if (destinationUnit == "tsp")
+                    {
+                        await command.RespondAsync($"Seriously... convert it yourself...\n{input} {inputVolume:0.0} {destinationUnit}");
+                    }
                 }
             }
-            else if (sourceUnit == "mL")
-            {
-                if (destinationUnit == "L")
-                {
-                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.Milliliter).ToUnit(UnitsNet.Units.VolumeUnit.Liter);
-                    await command.RespondAsync($"{input} {volume}");
-                }
-                else if (destinationUnit == "mL")
-                {
-                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {inputVolume:0.0} {destinationUnit}");
-                }
-                else if (destinationUnit == "gal")
-                {
-                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.Milliliter).ToUnit(UnitsNet.Units.VolumeUnit.UsGallon);
-                    await command.RespondAsync($"{input} {volume}");
-                }
-                else if (destinationUnit == "qt")
-                {
-                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.Milliliter).ToUnit(UnitsNet.Units.VolumeUnit.UsQuart);
-                    await command.RespondAsync($"{input} {volume}");
-                }
-                else if (destinationUnit == "pt")
-                {
-                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.Milliliter).ToUnit(UnitsNet.Units.VolumeUnit.UsPint);
-                    await command.RespondAsync($"{input} {volume}");
-                }
-                else if (destinationUnit == "cup")
-                {
-                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.Milliliter).ToUnit(UnitsNet.Units.VolumeUnit.UsCustomaryCup);
-                    await command.RespondAsync($"{input} {volume}");
-                }
-                else if (destinationUnit == "fl oz")
-                {
-                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.Milliliter).ToUnit(UnitsNet.Units.VolumeUnit.UsOunce);
-                    await command.RespondAsync($"{input} {volume}");
-                }
-                else if (destinationUnit == "tbsp")
-                {
-                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.Milliliter).ToUnit(UnitsNet.Units.VolumeUnit.UsTablespoon);
-                    await command.RespondAsync($"{input} {volume}");
-                }
-                else if (destinationUnit == "tsp")
-                {
-                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.Milliliter).ToUnit(UnitsNet.Units.VolumeUnit.UsTeaspoon);
-                    await command.RespondAsync($"{input} {volume}");
-                }
-            }
-            else if (sourceUnit == "gal")
-            {
-                if (destinationUnit == "L")
-                {
-                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsGallon).ToUnit(UnitsNet.Units.VolumeUnit.Liter);
-                    await command.RespondAsync($"{input} {volume}");
-                }
-                else if (destinationUnit == "mL")
-                {
-                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsGallon).ToUnit(UnitsNet.Units.VolumeUnit.Milliliter);
-                    await command.RespondAsync($"{input} {volume}");
-                }
-                else if (destinationUnit == "gal")
-                {
-                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {inputVolume:0.0} {destinationUnit}");
-                }
-                else if (destinationUnit == "qt")
-                {
-                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsGallon).ToUnit(UnitsNet.Units.VolumeUnit.UsQuart);
-                    await command.RespondAsync($"{input} {volume}");
-                }
-                else if (destinationUnit == "pt")
-                {
-                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsGallon).ToUnit(UnitsNet.Units.VolumeUnit.UsPint);
-                    await command.RespondAsync($"{input} {volume}");
-                }
-                else if (destinationUnit == "cup")
-                {
-                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsGallon).ToUnit(UnitsNet.Units.VolumeUnit.UsCustomaryCup);
-                    await command.RespondAsync($"{input} {volume}");
-                }
-                else if (destinationUnit == "fl oz")
-                {
-                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsGallon).ToUnit(UnitsNet.Units.VolumeUnit.UsOunce);
-                    await command.RespondAsync($"{input} {volume}");
-                }
-                else if (destinationUnit == "tbsp")
-                {
-                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsGallon).ToUnit(UnitsNet.Units.VolumeUnit.UsTablespoon);
-                    await command.RespondAsync($"{input} {volume}");
-                }
-                else if (destinationUnit == "tsp")
-                {
-                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsGallon).ToUnit(UnitsNet.Units.VolumeUnit.UsTeaspoon);
-                    await command.RespondAsync($"{input} {volume}");
-                }
-            }
-            else if (sourceUnit == "qt")
-            {
-                if (destinationUnit == "L")
-                {
-                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsQuart).ToUnit(UnitsNet.Units.VolumeUnit.Liter);
-                    await command.RespondAsync($"{input} {volume}");
-                }
-                else if (destinationUnit == "mL")
-                {
-                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsQuart).ToUnit(UnitsNet.Units.VolumeUnit.Milliliter);
-                    await command.RespondAsync($"{input} {volume}");
-                }
-                else if (destinationUnit == "gal")
-                {
-                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsQuart).ToUnit(UnitsNet.Units.VolumeUnit.UsGallon);
-                    await command.RespondAsync($"{input} {volume}");
-                }
-                else if (destinationUnit == "qt")
-                {
-                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {inputVolume:0.0} {destinationUnit}");
-                }
-                else if (destinationUnit == "pt")
-                {
-                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsQuart).ToUnit(UnitsNet.Units.VolumeUnit.UsPint);
-                    await command.RespondAsync($"{input} {volume}");
-                }
-                else if (destinationUnit == "cup")
-                {
-                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsQuart).ToUnit(UnitsNet.Units.VolumeUnit.UsCustomaryCup);
-                    await command.RespondAsync($"{input} {volume}");
-                }
-                else if (destinationUnit == "fl oz")
-                {
-                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsQuart).ToUnit(UnitsNet.Units.VolumeUnit.UsOunce);
-                    await command.RespondAsync($"{input} {volume}");
-                }
-                else if (destinationUnit == "tbsp")
-                {
-                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsQuart).ToUnit(UnitsNet.Units.VolumeUnit.UsTablespoon);
-                    await command.RespondAsync($"{input} {volume}");
-                }
-                else if (destinationUnit == "tsp")
-                {
-                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsQuart).ToUnit(UnitsNet.Units.VolumeUnit.UsTeaspoon);
-                    await command.RespondAsync($"{input} {volume}");
-                }
-            }
-            else if (sourceUnit == "pt")
-            {
-                if (destinationUnit == "L")
-                {
-                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsPint).ToUnit(UnitsNet.Units.VolumeUnit.Liter);
-                    await command.RespondAsync($"{input} {volume}");
-                }
-                else if (destinationUnit == "mL")
-                {
-                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsPint).ToUnit(UnitsNet.Units.VolumeUnit.Milliliter);
-                    await command.RespondAsync($"{input} {volume}");
-                }
-                else if (destinationUnit == "gal")
-                {
-                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsPint).ToUnit(UnitsNet.Units.VolumeUnit.UsGallon);
-                    await command.RespondAsync($"{input} {volume}");
-                }
-                else if (destinationUnit == "qt")
-                {
-                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsPint).ToUnit(UnitsNet.Units.VolumeUnit.UsQuart);
-                    await command.RespondAsync($"{input} {volume}");
-                }
-                else if (destinationUnit == "pt")
-                {
-                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {inputVolume:0.0} {destinationUnit}");
-                }
-                else if (destinationUnit == "cup")
-                {
-                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsPint).ToUnit(UnitsNet.Units.VolumeUnit.UsCustomaryCup);
-                    await command.RespondAsync($"{input} {volume}");
-                }
-                else if (destinationUnit == "fl oz")
-                {
-                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsPint).ToUnit(UnitsNet.Units.VolumeUnit.UsOunce);
-                    await command.RespondAsync($"{input} {volume}");
-                }
-                else if (destinationUnit == "tbsp")
-                {
-                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsPint).ToUnit(UnitsNet.Units.VolumeUnit.UsTablespoon);
-                    await command.RespondAsync($"{input} {volume}");
-                }
-                else if (destinationUnit == "tsp")
-                {
-                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsPint).ToUnit(UnitsNet.Units.VolumeUnit.UsTeaspoon);
-                    await command.RespondAsync($"{input} {volume}");
-                }
-            }
-            else if (sourceUnit == "cup")
-            {
-                if (destinationUnit == "L")
-                {
-                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsCustomaryCup).ToUnit(UnitsNet.Units.VolumeUnit.Liter);
-                    await command.RespondAsync($"{input} {volume}");
-                }
-                else if (destinationUnit == "mL")
-                {
-                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsCustomaryCup).ToUnit(UnitsNet.Units.VolumeUnit.Milliliter);
-                    await command.RespondAsync($"{input} {volume}");
-                }
-                else if (destinationUnit == "gal")
-                {
-                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsCustomaryCup).ToUnit(UnitsNet.Units.VolumeUnit.UsGallon);
-                    await command.RespondAsync($"{input} {volume}");
-                }
-                else if (destinationUnit == "qt")
-                {
-                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsCustomaryCup).ToUnit(UnitsNet.Units.VolumeUnit.UsQuart);
-                    await command.RespondAsync($"{input} {volume}");
-                }
-                else if (destinationUnit == "pt")
-                {
-                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsCustomaryCup).ToUnit(UnitsNet.Units.VolumeUnit.UsPint);
-                    await command.RespondAsync($"{input} {volume}");
-                }
-                else if (destinationUnit == "cup")
-                {
-                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {inputVolume:0.0} {destinationUnit}");
-                }
-                else if (destinationUnit == "fl oz")
-                {
-                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsCustomaryCup).ToUnit(UnitsNet.Units.VolumeUnit.UsOunce);
-                    await command.RespondAsync($"{input} {volume}");
-                }
-                else if (destinationUnit == "tbsp")
-                {
-                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsCustomaryCup).ToUnit(UnitsNet.Units.VolumeUnit.UsTablespoon);
-                    await command.RespondAsync($"{input} {volume}");
-                }
-                else if (destinationUnit == "tsp")
-                {
-                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsCustomaryCup).ToUnit(UnitsNet.Units.VolumeUnit.UsTeaspoon);
-                    await command.RespondAsync($"{input} {volume}");
-                }
-            }
-            else if (sourceUnit == "fl oz")
-            {
-                if (destinationUnit == "L")
-                {
-                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsOunce).ToUnit(UnitsNet.Units.VolumeUnit.Liter);
-                    await command.RespondAsync($"{input} {volume}");
-                }
-                else if (destinationUnit == "mL")
-                {
-                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsOunce).ToUnit(UnitsNet.Units.VolumeUnit.Milliliter);
-                    await command.RespondAsync($"{input} {volume}");
-                }
-                else if (destinationUnit == "gal")
-                {
-                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsOunce).ToUnit(UnitsNet.Units.VolumeUnit.UsGallon);
-                    await command.RespondAsync($"{input} {volume}");
-                }
-                else if (destinationUnit == "qt")
-                {
-                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsOunce).ToUnit(UnitsNet.Units.VolumeUnit.UsQuart);
-                    await command.RespondAsync($"{input} {volume}");
-                }
-                else if (destinationUnit == "pt")
-                {
-                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsOunce).ToUnit(UnitsNet.Units.VolumeUnit.UsPint);
-                    await command.RespondAsync($"{input} {volume}");
-                }
-                else if (destinationUnit == "cup")
-                {
-                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsOunce).ToUnit(UnitsNet.Units.VolumeUnit.UsCustomaryCup);
-                    await command.RespondAsync($"{input} {volume}");
-                }
-                else if (destinationUnit == "fl oz")
-                {
-                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {inputVolume:0.0} {destinationUnit}");
-                }
-                else if (destinationUnit == "tbsp")
-                {
-                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsOunce).ToUnit(UnitsNet.Units.VolumeUnit.UsTablespoon);
-                    await command.RespondAsync($"{input} {volume}");
-                }
-                else if (destinationUnit == "tsp")
-                {
-                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsOunce).ToUnit(UnitsNet.Units.VolumeUnit.UsTeaspoon);
-                    await command.RespondAsync($"{input} {volume}");
-                }
-            }
-            else if (sourceUnit == "tbsp")
-            {
-                if (destinationUnit == "L")
-                {
-                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsTablespoon).ToUnit(UnitsNet.Units.VolumeUnit.Liter);
-                    await command.RespondAsync($"{input} {volume}");
-                }
-                else if (destinationUnit == "mL")
-                {
-                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsTablespoon).ToUnit(UnitsNet.Units.VolumeUnit.Milliliter);
-                    await command.RespondAsync($"{input} {volume}");
-                }
-                else if (destinationUnit == "gal")
-                {
-                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsTablespoon).ToUnit(UnitsNet.Units.VolumeUnit.UsGallon);
-                    await command.RespondAsync($"{input} {volume}");
-                }
-                else if (destinationUnit == "qt")
-                {
-                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsTablespoon).ToUnit(UnitsNet.Units.VolumeUnit.UsQuart);
-                    await command.RespondAsync($"{input} {volume}");
-                }
-                else if (destinationUnit == "pt")
-                {
-                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsTablespoon).ToUnit(UnitsNet.Units.VolumeUnit.UsPint);
-                    await command.RespondAsync($"{input} {volume}");
-                }
-                else if (destinationUnit == "cup")
-                {
-                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsTablespoon).ToUnit(UnitsNet.Units.VolumeUnit.UsCustomaryCup);
-                    await command.RespondAsync($"{input} {volume}");
-                }
-                else if (destinationUnit == "fl oz")
-                {
-                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsTablespoon).ToUnit(UnitsNet.Units.VolumeUnit.UsOunce);
-                    await command.RespondAsync($"{input} {volume}");
-                }
-                else if (destinationUnit == "tbsp")
-                {
-                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {inputVolume:0.0} {destinationUnit}");
-                }
-                else if (destinationUnit == "tsp")
-                {
-                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsTablespoon).ToUnit(UnitsNet.Units.VolumeUnit.UsTeaspoon);
-                    await command.RespondAsync($"{input} {volume}");
-                }
-            }
-            else if (sourceUnit == "tsp")
-            {
-                if (destinationUnit == "L")
-                {
-                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsTeaspoon).ToUnit(UnitsNet.Units.VolumeUnit.Liter);
-                    await command.RespondAsync($"{input} {volume}");
-                }
-                else if (destinationUnit == "mL")
-                {
-                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsTeaspoon).ToUnit(UnitsNet.Units.VolumeUnit.Milliliter);
-                    await command.RespondAsync($"{input} {volume}");
-                }
-                else if (destinationUnit == "gal")
-                {
-                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsTeaspoon).ToUnit(UnitsNet.Units.VolumeUnit.UsGallon);
-                    await command.RespondAsync($"{input} {volume}");
-                }
-                else if (destinationUnit == "qt")
-                {
-                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsTeaspoon).ToUnit(UnitsNet.Units.VolumeUnit.UsQuart);
-                    await command.RespondAsync($"{input} {volume}");
-                }
-                else if (destinationUnit == "pt")
-                {
-                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsTeaspoon).ToUnit(UnitsNet.Units.VolumeUnit.UsPint);
-                    await command.RespondAsync($"{input} {volume}");
-                }
-                else if (destinationUnit == "cup")
-                {
-                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsTeaspoon).ToUnit(UnitsNet.Units.VolumeUnit.UsCustomaryCup);
-                    await command.RespondAsync($"{input} {volume}");
-                }
-                else if (destinationUnit == "fl oz")
-                {
-                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsTeaspoon).ToUnit(UnitsNet.Units.VolumeUnit.UsOunce);
-                    await command.RespondAsync($"{input} {volume}");
-                }
-                else if (destinationUnit == "tbsp")
-                {
-                    volume = Volume.From(inputVolume, UnitsNet.Units.VolumeUnit.UsTeaspoon).ToUnit(UnitsNet.Units.VolumeUnit.UsTablespoon);
-                    await command.RespondAsync($"{input} {volume}");
-                }
-                else if (destinationUnit == "tsp")
-                {
-                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {inputVolume:0.0} {destinationUnit}");
-                }
-            }
-        }
 
-        if (command.Data.Name == "speed")
-        {
-            string? sourceUnit = command.Data.Options.ElementAt(1).Value.ToString();
-            string? destinationUnit = command.Data.Options.ElementAt(2).Value.ToString();
+            if (cmd == "speed")
+            {
+                string? sourceUnit = command.Data.Options.First().Options.ElementAt(1).Value.ToString();
+                string? destinationUnit = command.Data.Options.First().Options.ElementAt(2).Value.ToString();
 
 #pragma warning disable CS8604 // Possible null reference argument.
-            double inputSpeed = double.Parse(command.Data.Options.ElementAt(0).Value.ToString(), CultureInfo.InvariantCulture.NumberFormat);
+                double inputSpeed = double.Parse(command.Data.Options.First().Options.ElementAt(0).Value.ToString(), CultureInfo.InvariantCulture.NumberFormat);
 #pragma warning restore CS8604 // Possible null reference argument.
 
-            string input = $"`{inputSpeed} {sourceUnit}:`  ";
-            UnitsNet.Speed speed;
+                string input = $"`{inputSpeed} {sourceUnit}:`  ";
+                UnitsNet.Speed speed;
 
-            if (sourceUnit == "m/s")
-            {
-                if (destinationUnit == "m/s")
+                if (sourceUnit == "m/s")
                 {
-                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {inputSpeed:0.0} {destinationUnit}");
+                    if (destinationUnit == "m/s")
+                    {
+                        await command.RespondAsync($"Seriously... convert it yourself...\n{input} {inputSpeed:0.0} {destinationUnit}");
+                    }
+                    else if (destinationUnit == "km/h")
+                    {
+                        speed = Speed.From(inputSpeed, UnitsNet.Units.SpeedUnit.CentimeterPerSecond).ToUnit(UnitsNet.Units.SpeedUnit.KilometerPerHour);
+                        await command.RespondAsync($"{input} {speed}");
+                    }
+                    else if (destinationUnit == "mph")
+                    {
+                        speed = Speed.From(inputSpeed, UnitsNet.Units.SpeedUnit.CentimeterPerSecond).ToUnit(UnitsNet.Units.SpeedUnit.MilePerHour);
+                        await command.RespondAsync($"{input} {speed}");
+                    }
+                    else if (destinationUnit == "knot")
+                    {
+                        speed = Speed.From(inputSpeed, UnitsNet.Units.SpeedUnit.CentimeterPerSecond).ToUnit(UnitsNet.Units.SpeedUnit.Knot);
+                        await command.RespondAsync($"{input} {speed}");
+                    }
                 }
-                else if (destinationUnit == "km/h")
+                else if (sourceUnit == "km/h")
                 {
-                    speed = Speed.From(inputSpeed, UnitsNet.Units.SpeedUnit.CentimeterPerSecond).ToUnit(UnitsNet.Units.SpeedUnit.KilometerPerHour);
-                    await command.RespondAsync($"{input} {speed}");
+                    if (destinationUnit == "m/s")
+                    {
+                        speed = Speed.From(inputSpeed, UnitsNet.Units.SpeedUnit.KilometerPerHour).ToUnit(UnitsNet.Units.SpeedUnit.MeterPerSecond);
+                        await command.RespondAsync($"{input} {speed}");
+                    }
+                    else if (destinationUnit == "km/h")
+                    {
+                        await command.RespondAsync($"Seriously... convert it yourself...\n{input} {inputSpeed:0.0} {destinationUnit}");
+                    }
+                    else if (destinationUnit == "mph")
+                    {
+                        speed = Speed.From(inputSpeed, UnitsNet.Units.SpeedUnit.KilometerPerHour).ToUnit(UnitsNet.Units.SpeedUnit.MilePerHour);
+                        await command.RespondAsync($"{input} {speed}");
+                    }
+                    else if (destinationUnit == "knot")
+                    {
+                        speed = Speed.From(inputSpeed, UnitsNet.Units.SpeedUnit.KilometerPerHour).ToUnit(UnitsNet.Units.SpeedUnit.Knot);
+                        await command.RespondAsync($"{input} {speed}");
+                    }
                 }
-                else if (destinationUnit == "mph")
+                else if (sourceUnit == "mph")
                 {
-                    speed = Speed.From(inputSpeed, UnitsNet.Units.SpeedUnit.CentimeterPerSecond).ToUnit(UnitsNet.Units.SpeedUnit.MilePerHour);
-                    await command.RespondAsync($"{input} {speed}");
+                    if (destinationUnit == "m/s")
+                    {
+                        speed = Speed.From(inputSpeed, UnitsNet.Units.SpeedUnit.MilePerHour).ToUnit(UnitsNet.Units.SpeedUnit.MeterPerSecond);
+                        await command.RespondAsync($"{input} {speed}");
+                    }
+                    else if (destinationUnit == "km/h")
+                    {
+                        speed = Speed.From(inputSpeed, UnitsNet.Units.SpeedUnit.MilePerHour).ToUnit(UnitsNet.Units.SpeedUnit.KilometerPerHour);
+                        await command.RespondAsync($"{input} {speed}");
+                    }
+                    else if (destinationUnit == "mph")
+                    {
+                        await command.RespondAsync($"Seriously... convert it yourself...\n{input} {inputSpeed:0.0} {destinationUnit}");
+                    }
+                    else if (destinationUnit == "knot")
+                    {
+                        speed = Speed.From(inputSpeed, UnitsNet.Units.SpeedUnit.MilePerHour).ToUnit(UnitsNet.Units.SpeedUnit.Knot);
+                        await command.RespondAsync($"{input} {speed}");
+                    }
                 }
-                else if (destinationUnit == "knot")
+                else if (sourceUnit == "knot")
                 {
-                    speed = Speed.From(inputSpeed, UnitsNet.Units.SpeedUnit.CentimeterPerSecond).ToUnit(UnitsNet.Units.SpeedUnit.Knot);
-                    await command.RespondAsync($"{input} {speed}");
-                }
-            }
-            else if (sourceUnit == "km/h")
-            {
-                if (destinationUnit == "m/s")
-                {
-                    speed = Speed.From(inputSpeed, UnitsNet.Units.SpeedUnit.KilometerPerHour).ToUnit(UnitsNet.Units.SpeedUnit.MeterPerSecond);
-                    await command.RespondAsync($"{input} {speed}");
-                }
-                else if (destinationUnit == "km/h")
-                {
-                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {inputSpeed:0.0} {destinationUnit}");
-                }
-                else if (destinationUnit == "mph")
-                {
-                    speed = Speed.From(inputSpeed, UnitsNet.Units.SpeedUnit.KilometerPerHour).ToUnit(UnitsNet.Units.SpeedUnit.MilePerHour);
-                    await command.RespondAsync($"{input} {speed}");
-                }
-                else if (destinationUnit == "knot")
-                {
-                    speed = Speed.From(inputSpeed, UnitsNet.Units.SpeedUnit.KilometerPerHour).ToUnit(UnitsNet.Units.SpeedUnit.Knot);
-                    await command.RespondAsync($"{input} {speed}");
-                }
-            }
-            else if (sourceUnit == "mph")
-            {
-                if (destinationUnit == "m/s")
-                {
-                    speed = Speed.From(inputSpeed, UnitsNet.Units.SpeedUnit.MilePerHour).ToUnit(UnitsNet.Units.SpeedUnit.MeterPerSecond);
-                    await command.RespondAsync($"{input} {speed}");
-                }
-                else if (destinationUnit == "km/h")
-                {
-                    speed = Speed.From(inputSpeed, UnitsNet.Units.SpeedUnit.MilePerHour).ToUnit(UnitsNet.Units.SpeedUnit.KilometerPerHour);
-                    await command.RespondAsync($"{input} {speed}");
-                }
-                else if (destinationUnit == "mph")
-                {
-                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {inputSpeed:0.0} {destinationUnit}");
-                }
-                else if (destinationUnit == "knot")
-                {
-                    speed = Speed.From(inputSpeed, UnitsNet.Units.SpeedUnit.MilePerHour).ToUnit(UnitsNet.Units.SpeedUnit.Knot);
-                    await command.RespondAsync($"{input} {speed}");
-                }
-            }
-            else if (sourceUnit == "knot")
-            {
-                if (destinationUnit == "m/s")
-                {
-                    speed = Speed.From(inputSpeed, UnitsNet.Units.SpeedUnit.Knot).ToUnit(UnitsNet.Units.SpeedUnit.MeterPerSecond);
-                    await command.RespondAsync($"{input} {speed}");
-                }
-                else if (destinationUnit == "km/h")
-                {
-                    speed = Speed.From(inputSpeed, UnitsNet.Units.SpeedUnit.Knot).ToUnit(UnitsNet.Units.SpeedUnit.KilometerPerHour);
-                    await command.RespondAsync($"{input} {speed}");
-                }
-                else if (destinationUnit == "mph")
-                {
-                    speed = Speed.From(inputSpeed, UnitsNet.Units.SpeedUnit.Knot).ToUnit(UnitsNet.Units.SpeedUnit.MilePerHour);
-                    await command.RespondAsync($"{input} {speed}");
-                }
-                else if (destinationUnit == "knot")
-                {
-                    await command.RespondAsync($"Seriously... convert it yourself...\n{input} {inputSpeed:0.0} {destinationUnit}");
+                    if (destinationUnit == "m/s")
+                    {
+                        speed = Speed.From(inputSpeed, UnitsNet.Units.SpeedUnit.Knot).ToUnit(UnitsNet.Units.SpeedUnit.MeterPerSecond);
+                        await command.RespondAsync($"{input} {speed}");
+                    }
+                    else if (destinationUnit == "km/h")
+                    {
+                        speed = Speed.From(inputSpeed, UnitsNet.Units.SpeedUnit.Knot).ToUnit(UnitsNet.Units.SpeedUnit.KilometerPerHour);
+                        await command.RespondAsync($"{input} {speed}");
+                    }
+                    else if (destinationUnit == "mph")
+                    {
+                        speed = Speed.From(inputSpeed, UnitsNet.Units.SpeedUnit.Knot).ToUnit(UnitsNet.Units.SpeedUnit.MilePerHour);
+                        await command.RespondAsync($"{input} {speed}");
+                    }
+                    else if (destinationUnit == "knot")
+                    {
+                        await command.RespondAsync($"Seriously... convert it yourself...\n{input} {inputSpeed:0.0} {destinationUnit}");
+                    }
                 }
             }
         }
@@ -1784,59 +1839,57 @@ public class CommandHandler : ICommandHandler
                         var connectionInfomc = new ConnectionInfo(dns01mc.Value.Value, powerUsermc.Value.Value,
                             new PasswordAuthenticationMethod(powerUsermc.Value.Value, powerPassmc.Value.Value));
 
-                        using (var sshClient = new SshClient(connectionInfomc))
-                        {
-                            embed.Color = Color.Gold;
-                            embed.Description = "__**WARNING:**__ Server Logs on Tacticraft are monitored.\n\n" +
-                                "Griefing is not tolerated on Tacticraft and will result in your access to the server being revoked.\n\n" +
-                                "By clicking `I Agree` below, you are acknowledging and agreeing to this policy.\n\n" +
-                                $"**Execution has started.**\n" +
-                                $"`STATUS:`  Connecting to TACTICRAFT...";
-                            await component.ModifyOriginalResponseAsync(msg => msg.Embed = embed.Build());
+                        using var sshClient = new SshClient(connectionInfomc);
+                        embed.Color = Color.Gold;
+                        embed.Description = "__**WARNING:**__ Server Logs on Tacticraft are monitored.\n\n" +
+                            "Griefing is not tolerated on Tacticraft and will result in your access to the server being revoked.\n\n" +
+                            "By clicking `I Agree` below, you are acknowledging and agreeing to this policy.\n\n" +
+                            $"**Execution has started.**\n" +
+                            $"`STATUS:`  Connecting to TACTICRAFT...";
+                        await component.ModifyOriginalResponseAsync(msg => msg.Embed = embed.Build());
 
-                            sshClient.Connect();
-                            await Logger.Log(LogSeverity.Debug, "SSHClient", $"Successfully connected to FINALIZER.");
+                        sshClient.Connect();
+                        await Logger.Log(LogSeverity.Debug, "SSHClient", $"Successfully connected to FINALIZER.");
 
-                            embed.Color = Color.Orange;
-                            embed.Description = "__**WARNING:**__ Server Logs on Tacticraft are monitored.\n\n" +
-                                "Griefing is not tolerated on Tacticraft and will result in your access to the server being revoked.\n\n" +
-                                "By clicking `I Agree` below, you are acknowledging and agreeing to this policy.\n\n" +
-                                $"**Execution has started.**\n" +
-                                $"`STATUS:`  Connected to TACTICRAFT.  Whitelisting in progress...";
-                            await component.ModifyOriginalResponseAsync(msg => msg.Embed = embed.Build());
+                        embed.Color = Color.Orange;
+                        embed.Description = "__**WARNING:**__ Server Logs on Tacticraft are monitored.\n\n" +
+                            "Griefing is not tolerated on Tacticraft and will result in your access to the server being revoked.\n\n" +
+                            "By clicking `I Agree` below, you are acknowledging and agreeing to this policy.\n\n" +
+                            $"**Execution has started.**\n" +
+                            $"`STATUS:`  Connected to TACTICRAFT.  Whitelisting in progress...";
+                        await component.ModifyOriginalResponseAsync(msg => msg.Embed = embed.Build());
 
-                            var output = sshClient.RunCommand($"mscs send tacticraft whitelist add {mcUsersplit[1]}");
-                            await Logger.Log(LogSeverity.Debug, "SSHClient", $"mscs send tacticraft whitelist add {mcUsersplit[1]} on JUMPBOX.");
+                        var output = sshClient.RunCommand($"mscs send tacticraft whitelist add {mcUsersplit[1]}");
+                        await Logger.Log(LogSeverity.Debug, "SSHClient", $"mscs send tacticraft whitelist add {mcUsersplit[1]} on JUMPBOX.");
 
-                            embed.Color = Color.Purple;
-                            embed.Description = "__**WARNING:**__ Server Logs on Tacticraft are monitored.\n\n" +
-                                "Griefing is not tolerated on Tacticraft and will result in your access to the server being revoked.\n\n" +
-                                "By clicking `I Agree` below, you are acknowledging and agreeing to this policy.\n\n" +
-                                $"**Execution has started.**\n" +
-                                $"`STATUS:`  Disconnecting from TACTICRAFT...";
-                            await component.ModifyOriginalResponseAsync(msg => msg.Embed = embed.Build());
+                        embed.Color = Color.Purple;
+                        embed.Description = "__**WARNING:**__ Server Logs on Tacticraft are monitored.\n\n" +
+                            "Griefing is not tolerated on Tacticraft and will result in your access to the server being revoked.\n\n" +
+                            "By clicking `I Agree` below, you are acknowledging and agreeing to this policy.\n\n" +
+                            $"**Execution has started.**\n" +
+                            $"`STATUS:`  Disconnecting from TACTICRAFT...";
+                        await component.ModifyOriginalResponseAsync(msg => msg.Embed = embed.Build());
 
-                            sshClient.Disconnect();
-                            sshClient.Dispose();
+                        sshClient.Disconnect();
+                        sshClient.Dispose();
 
-                            var roleAddition = component.User as IGuildUser;
-                            var roleAdded = guild.GetRole(1075576019152547942) as IRole;
+                        var roleAddition = component.User as IGuildUser;
+                        var roleAdded = guild.GetRole(1075576019152547942) as IRole;
 
-                            await roleAddition.AddRoleAsync(roleAdded);
+                        await roleAddition.AddRoleAsync(roleAdded);
 
-                            embed.Color = Color.Green;
-                            embed.Description = "__**WARNING:**__ Server Logs on Tacticraft are monitored.\n\n" +
-                                "Griefing is not tolerated on Tacticraft and will result in your access to the server being revoked.\n\n" +
-                                "By clicking `I Agree` below, you are acknowledging and agreeing to this policy.\n\n" +
-                                $"**Execution has completed.**\n\n" +
-                                $"You can connect to Tacticraft by using `tacticraft.app` as the Server Address.\n" +
-                                $"A world map is available at https://tacticraft.app";
-                            await component.ModifyOriginalResponseAsync(msg => msg.Embed = embed.Build());
+                        embed.Color = Color.Green;
+                        embed.Description = "__**WARNING:**__ Server Logs on Tacticraft are monitored.\n\n" +
+                            "Griefing is not tolerated on Tacticraft and will result in your access to the server being revoked.\n\n" +
+                            "By clicking `I Agree` below, you are acknowledging and agreeing to this policy.\n\n" +
+                            $"**Execution has completed.**\n\n" +
+                            $"You can connect to Tacticraft by using `tacticraft.app` as the Server Address.\n" +
+                            $"A world map is available at https://tacticraft.app";
+                        await component.ModifyOriginalResponseAsync(msg => msg.Embed = embed.Build());
 
-                            await channel.SendMessageAsync($"`{component.User.Username}#{component.User.DiscriminatorValue}` has witelisted a Minecraft Account.\n" +
-                                $"`MC Username: {mcUsersplit[1]}`\n\n" +
-                                $"Command Output:\n```{output.Result}```");
-                        }
+                        await channel.SendMessageAsync($"`{component.User.Username}#{component.User.DiscriminatorValue}` has witelisted a Minecraft Account.\n" +
+                            $"`MC Username: {mcUsersplit[1]}`\n\n" +
+                            $"Command Output:\n```{output.Result}```");
                     }
                     else
                     {
@@ -1846,7 +1899,7 @@ public class CommandHandler : ICommandHandler
                             $"**EXECUTION HAS FAILED:**\n**ERROR 503 (UNAUTHORIZED)**\n\n" +
                             $"You have already whitelisted A Minecraft Account.\nCommand execution has been blocked.  This incident has been logged.";
                         embed.Color = Color.Red;
-                        await component.UpdateAsync(niteghxst => niteghxst.Embed = embed.Build());
+                        await component.UpdateAsync(vampire => vampire.Embed = embed.Build());
                         await component.ModifyOriginalResponseAsync(msg => msg.Components = new ComponentBuilder().WithButton("Proceed", "proceed", ButtonStyle.Success, disabled: true).WithButton("Abort", "abort", ButtonStyle.Danger, disabled: true).Build());
 
                         await channel.SendMessageAsync($"`{component.User.Username}#{component.User.DiscriminatorValue}` has attempted to whitelist a second Minecraft Account.\n" +

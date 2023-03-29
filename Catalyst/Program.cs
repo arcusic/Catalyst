@@ -30,7 +30,7 @@ var client = new DiscordShardedClient(new DiscordSocketConfig
 {
     LogLevel = LogSeverity.Debug,
     MessageCacheSize = 1000,
-    TotalShards = 1,
+    TotalShards = null,
     GatewayIntents = GatewayIntents.All,
     AlwaysDownloadUsers = true,
     DefaultRetryMode = RetryMode.AlwaysRetry
@@ -56,10 +56,16 @@ async Task MainAsync()
 {
     await Bootstrapper.ServiceProvider.GetRequiredService<ICommandHandler>().InitializeAsync();
 
+    List<ApplicationCommandProperties> globalApplicationCommandProperties = new();
+    List<ApplicationCommandProperties> tacticalApplicationCommandProperties = new();
+
     //Start Conversion Module
-    var temperatureConversion = new SlashCommandBuilder()
-        .WithName("temperature")
-        .WithDescription("Temperature Conversion")
+    SlashCommandBuilder conversion = new();
+    conversion.WithName("conversion").WithDescription("Converts Units");
+    await Logger.Log(LogSeverity.Info, "CMDProvisioned", $"Preparing to provision Slash Command {conversion.Name}...");
+
+    SlashCommandOptionBuilder temperatureConversion = new();
+    temperatureConversion.WithName("temperature").WithDescription("Temperature Conversion").WithType(ApplicationCommandOptionType.SubCommand)
         .AddOption(new SlashCommandOptionBuilder()
             .WithName("temp")
             .WithDescription("Temperature")
@@ -71,12 +77,13 @@ async Task MainAsync()
             .WithRequired(true)
             .AddChoice("Celsius", "C")
             .AddChoice("Fahrenheit", "F")
-            .WithType(ApplicationCommandOptionType.String))
-        .Build();
+            .WithType(ApplicationCommandOptionType.String));
 
-    var distanceConversion = new SlashCommandBuilder()
-        .WithName("distance")
-        .WithDescription("Distance Conversion")
+    conversion.AddOptions(temperatureConversion);
+    await Logger.Log(LogSeverity.Info, "CMDProvisioned", $"Slash Command {temperatureConversion.Name} provisioned to {conversion.Name}.");
+
+    SlashCommandOptionBuilder distanceConversion = new();
+    distanceConversion.WithName("distance").WithDescription("Distance Conversion").WithType(ApplicationCommandOptionType.SubCommand)
         .AddOption(new SlashCommandOptionBuilder()
             .WithName("distance")
             .WithDescription("Distance")
@@ -105,12 +112,13 @@ async Task MainAsync()
             .AddChoice("Yards", "yd")
             .AddChoice("Feet", "ft")
             .AddChoice("Inches", "in")
-            .WithType(ApplicationCommandOptionType.String))
-        .Build();
-    
-    var weightConversion = new SlashCommandBuilder()
-        .WithName("weight")
-        .WithDescription("Weight Conversion")
+            .WithType(ApplicationCommandOptionType.String));
+
+    conversion.AddOptions(distanceConversion);
+    await Logger.Log(LogSeverity.Info, "CMDProvisioned", $"Slash Command {distanceConversion.Name} provisioned to {conversion.Name}.");
+
+    SlashCommandOptionBuilder weightConversion = new();
+    weightConversion.WithName("weight").WithDescription("Weight Conversion").WithType(ApplicationCommandOptionType.SubCommand)
         .AddOption(new SlashCommandOptionBuilder()
             .WithName("weight")
             .WithDescription("Weight")
@@ -135,12 +143,13 @@ async Task MainAsync()
             .AddChoice("Milligrams", "mg")
             .AddChoice("Pounds", "lb")
             .AddChoice("Ounces", "oz")
-            .WithType(ApplicationCommandOptionType.String))
-        .Build();
+            .WithType(ApplicationCommandOptionType.String));
 
-    var volumeConversion = new SlashCommandBuilder()
-        .WithName("volume")
-        .WithDescription("Volume Conversion")
+    conversion.AddOptions(weightConversion);
+    await Logger.Log(LogSeverity.Info, "CMDProvisioned", $"Slash Command {weightConversion.Name} provisioned to {conversion.Name}.");
+
+    SlashCommandOptionBuilder volumeConversion = new();
+    volumeConversion.WithName("volume").WithDescription("Volume Conversion").WithType(ApplicationCommandOptionType.SubCommand)
         .AddOption(new SlashCommandOptionBuilder()
             .WithName("volume")
             .WithDescription("Volume")
@@ -173,12 +182,13 @@ async Task MainAsync()
             .AddChoice("Fluid Ounces", "fl oz")
             .AddChoice("Tablespoons", "tbsp")
             .AddChoice("Teaspoons", "tsp")
-            .WithType(ApplicationCommandOptionType.String))
-        .Build();
-    
-    var speedConversion = new SlashCommandBuilder()
-        .WithName("speed")
-        .WithDescription("Speed Conversion")
+            .WithType(ApplicationCommandOptionType.String));
+
+    conversion.AddOptions(volumeConversion);
+    await Logger.Log(LogSeverity.Info, "CMDProvisioned", $"Slash Command {volumeConversion.Name} provisioned to {conversion.Name}.");
+
+    SlashCommandOptionBuilder speedConversion = new();
+    speedConversion.WithName("speed").WithDescription("Speed Conversion").WithType(ApplicationCommandOptionType.SubCommand)
         .AddOption(new SlashCommandOptionBuilder()
             .WithName("speed")
             .WithDescription("Speed")
@@ -201,91 +211,69 @@ async Task MainAsync()
             .AddChoice("Meters per second", "m/s")
             .AddChoice("Miles per hour", "mph")
             .AddChoice("Knots", "kn")
-            .WithType(ApplicationCommandOptionType.String))
-        .Build();
+            .WithType(ApplicationCommandOptionType.String));
+
+    conversion.AddOptions(speedConversion);
+    await Logger.Log(LogSeverity.Info, "CMDProvisioned", $"Slash Command {speedConversion.Name} provisioned to {conversion.Name}.");
+
+    globalApplicationCommandProperties.Add(conversion.Build());
+    await Logger.Log(LogSeverity.Info, "CMDProvisioned", $"Slash Command {conversion.Name} provisioned to Global Commands.");
     //End Conversion Module
 
     //Start About Module
-    var about = new SlashCommandBuilder()
-        .WithName("about")
-        .WithDescription("About The Catalyst")
-        .Build();
+    SlashCommandBuilder about = new SlashCommandBuilder();
+    about.WithName("about").WithDescription("About The Catalyst");
+    globalApplicationCommandProperties.Add(about.Build());
+    await Logger.Log(LogSeverity.Info, "CMDProvisioned", $"Slash Command {about.Name} provisioned to Global Commands.");
 
-    var changeLog = new SlashCommandBuilder()
-        .WithName("release_notes")
-        .WithDescription("Display Release Notes")
-        .Build();
+    SlashCommandBuilder changeLog = new SlashCommandBuilder();
+    changeLog.WithName("release_notes").WithDescription("Release Notes");
+    globalApplicationCommandProperties.Add(changeLog.Build());
+    await Logger.Log(LogSeverity.Info, "CMDProvisioned", $"Slash Command {changeLog.Name} provisioned to Global Commands.");
 
-    var help = new SlashCommandBuilder()
-        .WithName("help")
-        .WithDescription("Help for all Context Commands")
-        .Build();
+    SlashCommandBuilder help = new SlashCommandBuilder();
+    help.WithName("help").WithDescription("The Catalyst Documentation");
+    globalApplicationCommandProperties.Add(help.Build());
+    await Logger.Log(LogSeverity.Info, "CMDProvisioned", $"Slash Command {help.Name} provisioned to Global Commands.");
     //End About Module
 
     //Start Utility Module
-    var hc = new SlashCommandBuilder()
-        .WithName("health")
-        .WithDescription("Check the health of the bot")
-        .Build();
-    
-    var epo = new SlashCommandBuilder()
-        .WithName("emergency_power_off")
-        .WithDescription("Emergency Power Off")
-        .Build();
+    SlashCommandBuilder hc = new();
+    hc.WithName("status").WithDescription("The Catalyst Status");
+    globalApplicationCommandProperties.Add(hc.Build());
+    await Logger.Log(LogSeverity.Info, "CMDProvisioned", $"Slash Command {hc.Name} provisioned to Global Commands.");
 
-    var tacticraft_latest_log = new SlashCommandBuilder()
-        .WithName("tacticraft_latest_log")
-        .WithDescription("Get the latest logs from Tacticraft")
-        .Build();
+    SlashCommandBuilder epo = new();
+    epo.WithName("emergency_power_off").WithDescription("Emergency Power Off");
+    globalApplicationCommandProperties.Add(epo.Build());
+    await Logger.Log(LogSeverity.Info, "CMDProvisioned", $"Slash Command {epo.Name} provisioned to Global Commands.");
 
-    var tacticraft_whitelist = new SlashCommandBuilder()
-        .WithName("tacticraft_whitelist")
-        .WithDescription("Whitelist Account for Tacticraft")
-        .AddOption(new SlashCommandOptionBuilder()
-            .WithName("minecraft_username")
-            .WithDescription("Minecraft Username")
-            .WithRequired(true)
-            .WithType(ApplicationCommandOptionType.String))
-        .Build();
+    SlashCommandBuilder tacticraft_latest_log = new();
+    tacticraft_latest_log.WithName("tacticraft_latest_log").WithDescription("Get the latest logs from Tacticraft");
+    tacticalApplicationCommandProperties.Add(tacticraft_latest_log.Build());
+    await Logger.Log(LogSeverity.Info, "CMDProvisioned", $"Slash Command {tacticraft_latest_log.Name} provisioned to Guild (994625404243546292) Commands.");
+
+    SlashCommandBuilder tacticraft_whitelist = new();
+    SlashCommandOptionBuilder tacticraft_whitelist_options = new();
+    tacticraft_whitelist_options.WithName("minecraft_username").WithDescription("Minecraft Username").WithRequired(true).WithType(ApplicationCommandOptionType.String);
+    tacticraft_whitelist.WithName("tacticraft_whitelist").WithDescription("Whitelist Account for Tacticraft").AddOptions(tacticraft_whitelist_options);
+    tacticalApplicationCommandProperties.Add(tacticraft_whitelist.Build());
+    await Logger.Log(LogSeverity.Info, "CMDProvisioned", $"Slash Command {tacticraft_whitelist.Name} provisioned to Guild (994625404243546292) Commands.");
     //End Utility Module
 
     client.ShardReady += async shard =>
     {
-        await shard.CreateGlobalApplicationCommandAsync(about);
-        await Logger.Log(LogSeverity.Info, "CMDBuilt", $"Slash Command {about.Name} is built and ready!");
+        var tactical = shard.GetGuild(994625404243546292);
 
-        await shard.CreateGlobalApplicationCommandAsync(changeLog);
-        await Logger.Log(LogSeverity.Info, "CMDBuilt", $"Slash Command {changeLog.Name} is built and ready!");
+        await Logger.Log(LogSeverity.Info, "GLOBAL_BLD", $"Processing Global Application Commands...");
+        await shard.BulkOverwriteGlobalApplicationCommandsAsync(globalApplicationCommandProperties.ToArray());
+        await Logger.Log(LogSeverity.Info, "GLOBAL_BLD", $"Completed Global Application Commands.");
 
-        await shard.CreateGlobalApplicationCommandAsync(help);
-        await Logger.Log(LogSeverity.Info, "CMDBuilt", $"Slash Command {help.Name} is built and ready!");
-
-        await shard.CreateGlobalApplicationCommandAsync(temperatureConversion);
-        await Logger.Log(LogSeverity.Info, "CMDBuilt", $"Slash Command {temperatureConversion.Name} is built and ready!");
-
-        await shard.CreateGlobalApplicationCommandAsync(distanceConversion);
-        await Logger.Log(LogSeverity.Info, "CMDBuilt", $"Slash Command {distanceConversion.Name} is built and ready!");
-
-        await shard.CreateGlobalApplicationCommandAsync(weightConversion);
-        await Logger.Log(LogSeverity.Info, "CMDBuilt", $"Slash Command {weightConversion.Name} is built and ready!");
-
-        await shard.CreateGlobalApplicationCommandAsync(volumeConversion);
-        await Logger.Log(LogSeverity.Info, "CMDBuilt", $"Slash Command {volumeConversion.Name} is built and ready!");
-
-        await shard.CreateGlobalApplicationCommandAsync(speedConversion);
-        await Logger.Log(LogSeverity.Info, "CMDBuilt", $"Slash Command {speedConversion.Name} is built and ready!");
-
-        await shard.CreateGlobalApplicationCommandAsync(hc);
-        await Logger.Log(LogSeverity.Info, "CMDBuilt", $"Slash Command {hc.Name} is built and ready!");
-
-        await shard.CreateGlobalApplicationCommandAsync(epo);
-        await Logger.Log(LogSeverity.Info, "CMDBuilt", $"Slash Command {epo.Name} is built and ready!");
-
-        await shard.CreateGlobalApplicationCommandAsync(tacticraft_latest_log);
-        await Logger.Log(LogSeverity.Info, "CMDBuilt", $"Slash Command {tacticraft_latest_log.Name} is built and ready!");
-
-        await shard.CreateGlobalApplicationCommandAsync(tacticraft_whitelist);
-        await Logger.Log(LogSeverity.Info, "CMDBuilt", $"Slash Command {tacticraft_whitelist.Name} is built and ready!");
+        await Logger.Log(LogSeverity.Info, "GUILD_BLD", $"Processing Guild Application Commands...");
+        await Logger.Log(LogSeverity.Info, "GUILD_BLD", $"Processing Tactical Commands...");
+        await tactical.BulkOverwriteApplicationCommandAsync(tacticalApplicationCommandProperties.ToArray());
+        await Logger.Log(LogSeverity.Info, "GUILD_BLD", $"Completed Tactical Commands.");
+        await Logger.Log(LogSeverity.Info, "GUILD_BLD", $"Completed Guild Application Commands.");
 
         await Logger.Log(LogSeverity.Info, "ShardReady", $"Shard Number {shard.ShardId} is connected and ready!");
     };
@@ -318,6 +306,8 @@ async Task MainAsync()
 #if DEBUG
     await client.SetGameAsync($"v{version}-alpha");
     await client.SetStatusAsync(UserStatus.DoNotDisturb);
+
+    
 #endif
 
 #if RELEASE
@@ -345,8 +335,9 @@ async Task MainAsync()
 
     while (await timer.WaitForNextTickAsync())
     {
-        using var wb = new WebClient();
-        var response = wb.DownloadString(url.Value.Value);
+        using var wb = new HttpClient();
+        using HttpResponseMessage response = await wb.GetAsync(url.Value.Value);
+        response.EnsureSuccessStatusCode();
     }
     
     // Wait infinitely so your bot actually stays connected.
