@@ -30,7 +30,7 @@ var client = new DiscordShardedClient(new DiscordSocketConfig
 {
     LogLevel = LogSeverity.Debug,
     MessageCacheSize = 1000,
-    TotalShards = null,
+    TotalShards = 10,
     GatewayIntents = GatewayIntents.All,
     AlwaysDownloadUsers = true,
     DefaultRetryMode = RetryMode.AlwaysRetry
