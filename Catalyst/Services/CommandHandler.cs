@@ -381,7 +381,7 @@ public class CommandHandler : ICommandHandler
                 .ToString();
 
             string topAGG1 = topologySettings
-                .Where(nova => nova.Name == "AggA1")
+                .Where(nova => nova.Name == "AggP")
                 .Select(nova => nova.Value)
                 .FirstOrDefault()
                 .ToString();
@@ -428,6 +428,18 @@ public class CommandHandler : ICommandHandler
                 .FirstOrDefault()
                 .ToString();
 
+            string topPDU = topologySettings
+                .Where(tikva => tikva.Name == "PDU")
+                .Select(tikva => tikva.Value)
+                .FirstOrDefault()
+                .ToString();
+
+            string topONT = topologySettings
+                .Where(simply => simply.Name == "ONT")
+                .Select(simply => simply.Value)
+                .FirstOrDefault()
+                .ToString();
+
             string hwDNS01 = hardwareSettings
                 .Where(kijmix => kijmix.Name == "DNS01")
                 .Select(kijmix => kijmix.Value)
@@ -437,6 +449,18 @@ public class CommandHandler : ICommandHandler
             string hwDNS02 = hardwareSettings
                 .Where(howly => howly.Name == "DNS02")
                 .Select(howly => howly.Value)
+                .FirstOrDefault()
+                .ToString();
+
+            string hwESX01 = hardwareSettings
+                .Where(cryes => cryes.Name == "ESX01")
+                .Select(cryes => cryes.Value)
+                .FirstOrDefault()
+                .ToString();
+
+            string hwESX02 = hardwareSettings
+                .Where(mac56 => mac56.Name == "ESX02")
+                .Select(mac56 => mac56.Value)
                 .FirstOrDefault()
                 .ToString();
 
@@ -479,6 +503,18 @@ public class CommandHandler : ICommandHandler
 
             var lteIP = secretClient.GetSecret(topLTE);
             await Logger.Log(LogSeverity.Debug, "LTEIPObtained", $"Successfully obtained LTE IP Address from Azure Key Vault.");
+
+            var pduIP = secretClient.GetSecret(topPDU);
+            await Logger.Log(LogSeverity.Debug, "PDUIPObtained", $"Successfully obtained PDU IP Address from Azure Key Vault.");
+
+            var ontIP = secretClient.GetSecret(topONT);
+            await Logger.Log(LogSeverity.Debug, "ONTIPObtained", $"Successfully obtained ONT IP Address from Azure Key Vault.");
+
+            var esx01IP = secretClient.GetSecret(hwESX01);
+            await Logger.Log(LogSeverity.Debug, "ESX01IPObtained", $"Successfully obtained ESX01 IP Address from Azure Key Vault.");
+
+            var esx02IP = secretClient.GetSecret(hwESX02);
+            await Logger.Log(LogSeverity.Debug, "ESX02IPObtained", $"Successfully obtained ESX02 IP Address from Azure Key Vault.");
 
             var dns01IP = secretClient.GetSecret(hwDNS01);
             await Logger.Log(LogSeverity.Debug, "DNS01IPObtained", $"Successfully obtained DNS01 IP Address from Azure Key Vault.");
@@ -528,16 +564,20 @@ public class CommandHandler : ICommandHandler
             string[,] networkDevices = new string[,]
             {
             { "UDE-SE", gatewayIP.Value.Value, "", "" },
-            { "USW-AGG-A1", aggA1IP.Value.Value, "", "" },
+            { "USW-AGG-PRO", aggA1IP.Value.Value, "", "" },
             { "USW-AGG-A2", aggA2IP.Value.Value, "", "" },
             { "USW-CORE-SW1", coreSW1IP.Value.Value, "", "" },
             { "USW-CORE-SW2", coreSW2IP.Value.Value, "", "" },
             { "USW-ACC-SW1", accSW1IP.Value.Value, "", "" },
-            { "U6-LR-01", ap1IP.Value.Value, "", "" },
-            { "U6-LR-02", ap2IP.Value.Value, "", "" },
+            { "U6-E-01", ap1IP.Value.Value, "", "" },
+            { "U6-E-02", ap2IP.Value.Value, "", "" },
             { "U-LTE", lteIP.Value.Value, "", "" },
+            { "PDU", pduIP.Value.Value, "", "" },
+            { "ONT", ontIP.Value.Value, "", "" },
+            { "ESXi-01", esx01IP.Value.Value, "", "" },
+            { "ESXi-02", esx02IP.Value.Value, "", "" },
             { "FINALIZER", dns01IP.Value.Value, "", "" },
-            { "DEVASTATOR", dns02IP.Value.Value, "", "" },
+            { "DEVASTATOR", dns02IP.Value.Value, "", "" }
             };
 
             Ping pingSender = new();
@@ -667,16 +707,20 @@ public class CommandHandler : ICommandHandler
                 $"__*Topology Information:*__\n" +
                 $"`{networkDevices[0, 0]}:`  {networkDevices[0, 2]}  {networkDevices[0, 3]}\n" +
                 $"`{networkDevices[1, 0]}:`  {networkDevices[1, 2]}  {networkDevices[1, 3]}\n" +
-                $"`{networkDevices[2, 0]}:`  {networkDevices[2, 2]}  {networkDevices[2, 3]}\n" +
+                //$"`{networkDevices[2, 0]}:`  {networkDevices[2, 2]}  {networkDevices[2, 3]}\n" +
                 $"`{networkDevices[3, 0]}:`  {networkDevices[3, 2]}  {networkDevices[3, 3]}\n" +
                 $"`{networkDevices[4, 0]}:`  {networkDevices[4, 2]}  {networkDevices[4, 3]}\n" +
                 $"`{networkDevices[5, 0]}:`  {networkDevices[5, 2]}  {networkDevices[5, 3]}\n" +
                 $"`{networkDevices[6, 0]}:`  {networkDevices[6, 2]}  {networkDevices[6, 3]}\n" +
                 $"`{networkDevices[7, 0]}:`  {networkDevices[7, 2]}  {networkDevices[7, 3]}\n" +
-                $"`{networkDevices[8, 0]}:`  {networkDevices[8, 2]}  {networkDevices[8, 3]}\n\n" +
-                $"__*Hardware Information:*__\n" +
+                $"`{networkDevices[8, 0]}:`  {networkDevices[8, 2]}  {networkDevices[8, 3]}\n" +
                 $"`{networkDevices[9, 0]}:`  {networkDevices[9, 2]}  {networkDevices[9, 3]}\n" +
                 $"`{networkDevices[10, 0]}:`  {networkDevices[10, 2]}  {networkDevices[10, 3]}\n\n" +
+                $"__*Hardware Information:*__\n" +
+                $"`{networkDevices[11, 0]}:`  {networkDevices[11, 2]}  {networkDevices[11, 3]}\n" +
+                $"`{networkDevices[12, 0]}:`  {networkDevices[12, 2]}  {networkDevices[12, 3]}\n" +
+                $"`{networkDevices[13, 0]}:`  {networkDevices[13, 2]}  {networkDevices[13, 3]}\n" +
+                $"`{networkDevices[14, 0]}:`  {networkDevices[14, 2]}  {networkDevices[14, 3]}\n\n" +
                 $"__*Connection Information:*__\n" +
                 $"`Speed Test Results:` {psOutput[13].ToString().Replace("Result URL: ", "")}.png\n");
             await Logger.Log(LogSeverity.Verbose, $"[{command.GuildId}] ResponseSent", $"Health Report sent to the {command.Channel.Name} channel.");
