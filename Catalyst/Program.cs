@@ -30,7 +30,7 @@ var client = new DiscordShardedClient(new DiscordSocketConfig
 {
     LogLevel = LogSeverity.Debug,
     MessageCacheSize = 1000,
-    TotalShards = 10,
+    TotalShards = 1,
     GatewayIntents = GatewayIntents.All,
     AlwaysDownloadUsers = true,
     DefaultRetryMode = RetryMode.AlwaysRetry
@@ -339,7 +339,7 @@ async Task MainAsync()
         using HttpResponseMessage response = await wb.GetAsync(url.Value.Value);
         response.EnsureSuccessStatusCode();
     }
-    
+
     // Wait infinitely so your bot actually stays connected.
     await Task.Delay(Timeout.Infinite);
 }
