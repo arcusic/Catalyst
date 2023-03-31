@@ -563,7 +563,7 @@ public class CommandHandler : ICommandHandler
             //create network device array
             string[,] networkDevices = new string[,]
             {
-            { "UDE-SE", gatewayIP.Value.Value, "", "" },
+            { "UDM-SE", gatewayIP.Value.Value, "", "" },
             { "USW-AGG-PRO", aggA1IP.Value.Value, "", "" },
             { "USW-AGG-A2", aggA2IP.Value.Value, "", "" },
             { "USW-CORE-SW1", coreSW1IP.Value.Value, "", "" },
@@ -572,7 +572,7 @@ public class CommandHandler : ICommandHandler
             { "U6-E-01", ap1IP.Value.Value, "", "" },
             { "U6-E-02", ap2IP.Value.Value, "", "" },
             { "U-LTE", lteIP.Value.Value, "", "" },
-            { "PDU", pduIP.Value.Value, "", "" },
+            { "USP-PDU-PRO", pduIP.Value.Value, "", "" },
             { "ONT", ontIP.Value.Value, "", "" },
             { "ESXi-01", esx01IP.Value.Value, "", "" },
             { "ESXi-02", esx02IP.Value.Value, "", "" },
