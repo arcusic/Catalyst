@@ -1,0 +1,15 @@
+version: '3.4'
+
+services:
+  catalyst:
+    image: ${DOCKER_REGISTRY-}catalyst
+    build:
+      context: .
+      dockerfile: Catalyst/Dockerfile
+  mssql:
+    image: ${DOCKER_REGISTRY-}catalyst_db
+    build:
+      context: .
+      dockerfile: Catalyst/Redistributables/SQL/Dockerfile
+    environment:
+      ACCEPT_EULA: y
