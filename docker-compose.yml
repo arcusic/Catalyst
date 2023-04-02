@@ -9,7 +9,7 @@ services:
       context: .
       dockerfile: Catalyst/Dockerfile
     depends_on:
-      - Catalyst-DB
+      - mssql
   mssql:
     container_name: Catalyst-DB
     image: ${DOCKER_REGISTRY-}catalyst_db

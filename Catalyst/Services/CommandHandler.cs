@@ -743,7 +743,7 @@ public class CommandHandler : ICommandHandler
 #endif
 
 #if RELEASE
-            string path = "/root/.config/ookla/build.txt";
+            string path = "/home/catalyst/.config/ookla/build.txt";
             var dateTime = File.GetLastWriteTimeUtc(path);
 #endif
             string build = dateTime.ToString("yyMMddHHmm");
