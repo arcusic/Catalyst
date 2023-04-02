@@ -17,8 +17,6 @@ FROM mcr.microsoft.com/dotnet/sdk:latest AS build
 USER root
 RUN apt-get update
 RUN apt-get -y upgrade
-RUN useradd build
-USER build
 WORKDIR /src
 COPY ["Catalyst/Catalyst.csproj", "Catalyst/"]
 RUN dotnet restore "Catalyst/Catalyst.csproj"
