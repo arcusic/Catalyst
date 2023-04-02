@@ -10,8 +10,14 @@ RUN mkdir ~/.config/ookla/
 RUN echo '{"Settings": {"LicenseAccepted": "604ec27f828456331ebf441826292c49276bd3c1bee1a2f65a6452f505c4061c"}}' > ~/.config/ookla/speedtest-cli.json
 RUN apt-get update
 RUN apt-get -y upgrade
+RUN useradd catalyst
+USER catalyst
 
 FROM mcr.microsoft.com/dotnet/sdk:latest AS build
+USER root
+RUN apt-get update
+RUN apt-get -y upgrade
+USER build
 WORKDIR /src
 COPY ["Catalyst/Catalyst.csproj", "Catalyst/"]
 RUN dotnet restore "Catalyst/Catalyst.csproj"
