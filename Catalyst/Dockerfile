@@ -5,13 +5,14 @@
 
 FROM mcr.microsoft.com/dotnet/runtime:latest AS base
 WORKDIR /app
-RUN mkdir ~/.config/
-RUN mkdir ~/.config/ookla/
-RUN echo '{"Settings": {"LicenseAccepted": "604ec27f828456331ebf441826292c49276bd3c1bee1a2f65a6452f505c4061c"}}' > ~/.config/ookla/speedtest-cli.json
 RUN apt-get update
 RUN apt-get -y upgrade
-RUN useradd catalyst
-USER catalyst
+RUN apt-get -y install curl
+RUN curl -s https://packagecloud.io/install/repositories/ookla/speedtest-cli/script.deb.sh | bash
+RUN apt-get -y install speedtest
+RUN mkdir /root/.config/
+RUN mkdir /root/.config/ookla/
+RUN echo '{"Settings": {"LicenseAccepted": "604ec27f828456331ebf441826292c49276bd3c1bee1a2f65a6452f505c4061c"}}' > /root/.config/ookla/speedtest-cli.json
 
 FROM mcr.microsoft.com/dotnet/sdk:latest AS build
 USER root

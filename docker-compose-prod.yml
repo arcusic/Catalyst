@@ -4,7 +4,7 @@ name: the-catalyst
 services:
   catalyst:
     container_name: Catalyst
-    image: ${DOCKER_REGISTRY-}catalyst
+    image: catalyst.azurecr.io/catalyst
     build:
       context: .
       dockerfile: Catalyst/Dockerfile
@@ -12,7 +12,7 @@ services:
       - mssql
   mssql:
     container_name: Catalyst-DB
-    image: ${DOCKER_REGISTRY-}catalyst_db
+    image: catalyst.azurecr.io/catalyst_db
     build:
       context: .
       dockerfile: Catalyst/Redistributables/SQL/Dockerfile
