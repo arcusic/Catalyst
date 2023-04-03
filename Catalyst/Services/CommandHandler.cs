@@ -17,7 +17,6 @@ using System.Text.Json;
 using System.Text;
 using Renci.SshNet;
 using Microsoft.Extensions.Configuration;
-
 namespace Catalyst.Services;
 
 public class CommandHandler : ICommandHandler
@@ -581,7 +580,8 @@ public class CommandHandler : ICommandHandler
             };
 
             Ping pingSender = new();
-            PingOptions options = new();
+            PingOptions pingOptions = new();
+            pingOptions.DontFragment = true;
 
             string data = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
             byte[] buffer = Encoding.ASCII.GetBytes(data);
@@ -590,7 +590,7 @@ public class CommandHandler : ICommandHandler
             int x = 0;
             while (x < networkDevices.GetLength(0))
             {
-                PingReply reply = pingSender.Send(networkDevices[x, 1], timeout, buffer, options);
+                PingReply reply = pingSender.Send(networkDevices[x, 1], timeout, buffer, pingOptions);
                 if (reply.Status == IPStatus.Success)
                 {
                     await Logger.Log(LogSeverity.Debug, $"PING{networkDevices[x, 0]}", $"Successfully pinged {networkDevices[x, 0]}. {reply.RoundtripTime}ms");
@@ -617,15 +617,30 @@ public class CommandHandler : ICommandHandler
             }
             else
             {
-                psInstance.AddCommand("/app/Redistributables/SpeedTest/speedtest");
+                psInstance.AddCommand("speedtest");
             }
 
             await command.ModifyOriginalResponseAsync(msg => msg.Content = $"Executing infrastructure health check... please wait.\n\n`CURRENT STATUS:`  Executing Speed Test...");
             await Logger.Log(LogSeverity.Debug, "SpeedTestStarting", $"Launching speedtest... Please Wait.");
             var psOutput = psInstance.Invoke();
+
             psInstance.Dispose();
+            await Logger.Log(LogSeverity.Debug, "SpeedTestResults", $"{psOutput[0]}");
+            await Logger.Log(LogSeverity.Debug, "SpeedTestResults", $"{psOutput[1]}");
+            await Logger.Log(LogSeverity.Debug, "SpeedTestResults", $"{psOutput[2]}");
+            await Logger.Log(LogSeverity.Debug, "SpeedTestResults", $"{psOutput[3]}");
+            await Logger.Log(LogSeverity.Debug, "SpeedTestResults", $"{psOutput[4]}");
+            await Logger.Log(LogSeverity.Debug, "SpeedTestResults", $"{psOutput[5]}");
+            await Logger.Log(LogSeverity.Debug, "SpeedTestResults", $"{psOutput[6]}");
             await Logger.Log(LogSeverity.Debug, "SpeedTestResults", $"{psOutput[7]}");
+            await Logger.Log(LogSeverity.Debug, "SpeedTestResults", $"{psOutput[8]}");
             await Logger.Log(LogSeverity.Debug, "SpeedTestResults", $"{psOutput[9]}");
+            await Logger.Log(LogSeverity.Debug, "SpeedTestResults", $"{psOutput[10]}");
+            await Logger.Log(LogSeverity.Debug, "SpeedTestResults", $"{psOutput[11]}");
+            await Logger.Log(LogSeverity.Debug, "SpeedTestResults", $"{psOutput[12]}");
+            await Logger.Log(LogSeverity.Debug, "SpeedTestResults", $"{psOutput[13]}");
+            await Logger.Log(LogSeverity.Debug, "SpeedTestResults", $"{psOutput[0]}");
+
 
             await command.ModifyOriginalResponseAsync(msg => msg.Content = $"Executing infrastructure health check... please wait.\n\n`CURRENT STATUS:`  Converting retreived data to human-readable format...");
             decimal tempF = Convert.ToDecimal(tempResult[0].Data.ToString()) / 10;
@@ -743,7 +758,7 @@ public class CommandHandler : ICommandHandler
 #endif
 
 #if RELEASE
-            string path = "/home/catalyst/.config/ookla/build.txt";
+            string path = "/root/.config/ookla/build.txt";
             var dateTime = File.GetLastWriteTimeUtc(path);
 #endif
             string build = dateTime.ToString("yyMMddHHmm");

@@ -297,9 +297,9 @@ async Task MainAsync()
     version = version.Replace(".0", "");
 
 #if RELEASE
-    if (!File.Exists("/home/catalyst/.config/ookla/build.txt"))
+    if (!File.Exists("/root/.config/ookla/build.txt"))
     {
-        File.WriteAllText("/home/catalyst/.config/ookla/build.txt", DateTime.UtcNow.ToString());
+        File.WriteAllText("/root/.config/ookla/build.txt", DateTime.UtcNow.ToString());
     }
 #endif
 
