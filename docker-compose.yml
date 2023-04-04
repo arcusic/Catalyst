@@ -4,15 +4,17 @@ name: the-catalyst
 services:
   catalyst:
     container_name: Catalyst
-    image: arcusic/catalyst:latest
+    image: arcusic/catalyst:main
     build:
       context: .
       dockerfile: Catalyst/Dockerfile
+    links:
+      - mssql:database
     depends_on:
       - mssql
   mssql:
     container_name: Catalyst-DB
-    image: arcusic/catalyst_db:latest
+    image: arcusic/catalyst_db:main
     build:
       context: .
       dockerfile: Catalyst/Redistributables/SQL/Dockerfile
