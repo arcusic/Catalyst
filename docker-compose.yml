@@ -5,6 +5,9 @@ networks:
   catalyst:
     name: catalyst
     driver: bridge
+  utilities:
+    name: utilities
+    driver: bridge
 
 services:
   catalyst:
@@ -40,6 +43,8 @@ services:
   watchtower:
     container_name: catalyst-updtr
     image: containrrr/watchtower:latest
+    network:
+      - utilities
     labels:
       - "com.centurylinklabs.watchtower.scope=catalyst"
     restart: always
