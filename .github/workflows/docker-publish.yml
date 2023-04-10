@@ -74,7 +74,7 @@ jobs:
           context: .
           file: Catalyst/Dockerfile
           push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ secrets.REGISTRY }}${{ steps.meta.outputs.tags }}
+          tags: arcusic${{ secrets.REGISTRY }}${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
       
       - name: Build and Push Docker image
