@@ -8,6 +8,8 @@ WORKDIR /app
 RUN apt-get update
 RUN apt-get -y upgrade
 RUN apt-get -y install curl iputils-ping
+RUN apt-get clean
+RUN rm -rf /var/lib/apt/lists/*
 RUN curl -s https://packagecloud.io/install/repositories/ookla/speedtest-cli/script.deb.sh | bash
 RUN apt-get -y install speedtest
 RUN mkdir /root/.config/
@@ -18,6 +20,8 @@ FROM mcr.microsoft.com/dotnet/sdk:latest AS build
 USER root
 RUN apt-get update
 RUN apt-get -y upgrade
+RUN apt-get clean
+RUN rm -rf /var/lib/apt/lists/*
 WORKDIR /src
 COPY ["Catalyst/Catalyst.csproj", "Catalyst/"]
 RUN dotnet restore "Catalyst/Catalyst.csproj"
