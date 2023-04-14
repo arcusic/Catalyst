@@ -38,7 +38,7 @@ jobs:
       # https://github.com/sigstore/cosign-installer
       - name: Install cosign
         if: github.event_name != 'pull_request'
-        uses: sigstore/cosign-installer@c3667d99424e7e6047999fb6246c0da843953c65
+        uses: sigstore/cosign-installer@9e9de2292db7abb3f51b7f4808d98f0d347a8919
         with:
           cosign-release: 'v1.9.0'
 
@@ -74,7 +74,7 @@ jobs:
           context: .
           file: Catalyst/Redistributables/SQL/Dockerfile
           push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ secrets.REGISTRY }}${{ steps.meta.outputs.tags }}
+          tags: arcusic${{ secrets.REGISTRY }}${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
       - name: Build and Push Docker image (MSSQL)
