@@ -5,11 +5,11 @@
 
 FROM mcr.microsoft.com/dotnet/runtime:latest AS base
 WORKDIR /app
-RUN apt-get update
-RUN apt-get -y upgrade
-RUN apt-get -y install curl iputils-ping
-RUN apt-get clean
-RUN rm -rf /var/lib/apt/lists/*
+RUN apt-get update \
+ && apt-get -y upgrade \
+ && apt-get -y install curl iputils-ping \
+ && apt-get clean \
+ && rm -rf /var/lib/apt/lists/*
 RUN curl -s https://packagecloud.io/install/repositories/ookla/speedtest-cli/script.deb.sh | bash
 RUN apt-get -y install speedtest
 RUN mkdir /root/.config/
@@ -18,10 +18,10 @@ RUN echo '{"Settings": {"LicenseAccepted": "604ec27f828456331ebf441826292c49276b
 
 FROM mcr.microsoft.com/dotnet/sdk:latest AS build
 USER root
-RUN apt-get update
-RUN apt-get -y upgrade
-RUN apt-get clean
-RUN rm -rf /var/lib/apt/lists/*
+RUN apt-get update \
+ && apt-get -y upgrade \
+ && apt-get clean \
+ && rm -rf /var/lib/apt/lists/*
 WORKDIR /src
 COPY ["Catalyst/Catalyst.csproj", "Catalyst/"]
 RUN dotnet restore "Catalyst/Catalyst.csproj"
