@@ -9,7 +9,7 @@ RUN apt-get update \
  && apt-get -y upgrade \
  && apt-get -y install curl iputils-ping \
  && curl -s https://packagecloud.io/install/repositories/ookla/speedtest-cli/script.deb.sh | bash \
- && apt-get -y install speedtest
+ && apt-get -y install speedtest \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/*
 RUN mkdir /root/.config/
