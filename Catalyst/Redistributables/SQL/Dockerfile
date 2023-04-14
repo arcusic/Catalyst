@@ -5,8 +5,10 @@
 
 FROM mcr.microsoft.com/mssql/server:2022-latest AS base
 USER root
-RUN apt-get update
-RUN apt-get -y upgrade
+RUN apt-get update \
+ && apt-get -y upgrade \
+ && apt-get clean \
+ && rm -rf /var/lib/apt/lists/*
 USER mssql
 
 #FROM mcr.microsoft.com/dotnet/sdk:latest AS build
