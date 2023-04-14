@@ -1,0 +1,20 @@
+version: '3.4'
+name: the-catalyst
+
+services:
+  catalyst:
+    container_name: Catalyst
+    image: catalyst.azurecr.io/catalyst
+    build:
+      context: .
+      dockerfile: Catalyst/Dockerfile
+    depends_on:
+      - mssql
+  mssql:
+    container_name: Catalyst-DB
+    image: catalyst.azurecr.io/catalyst_db
+    build:
+      context: .
+      dockerfile: Catalyst/Redistributables/SQL/Dockerfile
+    environment:
+      ACCEPT_EULA: y

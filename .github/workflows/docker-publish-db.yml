@@ -1,4 +1,4 @@
-name: Docker (Catalyst)
+name: Docker (Catalyst DB)
 
 # This workflow uses actions that are not certified by GitHub.
 # They are provided by a third-party and are governed by
@@ -16,7 +16,7 @@ on:
 
 env:
   # github.repository as <account>/<repo>
-  IMAGE_NAME: ${{ secrets.REGISTRY }}/catalyst
+  IMAGE_NAME: ${{ secrets.REGISTRY }}/catalyst_db
 
 
 jobs:
@@ -62,29 +62,28 @@ jobs:
         id: meta
         uses: docker/metadata-action@507c2f2dc502c992ad446e3d7a5dfbe311567a96
         with:
-          images: ${{ secrets.REGISTRY }}/catalyst
+          images: ${{ secrets.REGISTRY }}/catalyst_db
 
       # Build and push Docker image with Buildx (don't push on PR)
       # https://github.com/docker/build-push-action
-      - name: Build Docker image (PR Only)
+      - name: Build Docker image (MSSQL PR Only)
         if: github.event_name == 'pull_request'
         id: build-pr
         uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
         with:
           context: .
-          file: Catalyst/Dockerfile
+          file: Catalyst/Redistributables/SQL/Dockerfile
           push: ${{ github.event_name != 'pull_request' }}
           tags: arcusic${{ secrets.REGISTRY }}${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-      
-      - name: Build and Push Docker image
+
+      - name: Build and Push Docker image (MSSQL)
         if: github.event_name != 'pull_request'
         id: build-and-push
         uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
         with:
           context: .
-          file: Catalyst/Dockerfile
+          file: Catalyst/Redistributables/SQL/Dockerfile
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-

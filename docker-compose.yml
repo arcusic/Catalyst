@@ -1,0 +1,51 @@
+version: '3.4'
+name: the-catalyst
+
+networks:
+  catalyst:
+    name: catalyst
+    driver: bridge
+
+services:
+  catalyst:
+    container_name: catalyst
+    image: index.docker.io/arcusic/catalyst:main
+    network:
+      - catalyst
+    labels:
+      - "com.centurylinklabs.watchtower.scope=catalyst"
+    restart: always
+    build:
+      context: .
+      network: host
+      dockerfile: Catalyst/Dockerfile
+    links:
+      - mssql:database
+
+  mssql:
+    container_name: catalyst-db
+    image: index.docker.io/arcusic/catalyst_db:main
+    network:
+      - catalyst
+    labels:
+      - "com.centurylinklabs.watchtower.scope=catalyst"
+    restart: always
+    build:
+      context: .
+      network: host
+      dockerfile: Catalyst/Redistributables/SQL/Dockerfile
+    environment:
+      ACCEPT_EULA: y
+
+  watchtower:
+    container_name: catalyst-updtr
+    image: containrrr/watchtower:latest
+    labels:
+      - "com.centurylinklabs.watchtower.scope=catalyst"
+    restart: always
+    environment:
+      DOCKER_CONFIG: /config
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /root/.docker/config.json:/config/config.json
+    command: --interval 300 --scope catalyst
