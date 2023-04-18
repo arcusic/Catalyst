@@ -17,7 +17,6 @@ RUN mkdir /root/.config/ookla/
 RUN echo '{"Settings": {"LicenseAccepted": "604ec27f828456331ebf441826292c49276bd3c1bee1a2f65a6452f505c4061c"}}' > /root/.config/ookla/speedtest-cli.json
 
 FROM mcr.microsoft.com/dotnet/sdk:latest AS build
-USER root
 RUN apt-get update \
  && apt-get -y upgrade \
  && apt-get clean \
