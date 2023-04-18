@@ -641,7 +641,6 @@ public class CommandHandler : ICommandHandler
             await Logger.Log(LogSeverity.Debug, "SpeedTestResults", $"{psOutput[13]}");
             await Logger.Log(LogSeverity.Debug, "SpeedTestResults", $"{psOutput[0]}");
 
-
             await command.ModifyOriginalResponseAsync(msg => msg.Content = $"Executing infrastructure health check... please wait.\n\n`CURRENT STATUS:`  Converting retreived data to human-readable format...");
             decimal tempF = Convert.ToDecimal(tempResult[0].Data.ToString()) / 10;
             decimal tempC = (tempF - 32) * 5 / 9;
