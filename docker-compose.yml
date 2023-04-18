@@ -5,12 +5,15 @@ networks:
   catalyst:
     name: catalyst
     driver: bridge
+  utilities:
+    name: utilities
+    driver: bridge
 
 services:
   catalyst:
     container_name: catalyst
     image: index.docker.io/arcusic/catalyst:main
-    network:
+    networks:
       - catalyst
     labels:
       - "com.centurylinklabs.watchtower.scope=catalyst"
@@ -25,7 +28,7 @@ services:
   mssql:
     container_name: catalyst-db
     image: index.docker.io/arcusic/catalyst_db:main
-    network:
+    networks:
       - catalyst
     labels:
       - "com.centurylinklabs.watchtower.scope=catalyst"
@@ -40,6 +43,8 @@ services:
   watchtower:
     container_name: catalyst-updtr
     image: containrrr/watchtower:latest
+    networks:
+     - utilities
     labels:
       - "com.centurylinklabs.watchtower.scope=catalyst"
     restart: always
