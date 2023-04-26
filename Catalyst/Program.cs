@@ -23,8 +23,13 @@ var config = new ConfigurationBuilder()
 var secretClient = new SecretClient(new Uri($"https://{config.GetRequiredSection("KeyVault")["KeyVaultName"]}.vault.azure.net"), new ClientSecretCredential(config.GetRequiredSection("KeyVault")["AzureADTennantId"], config.GetRequiredSection("KeyVault")["AzureADClientId"], config.GetRequiredSection("KeyVault")["AzureADClientSecret"]));
 await Logger.Log(LogSeverity.Debug, "SecretClientConfigured", $"Configured Azure Key Vault client to connect to {secretClient.VaultUri}.");
 
+#if DEBUG
+var token = secretClient.GetSecret(config.GetRequiredSection("KeyVault")["SecretNameDev"]);
+await Logger.Log(LogSeverity.Debug, "AuthTokenObtained", $"Successfully obtained token from Azure Key Vault. Secret ID: {token.Value.Id}");
+#else
 var token = secretClient.GetSecret(config.GetRequiredSection("KeyVault")["SecretName"]);
 await Logger.Log(LogSeverity.Debug, "AuthTokenObtained", $"Successfully obtained token from Azure Key Vault. Secret ID: {token.Value.Id}");
+#endif
 
 var client = new DiscordShardedClient(new DiscordSocketConfig
 {
@@ -271,9 +276,11 @@ async Task MainAsync()
 
         await Logger.Log(LogSeverity.Info, "GUILD_BLD", $"Processing Guild Application Commands...");
         await Logger.Log(LogSeverity.Info, "GUILD_BLD", $"Processing Tactical Commands...");
+#if RELEASE
         await tactical.BulkOverwriteApplicationCommandAsync(tacticalApplicationCommandProperties.ToArray());
         await Logger.Log(LogSeverity.Info, "GUILD_BLD", $"Completed Tactical Commands.");
         await Logger.Log(LogSeverity.Info, "GUILD_BLD", $"Completed Guild Application Commands.");
+#endif
 
         await Logger.Log(LogSeverity.Info, "ShardReady", $"Shard Number {shard.ShardId} is connected and ready!");
     };
@@ -333,12 +340,14 @@ async Task MainAsync()
 
     var timer = new PeriodicTimer(TimeSpan.FromMinutes(1));
 
+#if RELEASE
     while (await timer.WaitForNextTickAsync())
     {
         using var wb = new HttpClient();
         using HttpResponseMessage response = await wb.GetAsync(url.Value.Value);
         response.EnsureSuccessStatusCode();
     }
+#endif
 
     // Wait infinitely so your bot actually stays connected.
     await Task.Delay(Timeout.Infinite);
