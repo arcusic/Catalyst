@@ -7,7 +7,7 @@ FROM mcr.microsoft.com/dotnet/runtime:latest AS base
 WORKDIR /app
 RUN apt-get update \
  && apt-get -y upgrade \
- && apt-get -y --no-install-recommends install curl iputils-ping gnupg \
+ && apt-get -y --no-install-recommends install curl iputils-ping \
  && curl -s https://packagecloud.io/install/repositories/ookla/speedtest-cli/script.deb.sh | bash \
  && apt-get -y --no-install-recommends install speedtest \
  && apt-get clean \
