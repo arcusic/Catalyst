@@ -5,6 +5,7 @@
 
 FROM mcr.microsoft.com/mssql/server:2022-latest AS base
 USER root
+ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get update \
  && apt-get -y install gnupg \
  && apt-get -y upgrade \
