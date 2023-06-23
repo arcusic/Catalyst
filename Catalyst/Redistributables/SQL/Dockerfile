@@ -5,8 +5,9 @@
 
 FROM mcr.microsoft.com/mssql/server:2022-latest AS base
 USER root
+ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get update \
- && apt-get -y upgrade \
+ && ACCEPT_EULA=Y apt-get -y upgrade \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/*
 USER mssql
