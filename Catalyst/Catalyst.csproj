@@ -48,7 +48,7 @@
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.19.5" />
     <PackageReference Include="Microsoft.WSMan.Management" Version="7.3.7" />
     <PackageReference Include="SSH.NET" Version="2020.0.2" />
-    <PackageReference Include="UnitsNet" Version="5.33.0" />
+    <PackageReference Include="UnitsNet" Version="5.34.0" />
   </ItemGroup>
   <ItemGroup>
     <None Update="appsettings.json">
