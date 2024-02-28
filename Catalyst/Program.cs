@@ -24,11 +24,11 @@ var secretClient = new SecretClient(new Uri($"https://{config.GetRequiredSection
 await Logger.Log(LogSeverity.Debug, "SecretClientConfigured", $"Configured Azure Key Vault client to connect to {secretClient.VaultUri}.");
 
 #if DEBUG
-var token = secretClient.GetSecret(config.GetRequiredSection("KeyVault")["SecretNameDev"]);
-await Logger.Log(LogSeverity.Debug, "AuthTokenObtained", $"Successfully obtained token from Azure Key Vault. Secret ID: {token.Value.Id}");
+    var token = secretClient.GetSecret(config.GetRequiredSection("KeyVault")["SecretNameDev"]);
+    await Logger.Log(LogSeverity.Debug, "AuthTokenObtained", $"Successfully obtained token from Azure Key Vault. Secret ID: {token.Value.Id}");
 #else
-var token = secretClient.GetSecret(config.GetRequiredSection("KeyVault")["SecretName"]);
-await Logger.Log(LogSeverity.Debug, "AuthTokenObtained", $"Successfully obtained token from Azure Key Vault. Secret ID: {token.Value.Id}");
+    var token = secretClient.GetSecret(config.GetRequiredSection("KeyVault")["SecretName"]);
+    await Logger.Log(LogSeverity.Debug, "AuthTokenObtained", $"Successfully obtained token from Azure Key Vault. Secret ID: {token.Value.Id}");
 #endif
 
 var client = new DiscordShardedClient(new DiscordSocketConfig
@@ -315,9 +315,7 @@ async Task MainAsync()
 
 #if DEBUG
     await client.SetGameAsync($"v{version}-alpha");
-    await client.SetStatusAsync(UserStatus.DoNotDisturb);
-
-    
+    await client.SetStatusAsync(UserStatus.DoNotDisturb);    
 #endif
 
 #if RELEASE
