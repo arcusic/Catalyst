@@ -35,10 +35,9 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
     <PackageReference Include="Lextm.SharpSnmpLib" Version="12.5.2" />
-    <PackageReference Include="Microsoft.PowerShell.Commands.Diagnostics" Version="7.4.0" />
+    <PackageReference Include="Microsoft.PowerShell.Commands.Diagnostics" Version="7.4.1" />
     <PackageReference Include="Microsoft.PowerShell.Commands.Management" Version="7.4.1" />
-    <PackageReference Include="Microsoft.PowerShell.Commands.Utility" Version="7.4.0" />
-    <PackageReference Include="Microsoft.PowerShell.ConsoleHost" Version="7.4.0" />
+    <PackageReference Include="Microsoft.PowerShell.ConsoleHost" Version="7.4.1" />
     <PackageReference Include="MediatR" Version="12.2.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.0" />
@@ -47,9 +46,9 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.PowerShell.Security" Version="7.4.0" />
+    <PackageReference Include="Microsoft.PowerShell.Security" Version="7.4.1" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.19.6" />
-    <PackageReference Include="Microsoft.WSMan.Management" Version="7.4.0" />
+    <PackageReference Include="Microsoft.WSMan.Management" Version="7.4.1" />
     <PackageReference Include="SSH.NET" Version="2023.0.1" />
     <PackageReference Include="UnitsNet" Version="5.42.0" />
   </ItemGroup>
