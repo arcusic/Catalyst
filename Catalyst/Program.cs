@@ -304,9 +304,12 @@ async Task MainAsync()
     version = version.Replace(".0", "");
 
 #if RELEASE
-    if (!File.Exists("/root/.config/ookla/build.txt"))
+    if (!Environment.OSVersion.ToString().Contains("Unix"))
     {
-        File.WriteAllText("/root/.config/ookla/build.txt", DateTime.UtcNow.ToString());
+        if (!File.Exists("/root/.config/ookla/build.txt"))
+        {
+            File.WriteAllText("/root/.config/ookla/build.txt", DateTime.UtcNow.ToString());
+        }
     }
 #endif
 
