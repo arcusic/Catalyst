@@ -304,12 +304,9 @@ async Task MainAsync()
     version = version.Replace(".0", "");
 
 #if RELEASE
-    if ((!Environment.OSVersion.ToString().Contains("Unix") && (Environment.MachineName == "catalyst")))
+    if (!File.Exists("/root/.config/ookla/build.txt"))
     {
-        if (!File.Exists("/root/.config/ookla/build.txt"))
-        {
-            File.WriteAllText("/root/.config/ookla/build.txt", DateTime.UtcNow.ToString());
-        }
+        File.WriteAllText("/root/.config/ookla/build.txt", DateTime.UtcNow.ToString());
     }
 #endif
 
