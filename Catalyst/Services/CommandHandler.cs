@@ -606,40 +606,40 @@ public class CommandHandler : ICommandHandler
                 x++;
             }
 
-            await command.ModifyOriginalResponseAsync(msg => msg.Content = $"Executing infrastructure health check... please wait.\n\n`CURRENT STATUS:`  Spawning a PowerShell Instance...");
-            PowerShell psInstance = PowerShell.Create();
+            // await command.ModifyOriginalResponseAsync(msg => msg.Content = $"Executing infrastructure health check... please wait.\n\n`CURRENT STATUS:`  Spawning a PowerShell Instance...");
+            // PowerShell psInstance = PowerShell.Create();
 
-            if (OperatingSystem.IsWindows())
-            {
-                string stDirectory = Directory.GetCurrentDirectory();
-                stDirectory += "\\Redistributables\\SpeedTest\\speedtest.exe";
-                psInstance.AddCommand(stDirectory);
-            }
-            else
-            {
-                psInstance.AddCommand("speedtest");
-            }
+            // if (OperatingSystem.IsWindows())
+            // {
+            //     string stDirectory = Directory.GetCurrentDirectory();
+            //     stDirectory += "\\Redistributables\\SpeedTest\\speedtest.exe";
+            //     psInstance.AddCommand(stDirectory);
+            // }
+            // else
+            // {
+            //     psInstance.AddCommand("speedtest");
+            // }
 
-            await command.ModifyOriginalResponseAsync(msg => msg.Content = $"Executing infrastructure health check... please wait.\n\n`CURRENT STATUS:`  Executing Speed Test...");
-            await Logger.Log(LogSeverity.Debug, "SpeedTestStarting", $"Launching speedtest... Please Wait.");
-            var psOutput = psInstance.Invoke();
+            // await command.ModifyOriginalResponseAsync(msg => msg.Content = $"Executing infrastructure health check... please wait.\n\n`CURRENT STATUS:`  Executing Speed Test...");
+            // await Logger.Log(LogSeverity.Debug, "SpeedTestStarting", $"Launching speedtest... Please Wait.");
+            // var psOutput = psInstance.Invoke();
 
-            psInstance.Dispose();
-            await Logger.Log(LogSeverity.Debug, "SpeedTestResults", $"{psOutput[0]}");
-            await Logger.Log(LogSeverity.Debug, "SpeedTestResults", $"{psOutput[1]}");
-            await Logger.Log(LogSeverity.Debug, "SpeedTestResults", $"{psOutput[2]}");
-            await Logger.Log(LogSeverity.Debug, "SpeedTestResults", $"{psOutput[3]}");
-            await Logger.Log(LogSeverity.Debug, "SpeedTestResults", $"{psOutput[4]}");
-            await Logger.Log(LogSeverity.Debug, "SpeedTestResults", $"{psOutput[5]}");
-            await Logger.Log(LogSeverity.Debug, "SpeedTestResults", $"{psOutput[6]}");
-            await Logger.Log(LogSeverity.Debug, "SpeedTestResults", $"{psOutput[7]}");
-            await Logger.Log(LogSeverity.Debug, "SpeedTestResults", $"{psOutput[8]}");
-            await Logger.Log(LogSeverity.Debug, "SpeedTestResults", $"{psOutput[9]}");
-            await Logger.Log(LogSeverity.Debug, "SpeedTestResults", $"{psOutput[10]}");
-            await Logger.Log(LogSeverity.Debug, "SpeedTestResults", $"{psOutput[11]}");
-            await Logger.Log(LogSeverity.Debug, "SpeedTestResults", $"{psOutput[12]}");
-            await Logger.Log(LogSeverity.Debug, "SpeedTestResults", $"{psOutput[13]}");
-            await Logger.Log(LogSeverity.Debug, "SpeedTestResults", $"{psOutput[0]}");
+            // psInstance.Dispose();
+            // await Logger.Log(LogSeverity.Debug, "SpeedTestResults", $"{psOutput[0]}");
+            // await Logger.Log(LogSeverity.Debug, "SpeedTestResults", $"{psOutput[1]}");
+            // await Logger.Log(LogSeverity.Debug, "SpeedTestResults", $"{psOutput[2]}");
+            // await Logger.Log(LogSeverity.Debug, "SpeedTestResults", $"{psOutput[3]}");
+            // await Logger.Log(LogSeverity.Debug, "SpeedTestResults", $"{psOutput[4]}");
+            // await Logger.Log(LogSeverity.Debug, "SpeedTestResults", $"{psOutput[5]}");
+            // await Logger.Log(LogSeverity.Debug, "SpeedTestResults", $"{psOutput[6]}");
+            // await Logger.Log(LogSeverity.Debug, "SpeedTestResults", $"{psOutput[7]}");
+            // await Logger.Log(LogSeverity.Debug, "SpeedTestResults", $"{psOutput[8]}");
+            // await Logger.Log(LogSeverity.Debug, "SpeedTestResults", $"{psOutput[9]}");
+            // await Logger.Log(LogSeverity.Debug, "SpeedTestResults", $"{psOutput[10]}");
+            // await Logger.Log(LogSeverity.Debug, "SpeedTestResults", $"{psOutput[11]}");
+            // await Logger.Log(LogSeverity.Debug, "SpeedTestResults", $"{psOutput[12]}");
+            // await Logger.Log(LogSeverity.Debug, "SpeedTestResults", $"{psOutput[13]}");
+            // await Logger.Log(LogSeverity.Debug, "SpeedTestResults", $"{psOutput[0]}");
 
             await command.ModifyOriginalResponseAsync(msg => msg.Content = $"Executing infrastructure health check... please wait.\n\n`CURRENT STATUS:`  Converting retreived data to human-readable format...");
             decimal tempF = Convert.ToDecimal(tempResult[0].Data.ToString()) / 10;
@@ -734,9 +734,9 @@ public class CommandHandler : ICommandHandler
                 $"`{networkDevices[11, 0]}:`  {networkDevices[11, 2]}  {networkDevices[11, 3]}\n" +
                 $"`{networkDevices[12, 0]}:`  {networkDevices[12, 2]}  {networkDevices[12, 3]}\n" +
                 $"`{networkDevices[13, 0]}:`  {networkDevices[13, 2]}  {networkDevices[13, 3]}\n" +
-                $"`{networkDevices[14, 0]}:`  {networkDevices[14, 2]}  {networkDevices[14, 3]}\n\n" +
-                $"__*Connection Information:*__\n" +
-                $"`Speed Test Results:` {psOutput[13].ToString().Replace("Result URL: ", "")}.png\n");
+                $"`{networkDevices[14, 0]}:`  {networkDevices[14, 2]}  {networkDevices[14, 3]}\n\n");
+                // $"__*Connection Information:*__\n" +
+                // $"`Speed Test Results:` {psOutput[13].ToString().Replace("Result URL: ", "")}.png\n");
             await Logger.Log(LogSeverity.Verbose, $"[{command.GuildId}] ResponseSent", $"Health Report sent to the {command.Channel.Name} channel.");
         }
         
