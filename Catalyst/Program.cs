@@ -304,7 +304,7 @@ async Task MainAsync()
     version = version.Replace(".0", "");
 
 #if RELEASE
-    if ((!Environment.OSVersion.ToString().Contains("Unix") && (!Environment.MachineName == "catalyst")))
+    if ((!Environment.OSVersion.ToString().Contains("Unix") && !(Environment.MachineName == "catalyst")))
     {
         if (!File.Exists("/root/.config/ookla/build.txt"))
         {
