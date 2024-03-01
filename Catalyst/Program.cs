@@ -296,18 +296,18 @@ async Task MainAsync()
     await Logger.Log(LogSeverity.Debug, $"Client{client.LoginState}", $"Discord Presence: {client.Status}.");
     
     await client.StartAsync();
-    await client.DownloadUsersAsync(guilds: client.Guilds);
+            await client.DownloadUsersAsync(guilds: client.Guilds);
 
-    await Logger.Log(LogSeverity.Debug, $"ClientReady", $"Client is connected to Discord.");
+            await Logger.Log(LogSeverity.Debug, $"ClientReady", $"Client is connected to Discord.");
 
-    string version = Assembly.GetEntryAssembly().GetName().Version.ToString();
-    version = version.Replace(".0", "");
+            string? version = Assembly.GetEntryAssembly()?.GetName()?.Version?.ToString();
+            version = version?.Replace(".0", "");
 
-#if RELEASE
-    if (!File.Exists("/root/.config/ookla/build.txt"))
-    {
-        File.WriteAllText("/root/.config/ookla/build.txt", DateTime.UtcNow.ToString());
-    }
+        #if RELEASE
+            if (!File.Exists("/root/.config/ookla/build.txt"))
+            {
+                File.WriteAllText("/root/.config/ookla/build.txt", DateTime.UtcNow.ToString());
+            }
 #endif
 
 #if DEBUG
