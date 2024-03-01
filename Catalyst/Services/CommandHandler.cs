@@ -329,6 +329,7 @@ public class CommandHandler : ICommandHandler
             var snmpSettings = appSettings.RootElement.GetProperty("SNMP").EnumerateObject();
             var topologySettings = appSettings.RootElement.GetProperty("Topology").EnumerateObject();
             var hardwareSettings = appSettings.RootElement.GetProperty("Hardware").EnumerateObject();
+            var hardwareSettingsmc = appSettings.RootElement.GetProperty("Hardware").EnumerateObject();
             await Logger.Log(LogSeverity.Debug, $"JSONImported", "JSON file has been successfully imported... Processing.");
 
             string keyVault = keyVaultSettings
@@ -463,6 +464,12 @@ public class CommandHandler : ICommandHandler
                 .FirstOrDefault()
                 .ToString();
 
+            string hwDNS01mc = hardwareSettingsmc
+                .Where(kijmix => kijmix.Name == "MinecraftHost")
+                .Select(kijmix => kijmix.Value)
+                .FirstOrDefault()
+                .ToString();
+
             await Logger.Log(LogSeverity.Debug, $"JSONParsed", "JSON file has been successfully parsed.");
 
             await command.ModifyOriginalResponseAsync(msg => msg.Content = $"Executing infrastructure health check... please wait.\n\n`CURRENT STATUS:`  Retreiving Secrets from Azure KeyVault...");
@@ -521,6 +528,9 @@ public class CommandHandler : ICommandHandler
             var dns02IP = secretClient.GetSecret(hwDNS02);
             await Logger.Log(LogSeverity.Debug, "DNS02IPObtained", $"Successfully obtained DNS02 IP Address from Azure Key Vault.");
 
+            var hwDNS01mcIP = secretClient.GetSecret(hwDNS01mc);
+            await Logger.Log(LogSeverity.Debug, "hwDNS01mcObtained", $"Successfully obtained Multicraft IP Address from Azure Key Vault.");
+
             await command.ModifyOriginalResponseAsync(msg => msg.Content = $"Executing infrastructure health check... please wait.\n\n`CURRENT STATUS:`  Gathering Environmental Information...");
             var tempResult = Messenger.Get(VersionCode.V2,
                 new IPEndPoint(IPAddress.Parse(upsIPAddress.Value.Value), Convert.ToInt32(snmpPort.Value.Value)),
@@ -564,19 +574,26 @@ public class CommandHandler : ICommandHandler
             {
             { "UDM-SE", gatewayIP.Value.Value, "", "" },
             { "USW-AGG-PRO", aggA1IP.Value.Value, "", "" },
-            { "USW-AGG-A2", aggA2IP.Value.Value, "", "" },
+            { "UCI", aggA2IP.Value.Value, "", "" },
             { "USW-CORE-SW1", coreSW1IP.Value.Value, "", "" },
             { "USW-CORE-SW2", coreSW2IP.Value.Value, "", "" },
             { "USW-ACC-SW1", accSW1IP.Value.Value, "", "" },
             { "U6-E-01", ap1IP.Value.Value, "", "" },
             { "U6-E-02", ap2IP.Value.Value, "", "" },
-            { "U-LTE", lteIP.Value.Value, "", "" },
+            { "U-LTE-Pro", lteIP.Value.Value, "", "" },
             { "USP-PDU-PRO", pduIP.Value.Value, "", "" },
-            { "ONT", ontIP.Value.Value, "", "" },
+            { "ONT Outlet", ontIP.Value.Value, "", "" },
             { "ESXi-01", esx01IP.Value.Value, "", "" },
             { "ESXi-02", esx02IP.Value.Value, "", "" },
-            { "FINALIZER", dns01IP.Value.Value, "", "" },
-            { "DEVASTATOR", dns02IP.Value.Value, "", "" }
+            { "Catalyst-DC01", dns01IP.Value.Value, "", "" },
+            { "Catalyst-DC02", dns02IP.Value.Value, "", "" },
+            { "Catalyst-AC01", aggA2IP.Value.Value, "", "" },
+            { "Catalyst-AC02", aggA2IP.Value.Value, "", "" },
+            { "vCenter", aggA2IP.Value.Value, "", "" },
+            { "Multicraft", hwDNS01mcIP.Value.Value, "", "" },
+            { "Wazuh", aggA2IP.Value.Value, "", "" },
+            { "Zabbix", aggA2IP.Value.Value, "", "" },
+            { "vROps", aggA2IP.Value.Value, "", "" }
             };
 
             Ping pingSender = new();
@@ -718,23 +735,32 @@ public class CommandHandler : ICommandHandler
                 $"`UPS Input Voltage Frequency:`  {inputStatus}  {inputFrequency} Hz\n" +
                 $"`UPS Battery Capacity:`  {capStatus}  {capResult[0].Data}%\n" +
                 $"`UPS Runtime:`  {runStatus}  {timeResult[0].Data} minutes\n\n" +
-                $"__*Topology Information:*__\n" +
+                $"__*Network Device Information:*__\n" +
+                $"`{networkDevices[2, 0]}:`  {networkDevices[2, 2]}  {networkDevices[2, 3]}\n" +
                 $"`{networkDevices[0, 0]}:`  {networkDevices[0, 2]}  {networkDevices[0, 3]}\n" +
+                $"`{networkDevices[9, 0]}:`  {networkDevices[9, 2]}  {networkDevices[9, 3]}\n" + 
                 $"`{networkDevices[1, 0]}:`  {networkDevices[1, 2]}  {networkDevices[1, 3]}\n" +
-                //$"`{networkDevices[2, 0]}:`  {networkDevices[2, 2]}  {networkDevices[2, 3]}\n" +
                 $"`{networkDevices[3, 0]}:`  {networkDevices[3, 2]}  {networkDevices[3, 3]}\n" +
                 $"`{networkDevices[4, 0]}:`  {networkDevices[4, 2]}  {networkDevices[4, 3]}\n" +
                 $"`{networkDevices[5, 0]}:`  {networkDevices[5, 2]}  {networkDevices[5, 3]}\n" +
                 $"`{networkDevices[6, 0]}:`  {networkDevices[6, 2]}  {networkDevices[6, 3]}\n" +
                 $"`{networkDevices[7, 0]}:`  {networkDevices[7, 2]}  {networkDevices[7, 3]}\n" +
                 $"`{networkDevices[8, 0]}:`  {networkDevices[8, 2]}  {networkDevices[8, 3]}\n" +
-                $"`{networkDevices[9, 0]}:`  {networkDevices[9, 2]}  {networkDevices[9, 3]}\n" +
                 $"`{networkDevices[10, 0]}:`  {networkDevices[10, 2]}  {networkDevices[10, 3]}\n\n" +
-                $"__*Hardware Information:*__\n" +
+                $"__*Hypervisor Information:*__\n" +
                 $"`{networkDevices[11, 0]}:`  {networkDevices[11, 2]}  {networkDevices[11, 3]}\n" +
-                $"`{networkDevices[12, 0]}:`  {networkDevices[12, 2]}  {networkDevices[12, 3]}\n" +
+                $"`{networkDevices[12, 0]}:`  {networkDevices[12, 2]}  {networkDevices[12, 3]}\n\n" +
+                $"__*Infrastructure Information:*__\n" +
                 $"`{networkDevices[13, 0]}:`  {networkDevices[13, 2]}  {networkDevices[13, 3]}\n" +
-                $"`{networkDevices[14, 0]}:`  {networkDevices[14, 2]}  {networkDevices[14, 3]}\n\n" +
+                $"`{networkDevices[14, 0]}:`  {networkDevices[14, 2]}  {networkDevices[14, 3]}\n" +
+                $"`{networkDevices[15, 0]}:`  {networkDevices[15, 2]}  {networkDevices[15, 3]}\n" +
+                $"`{networkDevices[16, 0]}:`  {networkDevices[16, 2]}  {networkDevices[16, 3]}\n\n" +
+                $"__*Application Information:*__\n" +
+                $"`{networkDevices[17, 0]}:`  {networkDevices[17, 2]}  {networkDevices[17, 3]}\n" +
+                $"`{networkDevices[18, 0]}:`  {networkDevices[18, 2]}  {networkDevices[18, 3]}\n" +
+                $"`{networkDevices[19, 0]}:`  {networkDevices[19, 2]}  {networkDevices[19, 3]}\n" +
+                $"`{networkDevices[20, 0]}:`  {networkDevices[20, 2]}  {networkDevices[20, 3]}\n" +
+                $"`{networkDevices[21, 0]}:`  {networkDevices[21, 2]}  {networkDevices[21, 3]}\n\n" +
                 $"__*Connection Information:*__\n" +
                 $"`Speed Test Results:` {psOutput[13].ToString().Replace("Result URL: ", "")}.png\n");
             await Logger.Log(LogSeverity.Verbose, $"[{command.GuildId}] ResponseSent", $"Health Report sent to the {command.Channel.Name} channel.");
