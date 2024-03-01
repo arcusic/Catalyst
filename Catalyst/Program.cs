@@ -59,7 +59,7 @@ await MainAsync();
 
 async Task MainAsync()
 {
-    await Bootstrapper.ServiceProvider.GetRequiredService<ICommandHandler>().InitializeAsync();
+    await Bootstrapper.ServiceProvider!.GetRequiredService<ICommandHandler>().InitializeAsync();
 
     List<ApplicationCommandProperties> globalApplicationCommandProperties = new();
     List<ApplicationCommandProperties> tacticalApplicationCommandProperties = new();

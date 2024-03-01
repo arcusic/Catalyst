@@ -4,8 +4,8 @@ namespace Catalyst.Init;
 
 public static class Bootstrapper
 {
-    public static IServiceProvider ServiceProvider { get; set; }
-    private static IServiceCollection _serviceCollection;
+    public static IServiceProvider? ServiceProvider { get; set; }
+    private static IServiceCollection? _serviceCollection;
     private static bool _isInitialized = false;
 
     public static void Init()
@@ -26,14 +26,20 @@ public static class Bootstrapper
         where TInterface : class
         where TImplementation : class, TInterface
     {
-        _serviceCollection.AddSingleton<TInterface, TImplementation>();
-        ServiceProvider = _serviceCollection.BuildServiceProvider();
+        if (_serviceCollection != null)
+        {
+            _serviceCollection.AddSingleton<TInterface, TImplementation>();
+            ServiceProvider = _serviceCollection.BuildServiceProvider();
+        }
     }
 
     public static void RegisterInstance<TInterface>(TInterface instance)
         where TInterface : class
     {
-        _serviceCollection.AddSingleton<TInterface>(instance);
-        ServiceProvider = _serviceCollection.BuildServiceProvider();
+        if (_serviceCollection != null)
+        {
+            _serviceCollection.AddSingleton<TInterface>(instance);
+            ServiceProvider = _serviceCollection.BuildServiceProvider();
+        }
     }
 }
