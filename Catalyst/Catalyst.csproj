@@ -88,6 +88,7 @@
     <PackageReference Include="Microsoft.NETCore.Targets" Version="6.0.0-preview.4.21253.7" />
     <PackageReference Include="Microsoft.PowerShell.Commands.Diagnostics" Version="7.4.1" />
     <PackageReference Include="Microsoft.PowerShell.Commands.Management" Version="7.4.1" />
+    <PackageReference Include="Microsoft.PowerShell.Commands.Utility" Version="7.4.1" />
     <PackageReference Include="Microsoft.PowerShell.ConsoleHost" Version="7.4.1" />
     <PackageReference Include="MediatR" Version="12.2.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.2" />
