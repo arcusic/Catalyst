@@ -777,7 +777,7 @@ public class CommandHandler : ICommandHandler
             string operatingSystem = Environment.OSVersion.ToString().Contains("Microsoft Windows") ? "Microsoft Windows" : Environment.OSVersion.ToString();
             operatingSystem = Environment.OSVersion.ToString().Contains("Unix") ? "Unix" : Environment.OSVersion.ToString();
 
-            string version = Assembly.GetEntryAssembly().GetName().Version.ToString();
+            string version = Assembly.GetEntryAssembly()?.GetName().Version?.ToString() ?? "Unknown";
 #if DEBUG
             var dateTime = DateTime.UtcNow;
 #endif
@@ -1834,7 +1834,7 @@ public class CommandHandler : ICommandHandler
             case "agree":
                 await Logger.Log(LogSeverity.Verbose, $"[{component.GuildId}] ConfirmationReceived", $"{component.User.Username}#{component.User.DiscriminatorValue} has confirmed from the confirmation message.");
 
-                string mcUser = component.Message.Embeds.FirstOrDefault().Title;
+                string mcUser = component.Message.Embeds.FirstOrDefault()?.Title ?? string.Empty;
 
                 if (component.GuildId == 994625404243546292)
                 {
@@ -1960,7 +1960,10 @@ public class CommandHandler : ICommandHandler
                         var roleAddition = component.User as IGuildUser;
                         var roleAdded = guild.GetRole(1075576019152547942) as IRole;
 
-                        await roleAddition.AddRoleAsync(roleAdded);
+                        if (roleAddition != null)
+                        {
+                            await roleAddition.AddRoleAsync(roleAdded);
+                        }
 
                         embed.Color = Color.Green;
                         embed.Description = "__**WARNING:**__ Server Logs on Tacticraft are monitored.\n\n" +
@@ -1971,9 +1974,12 @@ public class CommandHandler : ICommandHandler
                             $"A world map is available at https://tacticraft.app";
                         await component.ModifyOriginalResponseAsync(msg => msg.Embed = embed.Build());
 
-                        await channel.SendMessageAsync($"`{component.User.Username}#{component.User.DiscriminatorValue}` has witelisted a Minecraft Account.\n" +
-                            $"`MC Username: {mcUsersplit[1]}`\n\n" +
-                            $"Command Output:\n```{output.Result}```");
+                        if (component.User != null)
+                        {
+                            await channel.SendMessageAsync($"`{component.User.Username}#{component.User.DiscriminatorValue}` has witelisted a Minecraft Account.\n" +
+                                $"`MC Username: {mcUsersplit[1]}`\n\n" +
+                                $"Command Output:\n```{output.Result}```");
+                        }
                     }
                     else
                     {
@@ -1986,9 +1992,12 @@ public class CommandHandler : ICommandHandler
                         await component.UpdateAsync(vampire => vampire.Embed = embed.Build());
                         await component.ModifyOriginalResponseAsync(msg => msg.Components = new ComponentBuilder().WithButton("Proceed", "proceed", ButtonStyle.Success, disabled: true).WithButton("Abort", "abort", ButtonStyle.Danger, disabled: true).Build());
 
-                        await channel.SendMessageAsync($"`{component.User.Username}#{component.User.DiscriminatorValue}` has attempted to whitelist a second Minecraft Account.\n" +
-                            $"`MC Username:` {mcUsersplit[1]}\n" +
-                            $"`Command Execution has been blocked.`");
+                        if (component.User != null)
+                        {
+                            await channel.SendMessageAsync($"`{component.User.Username}#{component.User.DiscriminatorValue}` has attempted to whitelist a second Minecraft Account.\n" +
+                                $"`MC Username:` {mcUsersplit[1]}\n" +
+                                $"`Command Execution has been blocked.`");
+                        }
                     }
                 }
 
