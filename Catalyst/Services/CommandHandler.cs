@@ -736,7 +736,7 @@ public class CommandHandler : ICommandHandler
                 $"`UPS Battery Capacity:`  {capStatus}  {capResult[0].Data}%\n" +
                 $"`UPS Runtime:`  {runStatus}  {timeResult[0].Data} minutes\n\n" +
                 $"__*Network Device Information:*__\n" +
-                $"`{networkDevices[2, 0]}:`  {networkDevices[2, 2]}  {networkDevices[2, 3]}\n" +
+                // $"`{networkDevices[2, 0]}:`  {networkDevices[2, 2]}  {networkDevices[2, 3]}\n" +
                 $"`{networkDevices[0, 0]}:`  {networkDevices[0, 2]}  {networkDevices[0, 3]}\n" +
                 $"`{networkDevices[9, 0]}:`  {networkDevices[9, 2]}  {networkDevices[9, 3]}\n" + 
                 $"`{networkDevices[1, 0]}:`  {networkDevices[1, 2]}  {networkDevices[1, 3]}\n" +
