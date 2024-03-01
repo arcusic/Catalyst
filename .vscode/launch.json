@@ -9,16 +9,11 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceFolder}/LocationBot/bin/Debug/net6.0/LocationBot.dll",
+            "program": "${workspaceFolder}/Catalyst/bin/Debug/net80/Catalyst.dll",
             "args": [],
-            "cwd": "${workspaceFolder}/LocationBot",
+            "cwd": "${workspaceFolder}/Catalyst",
             "console": "internalConsole",
             "stopAtEntry": false
-        },
-        {
-            "name": ".NET Core Attach",
-            "type": "coreclr",
-            "request": "attach"
         }
     ]
 }
