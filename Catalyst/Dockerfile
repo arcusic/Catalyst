@@ -28,10 +28,10 @@ COPY ["Catalyst/Catalyst.csproj", "Catalyst/"]
 RUN dotnet restore "Catalyst/Catalyst.csproj"
 COPY . .
 WORKDIR "/src/Catalyst"
-RUN dotnet build "Catalyst.csproj" -c Release -o /app/build
+RUN dotnet build "Catalyst.csproj" -c Debug -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "Catalyst.csproj" -c Release -o /app/publish
+RUN dotnet publish "Catalyst.csproj" -c Debug -o /app/publish
 
 FROM base AS final
 WORKDIR /app
