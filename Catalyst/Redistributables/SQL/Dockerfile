@@ -11,10 +11,6 @@ RUN apt-get -y upgrade
 RUN apt-get clean
 RUN rm -rf /var/lib/apt/lists/*
 COPY ./Catalyst/Redistributables/SQL/entrypoint.sh /entrypoint.sh
-RUN mkdir -p /mssql
-# RUN chown -R mssql:mssql /mssql/data
-# RUN chown -R mssql:mssql /mssql/log
-# RUN chown -R mssql:mssql /mssql/dump
 RUN chown mssql:mssql /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 CMD ["/entrypoint.sh"]
