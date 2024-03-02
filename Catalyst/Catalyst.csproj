@@ -162,8 +162,5 @@
     <None Update="Redistributables\SpeedTest\speedtest.exe">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Redistributables\Scripts\startup.sh">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
 </Project>
