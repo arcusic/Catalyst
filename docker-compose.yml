@@ -26,7 +26,7 @@ services:
     volumes:
       - data:/mssql
     secrets:
-      - SA_Password
+      - sa_password
     environment:
       ACCEPT_EULA: y
       SA_PASSWORD_FILE: /run/secrets/sa_password
