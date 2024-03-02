@@ -1,9 +1,9 @@
 version: '3.4'
-name: the-catalyst
+name: the-catalyst-dev
 
 services:
   catalyst:
-    container_name: catalyst-dev
+    container_name: catalyst
     networks: 
       - catalyst
     restart: always
