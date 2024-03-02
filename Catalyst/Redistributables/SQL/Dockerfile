@@ -6,10 +6,10 @@
 FROM mcr.microsoft.com/mssql/server:2022-latest AS base
 USER root
 ENV DEBIAN_FRONTEND noninteractive
-RUN apt-get update \
- && apt-get -y upgrade
-RUN apt-get clean \
- && rm -rf /var/lib/apt/lists/*
+RUN apt-get update
+RUN apt-get -y upgrade
+RUN apt-get clean
+RUN rm -rf /var/lib/apt/lists/*
 COPY ./Catalyst/Redistributables/SQL/secrets/entrypoint.sh /entrypoint.sh
 RUN mkdir -p /mssql/backup
 RUN mkdir -p /mssql/data

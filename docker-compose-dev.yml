@@ -4,21 +4,25 @@ name: the-catalyst
 services:
   catalyst:
     container_name: catalyst-dev
-    platform: linux/amd64
     networks: 
       - catalyst
     restart: always
-    image: arcusic/catalyst:main
+    build:
+      context: .
+      network: host
+      dockerfile: Catalyst/Dockerfile
     links:
         - mssql:database
 
   mssql:
     container_name: catalyst-db
-    platform: linux/amd64
     networks: 
       - catalyst
     restart: always
-    image: arcusic/catalyst_db:main
+    build:
+      context: .
+      network: host
+      dockerfile: Catalyst/Redistributables/SQL/Dockerfile
     volumes:
       - data:/mssql
     secrets:
