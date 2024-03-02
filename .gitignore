@@ -405,3 +405,4 @@ ASALocalRun/
 .localhistory/
 Catalyst/AlphaBuildDate.txt
 Catalyst/BuildDate.txt
+Catalyst/Redistributables/SQL/secrets/sa_password.txt

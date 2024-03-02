@@ -4,6 +4,10 @@ name: the-catalyst
 volumes:
   data:
 
+secrets:
+  sa_password:
+    file: ./Catalyst/Redistributables/SQL/secrets/sa_password.txt
+
 networks:
   catalyst:
     name: catalyst
@@ -12,7 +16,6 @@ networks:
 services:
   catalyst:
     container_name: catalyst-dev
-    # network_mode: host
     networks: 
       - catalyst
     restart: always
@@ -25,7 +28,6 @@ services:
 
   mssql:
     container_name: catalyst-db
-    # network_mode: host
     networks: 
       - catalyst
     restart: always
@@ -35,9 +37,11 @@ services:
       dockerfile: Catalyst/Redistributables/SQL/Dockerfile
     volumes:
       - data:/mssql
+    secrets:
+      - sa_password
     environment:
       ACCEPT_EULA: y
-      SA_PASSWORD: "InitialPassword1!"
+      SA_PASSWORD: /run/secrets/sa_password
       MSSQL_PID: Developer
       MSSQL_TCP_PORT: 1433
       MSSQL_BACKUP_DIR: /mssql/backup
