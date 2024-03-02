@@ -10,6 +10,7 @@ RUN apt-get update \
  && apt-get -y upgrade
 RUN apt-get clean \
  && rm -rf /var/lib/apt/lists/*
+COPY ./Catalyst/Redistributables/SQL/secrets/entrypoint.sh /entrypoint.sh
 RUN mkdir -p /mssql/backup
 RUN mkdir -p /mssql/data
 RUN mkdir -p /mssql/log
@@ -18,4 +19,7 @@ RUN chown -R mssql:mssql /mssql/backup
 RUN chown -R mssql:mssql /mssql/data
 RUN chown -R mssql:mssql /mssql/log
 RUN chown -R mssql:mssql /mssql/dump
+RUN chown mssql:mssql /entrypoint.sh
 USER mssql
+RUN chmod +x /entrypoint.sh
+CMD ["/entrypoint.sh"]

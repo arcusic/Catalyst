@@ -1,18 +1,6 @@
 version: '3.4'
 name: the-catalyst
 
-volumes:
-  data:
-
-secrets:
-  sa_password:
-    file: ./Catalyst/Redistributables/SQL/secrets/sa_password.txt
-
-networks:
-  catalyst:
-    name: catalyst
-    driver: bridge
-
 services:
   catalyst:
     container_name: catalyst-dev
@@ -38,10 +26,10 @@ services:
     volumes:
       - data:/mssql
     secrets:
-      - sa_password
+      - SA_Password
     environment:
       ACCEPT_EULA: y
-      SA_PASSWORD: /run/secrets/sa_password
+      SA_PASSWORD_FILE: /run/secrets/sa_password
       MSSQL_PID: Developer
       MSSQL_TCP_PORT: 1433
       MSSQL_BACKUP_DIR: /mssql/backup
@@ -51,3 +39,15 @@ services:
       MSSQL_MASTER_DATA_FILE: /mssql/data/master.mdf
       MSSQL_MASTER_LOG_FILE: /mssql/log/mastlog.ldf
       MSSQL_ERROR_LOG_FILE: /mssql/log/errorlog
+  
+volumes:
+  data:
+
+secrets:
+  sa_password:
+    file: ./Catalyst/Redistributables/SQL/secrets/sa_password.txt
+
+networks:
+  catalyst:
+    name: catalyst
+    driver: bridge
