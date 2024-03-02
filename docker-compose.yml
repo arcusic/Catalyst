@@ -3,7 +3,7 @@ name: the-catalyst
 
 services:
   catalyst:
-    container_name: catalyst-dev
+    container_name: catalyst
     platform: linux/amd64
     networks: 
       - catalyst
