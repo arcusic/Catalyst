@@ -567,7 +567,7 @@ public class CommandHandler : ICommandHandler
                 60000);
             await Logger.Log(LogSeverity.Debug, "UPSInputObtained", $"Successfully obtained Input Voltage Frequency from UPS. {inputResult[0].Data.ToString()}");
 
-            await command.ModifyOriginalResponseAsync(msg => msg.Content = $"Executing infrastructure health check... please wait.\n\n`CURRENT STATUS:`  Gathering Topology Information...");
+            await command.ModifyOriginalResponseAsync(msg => msg.Content = $"Executing infrastructure health check... please wait.\n\n`CURRENT STATUS:`  Gathering Infrastructure Status...");
 
             //create network device array
             string[,] networkDevices = new string[,]
@@ -620,7 +620,10 @@ public class CommandHandler : ICommandHandler
                     networkDevices[x, 2] = ":x:";
                     networkDevices[x, 3] = "**OFFLINE**";
                 }
+                
                 x++;
+                int totalProgress = (int)((double)x / networkDevices.GetLength(0) * 100);
+                await command.ModifyOriginalResponseAsync(msg => msg.Content = $"Executing infrastructure health check... please wait.\n\n`CURRENT STATUS:`  Gathering Infrastructure Status... (" + totalProgress + "%)");
             }
 
             await command.ModifyOriginalResponseAsync(msg => msg.Content = $"Executing infrastructure health check... please wait.\n\n`CURRENT STATUS:`  Spawning a PowerShell Instance...");
@@ -640,8 +643,9 @@ public class CommandHandler : ICommandHandler
             await command.ModifyOriginalResponseAsync(msg => msg.Content = $"Executing infrastructure health check... please wait.\n\n`CURRENT STATUS:`  Executing Speed Test...");
             await Logger.Log(LogSeverity.Debug, "SpeedTestStarting", $"Launching speedtest... Please Wait.");
             var psOutput = psInstance.Invoke();
-
+            await command.ModifyOriginalResponseAsync(msg => msg.Content = $"Executing infrastructure health check... please wait.\n\n`CURRENT STATUS:`  Executing Speed Test... Done!");
             psInstance.Dispose();
+
             await Logger.Log(LogSeverity.Debug, "SpeedTestResults", $"{psOutput[0]}");
             await Logger.Log(LogSeverity.Debug, "SpeedTestResults", $"{psOutput[1]}");
             await Logger.Log(LogSeverity.Debug, "SpeedTestResults", $"{psOutput[2]}");
@@ -658,7 +662,7 @@ public class CommandHandler : ICommandHandler
             await Logger.Log(LogSeverity.Debug, "SpeedTestResults", $"{psOutput[13]}");
             await Logger.Log(LogSeverity.Debug, "SpeedTestResults", $"{psOutput[0]}");
 
-            await command.ModifyOriginalResponseAsync(msg => msg.Content = $"Executing infrastructure health check... please wait.\n\n`CURRENT STATUS:`  Converting retreived data to human-readable format...");
+            await command.ModifyOriginalResponseAsync(msg => msg.Content = $"Executing infrastructure health check... please wait.\n\n`CURRENT STATUS:`  Converting Data to Human-Readable Format...");
             decimal tempF = Convert.ToDecimal(tempResult[0].Data.ToString()) / 10;
             decimal tempC = (tempF - 32) * 5 / 9;
             decimal inputFrequency = Convert.ToDecimal(inputResult[0].Data.ToString()) / 10;
@@ -724,7 +728,6 @@ public class CommandHandler : ICommandHandler
                 runStatus = ":white_check_mark:";
             }
             typingState.Dispose();
-            await command.ModifyOriginalResponseAsync(msg => msg.Content = $"Executing infrastructure health check... please wait.\n\n`CURRENT STATUS:`  Analyzing Environmental Health... (99%)");
 
             await command.ModifyOriginalResponseAsync(msg => msg.Content = $"Executing infrastructure health check... please wait.\n\n`CURRENT STATUS:`  Analyzing Environmental Health... (100%)");
 
