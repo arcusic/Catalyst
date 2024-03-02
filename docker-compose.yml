@@ -20,7 +20,10 @@ services:
     restart: always
     image: arcusic/catalyst_db:main
     volumes:
-      - data:/mssql
+      - data:/mssql/data
+      - backup:/mssql/backup
+      - log:/mssql/log
+      - dump:/mssql/dump
     secrets:
       - sa_password
     environment:
@@ -38,6 +41,9 @@ services:
   
 volumes:
   data:
+  backup:
+  log:
+  dump:
 
 secrets:
   sa_password:

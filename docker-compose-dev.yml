@@ -3,9 +3,9 @@ name: the-catalyst-dev
 
 services:
   catalyst:
-    container_name: catalyst
+    container_name: catalyst-dev
     networks: 
-      - catalyst
+      - catalyst-dev
     restart: always
     build:
       context: .
@@ -15,16 +15,19 @@ services:
         - mssql:database
 
   mssql:
-    container_name: catalyst-db
+    container_name: catalyst-dev-db
     networks: 
-      - catalyst
+      - catalyst-dev
     restart: always
     build:
       context: .
       network: host
       dockerfile: Catalyst/Redistributables/SQL/Dockerfile
     volumes:
-      - data:/mssql
+      - data:/mssql/data
+      - backup:/mssql/backup
+      - log:/mssql/log
+      - dump:/mssql/dump
     secrets:
       - sa_password
     environment:
@@ -42,12 +45,15 @@ services:
   
 volumes:
   data:
+  backup:
+  log:
+  dump:
 
 secrets:
   sa_password:
     file: ./Catalyst/Redistributables/SQL/secrets/sa_password.txt
 
 networks:
-  catalyst:
-    name: catalyst
+  catalyst-dev:
+    name: catalyst-dev
     driver: bridge
