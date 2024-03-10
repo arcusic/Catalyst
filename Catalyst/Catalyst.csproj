@@ -42,10 +42,10 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-	  <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="4.8.0" />
-	  <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.8.0" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.8.0" />
-    <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.Common" Version="4.8.0" />
+	  <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="4.9.2" />
+	  <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.9.2" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.9.2" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.Common" Version="4.9.2" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.0" />
     <PackageReference Include="Microsoft.Data.SqlClient.SNI.runtime" Version="5.2.0" />
@@ -88,7 +88,6 @@
     <PackageReference Include="Microsoft.NETCore.Targets" Version="6.0.0-preview.4.21253.7" />
     <PackageReference Include="Microsoft.PowerShell.Commands.Diagnostics" Version="7.4.1" />
     <PackageReference Include="Microsoft.PowerShell.Commands.Management" Version="7.4.1" />
-    <PackageReference Include="Microsoft.PowerShell.Commands.Utility" Version="7.4.1" />
     <PackageReference Include="Microsoft.PowerShell.ConsoleHost" Version="7.4.1" />
     <PackageReference Include="MediatR" Version="12.2.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.2" />
@@ -162,5 +161,8 @@
     <None Update="Redistributables\SpeedTest\speedtest.exe">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Redistributables\SQL\" />
   </ItemGroup>
 </Project>
