@@ -69,7 +69,7 @@ jobs:
       - name: Build Docker image (PR Only)
         if: github.event_name == 'pull_request'
         id: build-pr
-        uses: docker/build-push-action@af5a7ed5ba88268d5278f7203fb52cd833f66d6e
+        uses: docker/build-push-action@2cdde995de11925a030ce8070c3d77a52ffcf1c0
         with:
           context: .
           file: Catalyst/Dockerfile
@@ -80,7 +80,7 @@ jobs:
       - name: Build and Push Docker image
         if: github.event_name != 'pull_request'
         id: build-and-push
-        uses: docker/build-push-action@af5a7ed5ba88268d5278f7203fb52cd833f66d6e
+        uses: docker/build-push-action@2cdde995de11925a030ce8070c3d77a52ffcf1c0
         with:
           context: .
           file: Catalyst/Dockerfile
