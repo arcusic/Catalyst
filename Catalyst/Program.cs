@@ -62,7 +62,7 @@ async Task MainAsync()
     await Bootstrapper.ServiceProvider!.GetRequiredService<ICommandHandler>().InitializeAsync();
 
     List<ApplicationCommandProperties> globalApplicationCommandProperties = new();
-    List<ApplicationCommandProperties> tacticalApplicationCommandProperties = new();
+    List<ApplicationCommandProperties> squidApplicationCommandProperties = new();
 
     //Start Conversion Module
     SlashCommandBuilder conversion = new();
@@ -255,29 +255,29 @@ async Task MainAsync()
 
     SlashCommandBuilder tacticraft_latest_log = new();
     tacticraft_latest_log.WithName("tacticraft_latest_log").WithDescription("Get the latest logs from Tacticraft");
-    tacticalApplicationCommandProperties.Add(tacticraft_latest_log.Build());
+    squidApplicationCommandProperties.Add(tacticraft_latest_log.Build());
     await Logger.Log(LogSeverity.Info, "CMDProvisioned", $"Slash Command {tacticraft_latest_log.Name} provisioned to Guild (994625404243546292) Commands.");
 
     SlashCommandBuilder tacticraft_whitelist = new();
     SlashCommandOptionBuilder tacticraft_whitelist_options = new();
     tacticraft_whitelist_options.WithName("minecraft_username").WithDescription("Minecraft Username").WithRequired(true).WithType(ApplicationCommandOptionType.String);
     tacticraft_whitelist.WithName("tacticraft_whitelist").WithDescription("Whitelist Account for Tacticraft").AddOptions(tacticraft_whitelist_options);
-    tacticalApplicationCommandProperties.Add(tacticraft_whitelist.Build());
+    squidApplicationCommandProperties.Add(tacticraft_whitelist.Build());
     await Logger.Log(LogSeverity.Info, "CMDProvisioned", $"Slash Command {tacticraft_whitelist.Name} provisioned to Guild (994625404243546292) Commands.");
     //End Utility Module
 
     client.ShardReady += async shard =>
     {
-        var tactical = shard.GetGuild(994625404243546292);
+        var squid = shard.GetGuild(1180745976303075348);
 
         await Logger.Log(LogSeverity.Info, "GLOBAL_BLD", $"Processing Global Application Commands...");
         await shard.BulkOverwriteGlobalApplicationCommandsAsync(globalApplicationCommandProperties.ToArray());
         await Logger.Log(LogSeverity.Info, "GLOBAL_BLD", $"Completed Global Application Commands.");
 
         await Logger.Log(LogSeverity.Info, "GUILD_BLD", $"Processing Guild Application Commands...");
-        await Logger.Log(LogSeverity.Info, "GUILD_BLD", $"Processing Tactical Commands...");
+        await Logger.Log(LogSeverity.Info, "GUILD_BLD", $"Processing Squid Commands...");
 #if RELEASE
-        await tactical.BulkOverwriteApplicationCommandAsync(tacticalApplicationCommandProperties.ToArray());
+        await squid.BulkOverwriteApplicationCommandAsync(squidApplicationCommandProperties.ToArray());
         await Logger.Log(LogSeverity.Info, "GUILD_BLD", $"Completed Tactical Commands.");
         await Logger.Log(LogSeverity.Info, "GUILD_BLD", $"Completed Guild Application Commands.");
 #endif
