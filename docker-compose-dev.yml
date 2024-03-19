@@ -18,6 +18,8 @@ services:
     container_name: catalyst-dev-db
     networks: 
       - catalyst-dev
+    ports: 
+      - "1433:1433"
     restart: always
     build:
       context: .
