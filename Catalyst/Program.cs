@@ -253,22 +253,26 @@ async Task MainAsync()
     globalApplicationCommandProperties.Add(epo.Build());
     await Logger.Log(LogSeverity.Info, "CMDProvisioned", $"Slash Command {epo.Name} provisioned to Global Commands.");
 
-    SlashCommandBuilder tacticraft_latest_log = new();
-    tacticraft_latest_log.WithName("tacticraft_latest_log").WithDescription("Get the latest logs from Tacticraft");
-    squidApplicationCommandProperties.Add(tacticraft_latest_log.Build());
-    await Logger.Log(LogSeverity.Info, "CMDProvisioned", $"Slash Command {tacticraft_latest_log.Name} provisioned to Guild (994625404243546292) Commands.");
+    SlashCommandBuilder minecraft_log = new();
+    minecraft_log.WithName("minecraft_log").WithDescription("Get the latest logs from Minecraft");
+    squidApplicationCommandProperties.Add(minecraft_log.Build());
+    await Logger.Log(LogSeverity.Info, "CMDProvisioned", $"Slash Command {minecraft_log.Name} provisioned to Guild (1180745976303075348) Commands.");
 
-    SlashCommandBuilder tacticraft_whitelist = new();
-    SlashCommandOptionBuilder tacticraft_whitelist_options = new();
-    tacticraft_whitelist_options.WithName("minecraft_username").WithDescription("Minecraft Username").WithRequired(true).WithType(ApplicationCommandOptionType.String);
-    tacticraft_whitelist.WithName("tacticraft_whitelist").WithDescription("Whitelist Account for Tacticraft").AddOptions(tacticraft_whitelist_options);
-    squidApplicationCommandProperties.Add(tacticraft_whitelist.Build());
-    await Logger.Log(LogSeverity.Info, "CMDProvisioned", $"Slash Command {tacticraft_whitelist.Name} provisioned to Guild (994625404243546292) Commands.");
+    SlashCommandBuilder minecraft_whitelist = new();
+    SlashCommandOptionBuilder minecraft_whitelist_options = new();
+    minecraft_whitelist_options.WithName("minecraft_username").WithDescription("Minecraft Username").WithRequired(true).WithType(ApplicationCommandOptionType.String);
+    minecraft_whitelist.WithName("minecraft_whitelist").WithDescription("Allow Account for Minecraft").AddOptions(minecraft_whitelist_options);
+    squidApplicationCommandProperties.Add(minecraft_whitelist.Build());
+    await Logger.Log(LogSeverity.Info, "CMDProvisioned", $"Slash Command {minecraft_whitelist.Name} provisioned to Guild (1180745976303075348) Commands.");
     //End Utility Module
 
     client.ShardReady += async shard =>
     {
+        var squid = shard.GetGuild(1212927743805886534);
+
+#if RELEASE
         var squid = shard.GetGuild(1180745976303075348);
+#endif
 
         await Logger.Log(LogSeverity.Info, "GLOBAL_BLD", $"Processing Global Application Commands...");
         await shard.BulkOverwriteGlobalApplicationCommandsAsync(globalApplicationCommandProperties.ToArray());
@@ -276,11 +280,11 @@ async Task MainAsync()
 
         await Logger.Log(LogSeverity.Info, "GUILD_BLD", $"Processing Guild Application Commands...");
         await Logger.Log(LogSeverity.Info, "GUILD_BLD", $"Processing Squid Commands...");
-#if RELEASE
+// #if RELEASE
         await squid.BulkOverwriteApplicationCommandAsync(squidApplicationCommandProperties.ToArray());
-        await Logger.Log(LogSeverity.Info, "GUILD_BLD", $"Completed Tactical Commands.");
+        await Logger.Log(LogSeverity.Info, "GUILD_BLD", $"Completed Squid Commands.");
         await Logger.Log(LogSeverity.Info, "GUILD_BLD", $"Completed Guild Application Commands.");
-#endif
+// #endif
 
         await Logger.Log(LogSeverity.Info, "ShardReady", $"Shard Number {shard.ShardId} is connected and ready!");
     };

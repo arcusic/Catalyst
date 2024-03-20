@@ -82,7 +82,52 @@ public class CommandHandler : ICommandHandler
         var secretClient = new SecretClient(new Uri($"https://{config.GetRequiredSection("KeyVault")["KeyVaultName"]}.vault.azure.net"), new ClientSecretCredential(config.GetRequiredSection("KeyVault")["AzureADTennantId"], config.GetRequiredSection("KeyVault")["AzureADClientId"], config.GetRequiredSection("KeyVault")["AzureADClientSecret"]));
         await Logger.Log(LogSeverity.Debug, "SecretClientConfigured", $"Configured Azure Key Vault client to connect to {secretClient.VaultUri}.");
 
-        if (command.Data.Name == "post_role_message")
+        // if (command.Data.Name == "post_role_message")
+        // {
+        //     var whiteCheckMark = new Emoji("\u2705");
+        //     var redX = new Emoji("\u274C");
+        //     var denied = new Emoji("\uD83D\uDEAB");
+
+        //     await Logger.Log(LogSeverity.Verbose, $"[{command.GuildId}] CommandReceived", $"{command.User.Username}#{command.User.DiscriminatorValue} has invoked {command.CommandName} from the {command.Channel.Name} channel.");
+
+        //     if (command.Channel.Id == 996886356934533260)
+        //     {
+        //         await command.Channel.TriggerTypingAsync();
+
+        //         var embed = new EmbedBuilder
+        //         {
+        //             Title = "Review Updated Roles",
+        //             Description = "__**WARNING:**__ This command will `replace` the current message in #roles.  This cannot be undone.",
+        //             Color = Color.Red,
+        //             Footer = new EmbedFooterBuilder
+        //             {
+        //                 Text = $"Requested by {command.User.Username}#{command.User.DiscriminatorValue}",
+        //                 IconUrl = command.User.GetAvatarUrl()
+        //             },
+        //             Timestamp = DateTime.Now,
+        //             Author = new EmbedAuthorBuilder
+        //             {
+        //                 Name = "The Catalyst",
+        //                 IconUrl = "https://raw.githubusercontent.com/CodingCatalysts/Catalyst/main/Catalyst/Assets/Animated%20Logo/Bot_catalyst.gif"
+        //             },
+        //         };
+
+        //         var buttons = new ComponentBuilder()
+        //             .WithButton("Proceed", "role_proceed", ButtonStyle.Success)
+        //             .WithButton("Abort", "role_abort", ButtonStyle.Danger)
+        //             .Build();
+
+        //         await command.RespondAsync(embed: embed.Build(), components: buttons, ephemeral: true);
+        //     }
+        //     else
+        //     {
+        //         await command.RespondAsync(":no_entry:  ***UNAUTHORIZED***  :no_entry:\n" +
+        //         "You have attempted to execute a privledged command without propper permissions.\n\n" +
+        //         "__**WARNING:**__  This incident has been logged!\n" +
+        //         "*Further attempts to execute a privledged command without authorization may lead to additional action.*", ephemeral: true);
+        //     }
+        // }
+        if (command.Data.Name == "minecraft_whitelist")
         {
             var whiteCheckMark = new Emoji("\u2705");
             var redX = new Emoji("\u274C");
@@ -90,61 +135,16 @@ public class CommandHandler : ICommandHandler
 
             await Logger.Log(LogSeverity.Verbose, $"[{command.GuildId}] CommandReceived", $"{command.User.Username}#{command.User.DiscriminatorValue} has invoked {command.CommandName} from the {command.Channel.Name} channel.");
 
-            if (command.Channel.Id == 996886356934533260)
-            {
-                await command.Channel.TriggerTypingAsync();
-
-                var embed = new EmbedBuilder
-                {
-                    Title = "Review Updated Roles",
-                    Description = "__**WARNING:**__ This command will `replace` the current message in #roles.  This cannot be undone.",
-                    Color = Color.Red,
-                    Footer = new EmbedFooterBuilder
-                    {
-                        Text = $"Requested by {command.User.Username}#{command.User.DiscriminatorValue}",
-                        IconUrl = command.User.GetAvatarUrl()
-                    },
-                    Timestamp = DateTime.Now,
-                    Author = new EmbedAuthorBuilder
-                    {
-                        Name = "The Catalyst",
-                        IconUrl = "https://raw.githubusercontent.com/CodingCatalysts/Catalyst/main/Catalyst/Assets/Animated%20Logo/Bot_catalyst.gif"
-                    },
-                };
-
-                var buttons = new ComponentBuilder()
-                    .WithButton("Proceed", "role_proceed", ButtonStyle.Success)
-                    .WithButton("Abort", "role_abort", ButtonStyle.Danger)
-                    .Build();
-
-                await command.RespondAsync(embed: embed.Build(), components: buttons, ephemeral: true);
-            }
-            else
-            {
-                await command.RespondAsync(":no_entry:  ***UNAUTHORIZED***  :no_entry:\n" +
-                "You have attempted to execute a privledged command without propper permissions.\n\n" +
-                "__**WARNING:**__  This incident has been logged!\n" +
-                "*Further attempts to execute a privledged command without authorization may lead to additional action.*", ephemeral: true);
-            }
-        }
-        if (command.Data.Name == "tacticraft_whitelist")
-        {
-            var whiteCheckMark = new Emoji("\u2705");
-            var redX = new Emoji("\u274C");
-            var denied = new Emoji("\uD83D\uDEAB");
-
-            await Logger.Log(LogSeverity.Verbose, $"[{command.GuildId}] CommandReceived", $"{command.User.Username}#{command.User.DiscriminatorValue} has invoked {command.CommandName} from the {command.Channel.Name} channel.");
-
-            if (command.GuildId == 994625404243546292)
+            if (command.GuildId == 994625404243546292 || command.GuildId == 1212927743805886534)
             {
                 await command.Channel.TriggerTypingAsync();
                 string? mcUser = command.Data.Options.ElementAt(0).Value.ToString();
 
                 var embed = new EmbedBuilder
                 {
-                    Title = $"Tacticraft Terms of Service - {mcUser}",
-                    Description = "__**WARNING:**__ Server Logs on Tacticraft are monitored.\n\n" +
-                    "Griefing is not tolerated on Tacticraft and will result in your access to the server being revoked.\n\n" +
+                    Title = $"Terms of Service - {mcUser}",
+                    Description = "__**WARNING:**__ Server Logs are monitored.\n\n" +
+                    "Griefing is not tolerated and will result in your access to the server being revoked.\n\n" +
                     "By clicking `I Agree` below, you are acknowledging and agreeing to this policy.\n\n `IF THE USER NAME LISTED ABOVE IS NOT CORRECT, CLICK ABORT.`",
                     Color = Color.Red,
                     Footer = new EmbedFooterBuilder
@@ -176,10 +176,10 @@ public class CommandHandler : ICommandHandler
             }
         }
 
-        if (command.Data.Name == "tacticraft_latest_log")
+        if (command.Data.Name == "minecraft_log")
         {
-            var guild = _client.GetGuild(994625404243546292);
-            var role = guild.GetRole(1090505454435708938);
+            var guild = _client.GetGuild(1180745976303075348);
+            var role = guild.GetRole(1181389391575404724);
             var user = _client.GetUser(command.User.Id);
             var roleMember = role.Members.Where(rm => rm.Id == user.Id).FirstOrDefault();
 
@@ -266,51 +266,51 @@ public class CommandHandler : ICommandHandler
             }
         }
 
-        if (command.Data.Name == "emergency_power_off")
-        {
-            var whiteCheckMark = new Emoji("\u2705");
-            var redX = new Emoji("\u274C");
-            var denied = new Emoji("\uD83D\uDEAB");
+        // if (command.Data.Name == "emergency_power_off")
+        // {
+        //     var whiteCheckMark = new Emoji("\u2705");
+        //     var redX = new Emoji("\u274C");
+        //     var denied = new Emoji("\uD83D\uDEAB");
 
-            await Logger.Log(LogSeverity.Verbose, $"[{command.GuildId}] CommandReceived", $"{command.User.Username}#{command.User.DiscriminatorValue} has invoked {command.CommandName} from the {command.Channel.Name} channel.");
+        //     await Logger.Log(LogSeverity.Verbose, $"[{command.GuildId}] CommandReceived", $"{command.User.Username}#{command.User.DiscriminatorValue} has invoked {command.CommandName} from the {command.Channel.Name} channel.");
 
-            if (command.User.Id == 162600879948562432)
-            {
-                await command.Channel.TriggerTypingAsync();
+        //     if (command.User.Id == 162600879948562432)
+        //     {
+        //         await command.Channel.TriggerTypingAsync();
 
-                var embed = new EmbedBuilder
-                {
-                    Title = "Emergency Power Off",
-                    Description = "__**WARNING:**__ This command will `Power Off` the Servers within the Enclosure!",
-                    Color = Color.Red,
-                    Footer = new EmbedFooterBuilder
-                    {
-                        Text = $"Requested by {command.User.Username}#{command.User.DiscriminatorValue}",
-                        IconUrl = command.User.GetAvatarUrl()
-                    },
-                    Timestamp = DateTime.Now,
-                    Author = new EmbedAuthorBuilder
-                    {
-                        Name = "The Catalyst",
-                        IconUrl = "https://raw.githubusercontent.com/CodingCatalysts/Catalyst/main/Catalyst/Assets/Animated%20Logo/Bot_catalyst.gif"
-                    },
-                };
+        //         var embed = new EmbedBuilder
+        //         {
+        //             Title = "Emergency Power Off",
+        //             Description = "__**WARNING:**__ This command will `Power Off` the Servers within the Enclosure!",
+        //             Color = Color.Red,
+        //             Footer = new EmbedFooterBuilder
+        //             {
+        //                 Text = $"Requested by {command.User.Username}#{command.User.DiscriminatorValue}",
+        //                 IconUrl = command.User.GetAvatarUrl()
+        //             },
+        //             Timestamp = DateTime.Now,
+        //             Author = new EmbedAuthorBuilder
+        //             {
+        //                 Name = "The Catalyst",
+        //                 IconUrl = "https://raw.githubusercontent.com/CodingCatalysts/Catalyst/main/Catalyst/Assets/Animated%20Logo/Bot_catalyst.gif"
+        //             },
+        //         };
 
-                var buttons = new ComponentBuilder()
-                    .WithButton("Proceed", "proceed", ButtonStyle.Success)
-                    .WithButton("Abort", "abort", ButtonStyle.Danger)
-                    .Build();
+        //         var buttons = new ComponentBuilder()
+        //             .WithButton("Proceed", "proceed", ButtonStyle.Success)
+        //             .WithButton("Abort", "abort", ButtonStyle.Danger)
+        //             .Build();
 
-                await command.RespondAsync(embed: embed.Build(), components: buttons, ephemeral: true);
-            }
-            else
-            {
-                await command.RespondAsync(":no_entry:  ***UNAUTHORIZED***  :no_entry:\n" +
-                "You have attempted to execute a privledged command without propper permissions.\n\n" +
-                "__**WARNING:**__  This incident has been logged!\n" +
-                "*Further attempts to execute a privledged command without authorization may lead to additional action.*", ephemeral: true);
-            }
-        }
+        //         await command.RespondAsync(embed: embed.Build(), components: buttons, ephemeral: true);
+        //     }
+        //     else
+        //     {
+        //         await command.RespondAsync(":no_entry:  ***UNAUTHORIZED***  :no_entry:\n" +
+        //         "You have attempted to execute a privledged command without propper permissions.\n\n" +
+        //         "__**WARNING:**__  This incident has been logged!\n" +
+        //         "*Further attempts to execute a privledged command without authorization may lead to additional action.*", ephemeral: true);
+        //     }
+        // }
 
         if (command.Data.Name == "status")
         {
@@ -1839,20 +1839,25 @@ public class CommandHandler : ICommandHandler
 
                 string mcUser = component.Message.Embeds.FirstOrDefault()?.Title ?? string.Empty;
 
-                if (component.GuildId == 994625404243546292)
+                if (component.GuildId == 1180745976303075348 || component.GuildId == 1212927743805886534)
                 {
-                    var guild = _client.GetGuild(994625404243546292);
-                    var role = guild.GetRole(1075576019152547942);
+                    var guild = _client.GetGuild(1212927743805886534);
+                    var role = guild.GetRole(1219844340449280091); //TODO: replace role system with database
+                    var channel = _client.GetChannel(1212927745571557430) as IMessageChannel;
+#if RELEASE
+                    var guild = _client.GetGuild(1180745976303075348);
+                    var role = guild.GetRole(1202851469498515486);
+                    var channel = _client.GetChannel(1208520957409362042) as IMessageChannel;
+#endif
                     var user = _client.GetUser(component.User.Id);
-                    var channel = _client.GetChannel(996886356934533260) as IMessageChannel;
                     string[] mcUsersplit = mcUser.Split(" - ");
 
                     var roleMember = role.Members.Where(rm => rm.Id == user.Id).FirstOrDefault();
 
                     if (roleMember == null)
                     {
-                        embed.Description = "__**WARNING:**__ Server Logs on Tacticraft are monitored.\n\n" +
-                        "Griefing is not tolerated on Tacticraft and will result in your access to the server being revoked.\n\n" +
+                        embed.Description = "__**WARNING:**__ Server Logs are monitored.\n\n" +
+                        "Griefing is not tolerated and will result in your access to the server being revoked.\n\n" +
                         "By clicking `I Agree` below, you are acknowledging and agreeing to this policy.\n\n" +
                         $"**Execution has started.**\n" +
                         $"`STATUS:`  Parsing Required Information...";
@@ -1928,52 +1933,53 @@ public class CommandHandler : ICommandHandler
 
                         using var sshClient = new SshClient(connectionInfomc);
                         embed.Color = Color.Gold;
-                        embed.Description = "__**WARNING:**__ Server Logs on Tacticraft are monitored.\n\n" +
-                            "Griefing is not tolerated on Tacticraft and will result in your access to the server being revoked.\n\n" +
+                        embed.Description = "__**WARNING:**__ Server Logs are monitored.\n\n" +
+                            "Griefing is not tolerated and will result in your access to the server being revoked.\n\n" +
                             "By clicking `I Agree` below, you are acknowledging and agreeing to this policy.\n\n" +
                             $"**Execution has started.**\n" +
-                            $"`STATUS:`  Connecting to TACTICRAFT...";
+                            $"`STATUS:`  Connecting to Server API...";
                         await component.ModifyOriginalResponseAsync(msg => msg.Embed = embed.Build());
 
                         sshClient.Connect();
-                        await Logger.Log(LogSeverity.Debug, "SSHClient", $"Successfully connected to FINALIZER.");
+                        await Logger.Log(LogSeverity.Debug, "SSHClient", $"Successfully connected to MULTICRAFT.");
 
                         embed.Color = Color.Orange;
-                        embed.Description = "__**WARNING:**__ Server Logs on Tacticraft are monitored.\n\n" +
-                            "Griefing is not tolerated on Tacticraft and will result in your access to the server being revoked.\n\n" +
+                        embed.Description = "__**WARNING:**__ Server Logs are monitored.\n\n" +
+                            "Griefing is not tolerated and will result in your access to the server being revoked.\n\n" +
                             "By clicking `I Agree` below, you are acknowledging and agreeing to this policy.\n\n" +
                             $"**Execution has started.**\n" +
-                            $"`STATUS:`  Connected to TACTICRAFT.  Whitelisting in progress...";
+                            $"`STATUS:`  Connected to Server API...  Operation in progress...";
                         await component.ModifyOriginalResponseAsync(msg => msg.Embed = embed.Build());
 
-                        var output = sshClient.RunCommand($"mscs send tacticraft whitelist add {mcUsersplit[1]}");
-                        await Logger.Log(LogSeverity.Debug, "SSHClient", $"mscs send tacticraft whitelist add {mcUsersplit[1]} on JUMPBOX.");
+                        var output = sshClient.RunCommand($"mcrcon -P 25579 -p '{powerPassmc.Value.Value}' -w 5 'whitelist add {mcUsersplit[1]}'");
+                        await Logger.Log(LogSeverity.Debug, "SSHClient", $"mscs send minecraft whitelist add {mcUsersplit[1]} on MULTICRAFT.");
 
                         embed.Color = Color.Purple;
-                        embed.Description = "__**WARNING:**__ Server Logs on Tacticraft are monitored.\n\n" +
-                            "Griefing is not tolerated on Tacticraft and will result in your access to the server being revoked.\n\n" +
+                        embed.Description = "__**WARNING:**__ Server Logs are monitored.\n\n" +
+                            "Griefing is not tolerated and will result in your access to the server being revoked.\n\n" +
                             "By clicking `I Agree` below, you are acknowledging and agreeing to this policy.\n\n" +
                             $"**Execution has started.**\n" +
-                            $"`STATUS:`  Disconnecting from TACTICRAFT...";
+                            $"`STATUS:`  Disconnecting from Server API...";
                         await component.ModifyOriginalResponseAsync(msg => msg.Embed = embed.Build());
 
                         sshClient.Disconnect();
                         sshClient.Dispose();
 
-                        var roleAddition = component.User as IGuildUser;
-                        var roleAdded = guild.GetRole(1075576019152547942) as IRole;
+                        //TODO: Add Database Table Entry for Whitelisted User
+                        // var roleAddition = component.User as IGuildUser;
+                        // var roleAdded = guild.GetRole(1075576019152547942) as IRole;
 
-                        if (roleAddition != null)
-                        {
-                            await roleAddition.AddRoleAsync(roleAdded);
-                        }
+                        // if (roleAddition != null)
+                        // {
+                        //     await roleAddition.AddRoleAsync(roleAdded);
+                        // }
 
                         embed.Color = Color.Green;
-                        embed.Description = "__**WARNING:**__ Server Logs on Tacticraft are monitored.\n\n" +
-                            "Griefing is not tolerated on Tacticraft and will result in your access to the server being revoked.\n\n" +
+                        embed.Description = "__**WARNING:**__ Server Logs are monitored.\n\n" +
+                            "Griefing is not tolerated and will result in your access to the server being revoked.\n\n" +
                             "By clicking `I Agree` below, you are acknowledging and agreeing to this policy.\n\n" +
                             $"**Execution has completed.**\n\n" +
-                            $"You can connect to Tacticraft by using `tacticraft.app` as the Server Address.\n" +
+                            $"You can connect to the server by using `tacticraft.app:25569` as the Server Address.\n" +
                             $"A world map is available at https://tacticraft.app";
                         await component.ModifyOriginalResponseAsync(msg => msg.Embed = embed.Build());
 
@@ -1986,11 +1992,11 @@ public class CommandHandler : ICommandHandler
                     }
                     else
                     {
-                        embed.Description = "__**WARNING:**__ Server Logs on Tacticraft are monitored.\n\n" +
-                            "Griefing is not tolerated on Tacticraft and will result in your access to the server being revoked.\n\n" +
+                        embed.Description = "__**WARNING:**__ Server Logs are monitored.\n\n" +
+                            "Griefing is not tolerated and will result in your access to the server being revoked.\n\n" +
                             "By clicking `I Agree` below, you are acknowledging and agreeing to this policy.\n\n" +
                             $"**EXECUTION HAS FAILED:**\n**ERROR 503 (UNAUTHORIZED)**\n\n" +
-                            $"You have already whitelisted A Minecraft Account.\nCommand execution has been blocked.  This incident has been logged.";
+                            $"You have already added A Minecraft Account.\nCommand execution has been blocked.  This incident has been logged.";
                         embed.Color = Color.Red;
                         await component.UpdateAsync(vampire => vampire.Embed = embed.Build());
                         await component.ModifyOriginalResponseAsync(msg => msg.Components = new ComponentBuilder().WithButton("Proceed", "proceed", ButtonStyle.Success, disabled: true).WithButton("Abort", "abort", ButtonStyle.Danger, disabled: true).Build());
