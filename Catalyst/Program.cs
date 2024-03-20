@@ -280,11 +280,10 @@ async Task MainAsync()
 
         await Logger.Log(LogSeverity.Info, "GUILD_BLD", $"Processing Guild Application Commands...");
         await Logger.Log(LogSeverity.Info, "GUILD_BLD", $"Processing Squid Commands...");
-// #if RELEASE
+
         await squid.BulkOverwriteApplicationCommandAsync(squidApplicationCommandProperties.ToArray());
         await Logger.Log(LogSeverity.Info, "GUILD_BLD", $"Completed Squid Commands.");
         await Logger.Log(LogSeverity.Info, "GUILD_BLD", $"Completed Guild Application Commands.");
-// #endif
 
         await Logger.Log(LogSeverity.Info, "ShardReady", $"Shard Number {shard.ShardId} is connected and ready!");
     };
@@ -307,7 +306,7 @@ async Task MainAsync()
             string? version = Assembly.GetEntryAssembly()?.GetName()?.Version?.ToString();
             version = version?.Replace(".0", "");
 
-        #if RELEASE
+#if RELEASE
             if (!File.Exists("/root/.config/ookla/build.txt"))
             {
                 File.WriteAllText("/root/.config/ookla/build.txt", DateTime.UtcNow.ToString());
