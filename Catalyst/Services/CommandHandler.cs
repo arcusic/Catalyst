@@ -178,8 +178,12 @@ public class CommandHandler : ICommandHandler
 
         if (command.Data.Name == "minecraft_log")
         {
+            var guild = _client.GetGuild(1212927743805886534);
+            var role = guild.GetRole(1219844340449280091);
+#if RELEASE
             var guild = _client.GetGuild(1180745976303075348);
             var role = guild.GetRole(1181389391575404724);
+#endif            
             var user = _client.GetUser(command.User.Id);
             var roleMember = role.Members.Where(rm => rm.Id == user.Id).FirstOrDefault();
 
@@ -251,7 +255,7 @@ public class CommandHandler : ICommandHandler
                 using var sftpClient = new SftpClient(connectionInfo);
 
                 sftpClient.Connect();
-                Stream latestLog = sftpClient.OpenRead("/opt/mscs/worlds/tacticraft/logs/latest.log");
+                Stream latestLog = sftpClient.OpenRead("/home/minecraft/multicraft/servers/squidsixx/logs/latest.log");
 
                 await command.RespondWithFileAsync(latestLog, "latest.log", ephemeral: true);
                 sftpClient.Disconnect();
