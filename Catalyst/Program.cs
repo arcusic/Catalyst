@@ -12,6 +12,8 @@ using System.Reflection;
 using System.Net;
 using System.Security.Policy;
 using System.Text.Json;
+using Microsoft.EntityFrameworkCore;
+using Catalyst.Models;
 
 // Initialize Local Configuration File
 var config = new ConfigurationBuilder()
@@ -22,6 +24,15 @@ var config = new ConfigurationBuilder()
 // Initialize Azure KeyVault
 var secretClient = new SecretClient(new Uri($"https://{config.GetRequiredSection("KeyVault")["KeyVaultName"]}.vault.azure.net"), new ClientSecretCredential(config.GetRequiredSection("KeyVault")["AzureADTennantId"], config.GetRequiredSection("KeyVault")["AzureADClientId"], config.GetRequiredSection("KeyVault")["AzureADClientSecret"]));
 await Logger.Log(LogSeverity.Debug, "SecretClientConfigured", $"Configured Azure Key Vault client to connect to {secretClient.VaultUri}.");
+
+var connString = secretClient.GetSecret(config.GetRequiredSection("KeyVault")["ConnStringDev"]);
+
+#if RELEASE
+var connString = secretClient.GetSecret(config.GetRequiredSection("KeyVault")["ConnString"]);
+#endif
+
+var context = new CatalystContext(connString.Value.Value);
+context.Database.Migrate();
 
 #if DEBUG
     var token = secretClient.GetSecret(config.GetRequiredSection("KeyVault")["SecretNameDev"]);
