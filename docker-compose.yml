@@ -52,4 +52,4 @@ secrets:
 networks:
   catalyst:
     name: catalyst
-    driver: bridge
+    driver: host
