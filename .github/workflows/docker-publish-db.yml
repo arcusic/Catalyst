@@ -69,7 +69,7 @@ jobs:
       - name: Build Docker image (MSSQL PR Only)
         if: github.event_name == 'pull_request'
         id: build-pr
-        uses: docker/build-push-action@1ca370b3a9802c92e886402e0dd88098a2533b12
+        uses: docker/build-push-action@5176d81f87c23d6fc96624dfdbcd9f3830bbe445
         with:
           context: .
           file: Catalyst/Redistributables/SQL/Dockerfile
@@ -80,7 +80,7 @@ jobs:
       - name: Build and Push Docker image (MSSQL)
         if: github.event_name != 'pull_request'
         id: build-and-push
-        uses: docker/build-push-action@1ca370b3a9802c92e886402e0dd88098a2533b12
+        uses: docker/build-push-action@5176d81f87c23d6fc96624dfdbcd9f3830bbe445
         with:
           context: .
           file: Catalyst/Redistributables/SQL/Dockerfile
